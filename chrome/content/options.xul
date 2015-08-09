@@ -1,0 +1,10 @@
+<?xml version="1.0"?> 
+<!--
+    Google Tasks sync for Mozilla Thunderbird
+-->
+ 
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<setting pref="extensions.todotxt.todo-txt" type="file" title="Location of todo.txt file" />
+
+</vbox>

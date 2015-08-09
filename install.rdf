@@ -8,6 +8,9 @@
     <em:name>Todo.txt Extension</em:name>
     <em:version>1.0</em:version>
     <em:creator>Roy Kokkelkoren</em:creator>
+
+		<em:optionsURL>chrome://todotxt/content/options.xul</em:optionsURL>
+		<em:optionsType>2</em:optionsType>
    
     <em:targetApplication>
       <Description>

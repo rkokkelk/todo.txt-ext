@@ -8,6 +8,8 @@ window.addEventListener("load", function(e) {
 	calManager.registerCalendar(newCal);
 }, false);
 
-
 function startup() {
+	// May be usefull later
+	// Components.utils.import('resource://gre/modules/Services.jsm');
+	//Services.wm.getMostRecentWindow('navigator:browser').BrowserOpenAddonsMgr('addons://detail/YOUR_ADDON_ID_HERE/preferences');
 }
