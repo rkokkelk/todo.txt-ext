@@ -10,16 +10,16 @@ Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
 
-function calStormCows() {
+function calTodoTxt() {
   this.initProviderBase();
   
   let prefService = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefBranch);
-  stormcowsLogger.debugMode = true;
-  stormcowsLogger.debug("calStormCows");
+  todotxtLogger.debugMode = true;
+  todotxtLogger.debug("calTodoTxt");
 }
 
-calStormCows.prototype = {
+calTodoTxt.prototype = {
   __proto__: cal.ProviderBase.prototype,
   
   classID: Components.ID("{62227ad7-1b03-4ada-b640-8d794157cda3}"),
@@ -80,7 +80,7 @@ calStormCows.prototype = {
   },
   
   getCachedItems: function cSC_getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
-    stormcowsLogger.debug('calStormCows.js:getCachedItems() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:getCachedItems() (' + this.name + ')');
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
@@ -112,7 +112,7 @@ calStormCows.prototype = {
    * nsISupports
    */
   QueryInterface: function (aIID) {
-    return cal.doQueryInterface(this, calStormCows.prototype, aIID, null, this);
+    return cal.doQueryInterface(this, calTodoTxt.prototype, aIID, null, this);
   },
   
   /*
@@ -138,7 +138,7 @@ calStormCows.prototype = {
    * calICalendar interface
    */
   get type() {
-    return "stormcows";
+    return "todotxt";
   },
 
   get canRefresh() {
@@ -157,7 +157,7 @@ calStormCows.prototype = {
   },
 
   refresh: function cSC_refresh() {
-    stormcowsLogger.debug('calStormCows.js:refresh() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:refresh() (' + this.name + ')');
     
     // setting the last sync to null forces the next getItems call to make an API request rather than returning a cached result
     this.mLastSync = null;
@@ -165,12 +165,12 @@ calStormCows.prototype = {
   },
   
   addItem: function cSC_addItem(aItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:addItem()');
+    todotxtLogger.debug('calTodotxt.js:addItem()');
     return this.adoptItem(aItem.clone(), aListener);
   },
   
   adoptItem: function cSC_adoptItem(aItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:adoptItem()');
+    todotxtLogger.debug('calTodotxt.js:adoptItem()');
     
     try {    
       let isEvent = aItem.isCompleted == null;
@@ -189,7 +189,7 @@ calStormCows.prototype = {
       };
       rtmClient.request('add', data);
     } catch (e) {
-      stormcowsLogger.debug('calStormCows.js:adoptItem()', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:adoptItem()', 'ERROR');
       
       this.notifyOperationComplete(aListener,
                                     e.result,
@@ -200,7 +200,7 @@ calStormCows.prototype = {
   },
   
   adoptItem_callback: function cSC_adoptItem_callback(aStatus, aItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:adoptItem_callback()');
+    todotxtLogger.debug('calTodotxt.js:adoptItem_callback()');
         
     if (aStatus == rtmClient.results.RTM_API_OK) {
       this.mTaskCache[this.id][aItem.id] = aItem;
@@ -212,7 +212,7 @@ calStormCows.prototype = {
                                     aItem);
       this.observers.notify("onAddItem", [aItem]);
     } else {
-      stormcowsLogger.debug('calStormCows.js:adoptItem_callback', 'Got an error from the API request');
+      todotxtLogger.debug('calTodotxt.js:adoptItem_callback', 'Got an error from the API request');
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_ERROR_UNEXPECTED,
                                     Components.interfaces.calIOperationListener.ADD,
@@ -222,7 +222,7 @@ calStormCows.prototype = {
   },
   
   modifyItem: function cSC_modifyItem(aNewItem, aOldItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:modifyItem()');
+    todotxtLogger.debug('calTodotxt.js:modifyItem()');
     
     try {
       let data = {
@@ -233,7 +233,7 @@ calStormCows.prototype = {
       };
       rtmClient.request('modify', data);
     } catch (e) {
-      stormcowsLogger.debug('calStormCows.js:modifyItem()', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:modifyItem()', 'ERROR');
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.MODIFY,
@@ -243,7 +243,7 @@ calStormCows.prototype = {
   },
   
   modifyItem_callback: function cSC_modifyItem_callback(aStatus, aNewItem, aOldItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:modifyItem_callback()');
+    todotxtLogger.debug('calTodotxt.js:modifyItem_callback()');
     
     if (aStatus == rtmClient.results.RTM_API_OK) {
       this.mTaskCache[this.id][aNewItem.id] = aNewItem;
@@ -255,7 +255,7 @@ calStormCows.prototype = {
                                    aNewItem);
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
     } else {
-      stormcowsLogger.debug('calStormCows.js:modifyItem_callback()', 'Got an error from the API request');
+      todotxtLogger.debug('calTodotxt.js:modifyItem_callback()', 'Got an error from the API request');
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_ERROR_UNEXPECTED,
                                    Components.interfaces.calIOperationListener.MODIFY,
@@ -265,7 +265,7 @@ calStormCows.prototype = {
   },
 
   deleteItem: function cSC_deleteItem(aItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:deleteItem()');
+    todotxtLogger.debug('calTodotxt.js:deleteItem()');
     
     try {
       let data = {
@@ -275,7 +275,7 @@ calStormCows.prototype = {
       };
       rtmClient.request('delete', data);
     } catch (e) {
-      stormcowsLogger.debug('calStormCows.js:deleteItem()', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:deleteItem()', 'ERROR');
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.DELETE,
@@ -285,7 +285,7 @@ calStormCows.prototype = {
   },
   
   deleteItem_callback: function cSC_deleteItem_callback(aStatus, aItem, aListener) {
-    stormcowsLogger.debug('calStormCows.js:deleteItem_callback()');
+    todotxtLogger.debug('calTodotxt.js:deleteItem_callback()');
     
     if (aStatus == rtmClient.results.RTM_API_OK) {    
       delete this.mTaskCache[this.id][aItem.id];
@@ -297,7 +297,7 @@ calStormCows.prototype = {
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
     } else {
-      stormcowsLogger.debug('calStormCows.js:deleteItem_callback()', 'Got an error from the API request');
+      todotxtLogger.debug('calTodotxt.js:deleteItem_callback()', 'Got an error from the API request');
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_ERROR_UNEXPECTED,
                                     Components.interfaces.calIOperationListener.DELETE,
@@ -307,12 +307,12 @@ calStormCows.prototype = {
   },
 
   getItem: function cSC_getItem(aId, aListener) {
-    stormcowsLogger.debug('calStormCows.js:getItem()');
+    todotxtLogger.debug('calTodotxt.js:getItem()');
     // do we need to implement something here?
   },
   
   getItems: function cSC_getItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
-    stormcowsLogger.debug('calStormCows.js:getItems() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')');
     
     // we have to initialize these, and the calendar ID property isn't available
     // when the constructor is called
@@ -368,7 +368,7 @@ calStormCows.prototype = {
         }
       }
     } catch (e) {
-      stormcowsLogger.debug('calStormCows.js:getItems() (' + this.name + ')', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR');
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.GET,
@@ -378,7 +378,7 @@ calStormCows.prototype = {
   },
   
   getItems_callback: function cSC_getItems_callback(aStatus, aItems, aListener) {
-    stormcowsLogger.debug('calStormCows.js:getItems_callback() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:getItems_callback() (' + this.name + ')');
     
     let calItemType;
     if (this.itemType == 'events') {
@@ -403,7 +403,7 @@ calStormCows.prototype = {
                                     null);
     } else {
       if (aStatus == rtmClient.results.RTM_API_OK) {
-        stormcowsLogger.debug('calStormCows.js:getItems_callback()', 'Refreshing the task cache');
+        todotxtLogger.debug('calTodotxt.js:getItems_callback()', 'Refreshing the task cache');
         this.mTaskCache[this.id] = {};
         for (let i=0; i<aItems.length; i++) {
           let item = aItems[i];
@@ -423,7 +423,7 @@ calStormCows.prototype = {
                                       null,
                                       null);
       } else {
-        stormcowsLogger.debug('calStormCows.js:getItems_callback()', 'Got an error from the API request.');
+        todotxtLogger.debug('calTodotxt.js:getItems_callback()', 'Got an error from the API request.');
         this.notifyOperationComplete(aListener,
                                       Components.results.NS_ERROR_UNEXPECTED,
                                       Components.interfaces.calIOperationListener.GET,
@@ -435,17 +435,17 @@ calStormCows.prototype = {
 
   startBatch: function cSC_startBatch()
   {
-    stormcowsLogger.debug('calStormCows.js:startBatch()');
+    todotxtLogger.debug('calTodotxt.js:startBatch()');
   },
   
   endBatch: function cSC_endBatch()
   {
-    stormcowsLogger.debug('calStormCows.js:endBatch()');
+    todotxtLogger.debug('calTodotxt.js:endBatch()');
   }
 };
 
 
 /** Module Registration */
 function NSGetFactory(cid) {
-  return (XPCOMUtils.generateNSGetFactory([calStormCows]))(cid);
+  return (XPCOMUtils.generateNSGetFactory([calTodoTxt]))(cid);
 }

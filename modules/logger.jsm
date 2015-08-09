@@ -1,9 +1,9 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 
 
-EXPORTED_SYMBOLS = ['stormcowsLogger'];
+EXPORTED_SYMBOLS = ['todotxtLogger'];
 
-let stormcowsLogger = {
+let todotxtLogger = {
   
   mDebugMode: false,
   
