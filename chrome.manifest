@@ -1,0 +1,4 @@
+content     todotxt   chrome/content/
+resource 		todotxt 	modules/
+manifest 		components/calTodotxt.manifest
+overlay chrome://lightning/content/messenger-overlay-sidebar.xul chrome://todotxt/content/todotxt.xul

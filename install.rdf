@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>todotxt@xseth.nl</em:id>
+    <em:name>Todo.txt Extension</em:name>
+    <em:version>1.0</em:version>
+    <em:creator>Roy Kokkelkoren</em:creator>
+   
+    <em:targetApplication>
+      <Description>
+        <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
+        <em:minVersion>1.5</em:minVersion>
+        <em:maxVersion>5.0.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+   
+  </Description>      
+</RDF>
