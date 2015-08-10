@@ -1,19 +1,29 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
+Components.utils.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
-	let calManager = cal.getCalendarManager();
-	let url = cal.makeURL('todotxt://_unused');
-	let newCal = calManager.createCalendar('todotxt',url);
+	var ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+	var calManager = cal.getCalendarManager();
+	let found = false;
 
-	var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-	                    .getService(Components.interfaces.nsIPrefService);
-	prefs = prefs.getBranch("extensions.todotxt.");
-	newCal.name = "Todo.txt";
-	calManager.registerCalendar(newCal);
+	for each (calendar in calManager.getCalendars({})){
+		todotxtLogger.debug("overlay.js: providerID"+calendar.id);
+		if(calendar.providerID == ID){
+			todotxtLogger.debug("overlay.js: Calendar found");
+			found = true;
+			break;
+		}
+	}
+
+	if(!found){
+		createCal(calManager);
+	}
 }, false);
 
-function startup() {
-	// May be usefull later
-	// Components.utils.import('resource://gre/modules/Services.jsm');
-	//Services.wm.getMostRecentWindow('navigator:browser').BrowserOpenAddonsMgr('addons://detail/YOUR_ADDON_ID_HERE/preferences');
+function createCal(calManager){
+	todotxtLogger.debug("overlay.js: Create calendar");
+	let url = cal.makeURL('todotxt://_unused');
+	let newCal = calManager.createCalendar('todotxt',url);
+	newCal.name = "Todo.txt";
+	calManager.registerCalendar(newCal);
 }

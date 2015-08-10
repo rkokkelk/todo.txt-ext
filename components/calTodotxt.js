@@ -38,7 +38,7 @@ function calTodoTxt() {
 calTodoTxt.prototype = {
   __proto__: cal.ProviderBase.prototype,
   
-  classID: Components.ID("{62227ad7-1b03-4ada-b640-8d794157cda3}"),
+  classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
   contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
   classDescription: "TodoTxt",
   
@@ -156,6 +156,10 @@ calTodoTxt.prototype = {
   get type() {
     return "todotxt";
   },
+
+  get providerID() {
+  	return "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+	},
 
   get canRefresh() {
     return true;
@@ -342,48 +346,9 @@ calTodoTxt.prototype = {
       let wantEvents = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT) != 0);
       let wantTodos = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_TODO) != 0);
       
-      if ((this.itemType == 'events' && !wantEvents) ||
-           (this.itemType == 'todos' && !wantTodos)) {
-        this.notifyOperationComplete(aListener,
-                                      Components.results.NS_OK,
-                                      Components.interfaces.calIOperationListener.GET,
-                                      null,
-                                      null);
-      } else {
-        if (!this.mLastSync) {
-          this.mLastSync = new Date();
-          this.pendingApiRequest = true;
-          
-          let data = {
-            calendar: this,
-            itemType: this.itemType,
-            listId: this.listId,
-            calListener: aListener,
-            callback: this.getItems_callback.bind(this)
-          };
-          
-          rtmClient.request('get', data);
-        } else {
-          if (this.pendingApiRequest) {
-            // this means we've issued an API request and we're waiting for a response
-            // we wait until the response comes in before we check the task cache
-            // otherwise, we may get an old result, or it may be empty
-            let apiRequestListener = {
-              callback: this.getCachedItems,
-              itemFilter: aItemFilter,
-              count: aCount,
-              fromDate: aRangeStart,
-              toDate: aRangeEnd,
-              listener: aListener
-            };
-            this.mPendingApiRequestListeners[this.id].push(apiRequestListener);
-          } else {
-            this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
-          }
-        }
-      }
+     	todotxtLogger.debug('calTodotxt.js:getItems() (In else, todo length: '+todo.length);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.GET,
