@@ -11,6 +11,7 @@ Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
+Components.utils.import("resource://todotxt/todoclient.js");
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
@@ -23,16 +24,6 @@ function calTodoTxt() {
 
   todotxtLogger.debugMode = true;
   todotxtLogger.debug("calTodoTxt");
-
-  todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-	todotxtLogger.debug("Todo: "+todoFile.leafName);
-
-	let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-		              createInstance(Components.interfaces.nsIFileInputStream);
-	fstream.init(todoFile, -1, 0, 0);
-	let data = NetUtil.readInputStreamToString(fstream, fstream.available());
-	var todo = TodoTxt.parseFile(data);
-	todotxtLogger.debug("Todo's Length: "+todo.length);
 }
 
 calTodoTxt.prototype = {
@@ -63,7 +54,7 @@ calTodoTxt.prototype = {
   mTaskCache: {},
   mPendingApiRequest: false,
   mPendingApiRequestListeners: {},
-  
+
   get pendingApiRequest() {
     return this.mPendingApiRequest;
   },
@@ -346,7 +337,16 @@ calTodoTxt.prototype = {
       let wantEvents = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT) != 0);
       let wantTodos = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_TODO) != 0);
       
-     	todotxtLogger.debug('calTodotxt.js:getItems() (In else, todo length: '+todo.length);
+    	items = todoClient.getItems(this);
+     	todotxtLogger.debug('calTodotxt.js:getItems() (In else, items length: '+items.length);
+
+    	aListener.onGetResult(this.superCalendar,
+    												Components.results.NS_OK,
+    												Components.interfaces.calITodo,
+    												null,
+    												items.length,
+    												items);
+    	this.notifyOperationComplete(aListener, Components.results.NS_OK,Components.interfaces.calIOperationListener.GET,null,null);
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,
