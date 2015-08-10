@@ -4,19 +4,35 @@
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/FileUtils.jsm");
+Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
+Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
   
-  let prefService = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefBranch);
+  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
+
+	prefs = prefs.getBranch("extensions.todotxt.");
+
   todotxtLogger.debugMode = true;
   todotxtLogger.debug("calTodoTxt");
+
+  todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+	todotxtLogger.debug("Todo: "+todoFile.leafName);
+
+	let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+		              createInstance(Components.interfaces.nsIFileInputStream);
+	fstream.init(todoFile, -1, 0, 0);
+	let data = NetUtil.readInputStreamToString(fstream, fstream.available());
+	var todo = TodoTxt.parseFile(data);
+	todotxtLogger.debug("Todo's Length: "+todo.length);
 }
 
 calTodoTxt.prototype = {
@@ -33,7 +49,7 @@ calTodoTxt.prototype = {
                     Components.interfaces.nsISupports];
     count.value = ifaces.length;
     return ifaces;
-  },
+	},
   
   getHelperForLanguage: function getHelperForLanguage(language) {
     return null;
@@ -113,7 +129,7 @@ calTodoTxt.prototype = {
    */
   QueryInterface: function (aIID) {
     return cal.doQueryInterface(this, calTodoTxt.prototype, aIID, null, this);
-  },
+	},
   
   /*
    * calICalendarProvider interface
@@ -187,7 +203,6 @@ calTodoTxt.prototype = {
         calListener: aListener,
         callback: this.adoptItem_callback.bind(this)
       };
-      rtmClient.request('add', data);
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js:adoptItem()', 'ERROR');
       

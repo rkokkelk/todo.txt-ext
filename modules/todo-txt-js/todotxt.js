@@ -1,4 +1,5 @@
 
+EXPORTED_SYMBOLS = ['TodoTxt'];
 
 var TodoTxt = (function () {
   var SORT_ASC = 'asc';

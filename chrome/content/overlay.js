@@ -4,6 +4,10 @@ window.addEventListener("load", function(e) {
 	let calManager = cal.getCalendarManager();
 	let url = cal.makeURL('todotxt://_unused');
 	let newCal = calManager.createCalendar('todotxt',url);
+
+	var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+	                    .getService(Components.interfaces.nsIPrefService);
+	prefs = prefs.getBranch("extensions.todotxt.");
 	newCal.name = "Todo.txt";
 	calManager.registerCalendar(newCal);
 }, false);
