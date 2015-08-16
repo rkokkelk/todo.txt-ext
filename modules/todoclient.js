@@ -37,16 +37,30 @@ let todoClient = {
 	getItems: function(calendar){
 		let todo = this.getTodo();
 		let items = [];
+		let tzService = cal.getTimezoneService();
 
-		for each(todoItem in todo.items()){
+		for each(todoItem in todo.items({isComplete: false},'priority')){
 			item = cal.createTodo();
-			item.title = todoItem.render();
+
+			item.title = todoItem.textTokens().toString();
 			item.calendar = calendar;
 			item.id = todoItem.id();
+
+			if(todoItem.priority() != null)
+				item.priority = todoItem.priority().charCodeAt(0)-64;
+
+			if(todoItem.createdDate() != null){
+				let createDate = cal.createDateTime();
+				createDate.jsDAte = todoItem.createdDate();
+				createDate = createDate.getInTimezone(tzService.defaultTimezone);
+				item.startDate = createDate;
+			}
+
 			items.push(item);
 		}
 		return items;
 	},
+	
   
   request: function(aOperation, aData) {
     stormcowsLogger.debug('rtmclient.js:request()');
