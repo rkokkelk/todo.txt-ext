@@ -60,6 +60,29 @@ let todoClient = {
 		}
 		return items;
 	},
+
+	writeTodo: function(){
+			let todo = this.getTodo();
+			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+															.getService(Components.interfaces.nsIPrefService);
+			prefs = prefs.getBranch("extensions.todotxt.");
+
+			todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+			let ostream = FileUtils.openSafeFileOutputStream(todoFile);
+			let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+											createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+			converter.charset = "UTF-8";
+			let istream = converter.convertToInputStream(todo.render());
+
+			// The last argument (the callback) is optional.
+			NetUtil.asyncCopy(istream, ostream, function(status) {
+				if (!Components.isSuccessCode(status)) {
+					// Handle error!
+					return;
+				}
+
+			todotxtLogger.debug("todoClient.js: written Todo.txt");
+	},
 	
   
   request: function(aOperation, aData) {
