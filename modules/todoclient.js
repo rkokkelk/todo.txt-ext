@@ -50,6 +50,27 @@ let todoClient = {
 		return items;
 	},
 
+  modifyItem: function(oldItem, newItem){
+    let todo = this.getTodo();
+    let found = false;
+
+    for each(todoItem in todo.items()){
+      if(todoItem.id() == newItem.id){
+
+          // TODO: add modify of all properties
+          todoItem.replaceWith(newItem.title);
+          found = true;
+          break;
+      }
+    }
+
+    if(found) 
+      this.writeTodo();
+    else
+      throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+
+  },
+
   deleteItem: function(item){
     let todo = this.getTodo();
     let found = false;

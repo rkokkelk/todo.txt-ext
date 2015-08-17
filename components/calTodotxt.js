@@ -235,29 +235,9 @@ calTodoTxt.prototype = {
   modifyItem: function cSC_modifyItem(aNewItem, aOldItem, aListener) {
     todotxtLogger.debug('calTodotxt.js:modifyItem()');
     
-    try {
-      let data = {
-        newItem: aNewItem,
-        oldItem: aOldItem,
-        calListener: aListener,
-        callback: this.modifyItem_callback.bind(this)
-      };
-      rtmClient.request('modify', data);
-    } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:modifyItem()', 'ERROR');
-      this.notifyOperationComplete(aListener,
-                                    e.result,
-                                    Components.interfaces.calIOperationListener.MODIFY,
-                                    null,
-                                    e.message);
-    }
-  },
-  
-  modifyItem_callback: function cSC_modifyItem_callback(aStatus, aNewItem, aOldItem, aListener) {
-    todotxtLogger.debug('calTodotxt.js:modifyItem_callback()');
-    
-    if (aStatus == rtmClient.results.RTM_API_OK) {
+    try{
       this.mTaskCache[this.id][aNewItem.id] = aNewItem;
+      todoClient.modifyItem(aOldItem, aNewItem);
     
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_OK,
@@ -265,16 +245,17 @@ calTodoTxt.prototype = {
                                    aNewItem.id,
                                    aNewItem);
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
-    } else {
-      todotxtLogger.debug('calTodotxt.js:modifyItem_callback()', 'Got an error from the API request');
+    } catch (e) {
+      todotxtLogger.debug('calTodotxt.js: modifyItem() (' + this.name + ')', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_ERROR_UNEXPECTED,
                                    Components.interfaces.calIOperationListener.MODIFY,
                                    null,
                                    'Unable to modify task.');
+
     }
   },
-
+  
   deleteItem: function cSC_deleteItem(aItem, aListener) {
     todotxtLogger.debug('calTodotxt.js:deleteItem()');
     
