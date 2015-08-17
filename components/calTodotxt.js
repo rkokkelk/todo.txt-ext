@@ -24,6 +24,7 @@ function calTodoTxt() {
 
   todotxtLogger.debugMode = true;
   todotxtLogger.debug("calTodoTxt");
+  myPrefObserver.register();
 }
 
 calTodoTxt.prototype = {
@@ -423,6 +424,34 @@ calTodoTxt.prototype = {
     todotxtLogger.debug('calTodotxt.js:endBatch()');
   }
 };
+
+var myPrefObserver = {
+  register: function() {
+    // For this.branch we ask for the preferences for extensions.myextension. and children
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                      .getService(Components.interfaces.nsIPrefService);
+
+    this.branch = prefs.getBranch("extensions.todotxt.");
+
+    if (!("addObserver" in this.branch))
+        this.branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+
+    // Finally add the observer.
+    this.branch.addObserver("", this, false);
+  },
+
+  unregister: function() {
+    this.branch.removeObserver("", this);
+  },
+
+  observe: function(aSubject, aTopic, aData) {
+    switch (aData) {
+      case "todo-txt":
+        todoClient.setTodo();
+        break;
+    }
+  }
+}
 
 
 /** Module Registration */

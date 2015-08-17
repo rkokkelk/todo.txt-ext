@@ -13,26 +13,15 @@ let todoClient = {
 
 	todo: null,
 
-  getInterface: cal.InterfaceRequestor_getInterface,
+    getInterface: cal.InterfaceRequestor_getInterface,
 
-  getTodo: function(){
+    getTodo: function(){
   	
-  	if(!this.todo){
-			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-															.getService(Components.interfaces.nsIPrefService);
-			prefs = prefs.getBranch("extensions.todotxt.");
-
-			todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-			let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-														createInstance(Components.interfaces.nsIFileInputStream);
-
-			fstream.init(todoFile, -1, 0, 0);
-			let data = NetUtil.readInputStreamToString(fstream, fstream.available());
-			this.todo = TodoTxt.parseFile(data);
-			todotxtLogger.debug("todoClient.js:create() "+todo.length);
-		}
+     	if(!this.todo){
+     	  this.setTodo();
+		  }
   	return this.todo;
-  },
+    },
 
 	getItems: function(calendar){
 		let todo = this.getTodo();
@@ -61,27 +50,48 @@ let todoClient = {
 		return items;
 	},
 
-	writeTodo: function(){
-			let todo = this.getTodo();
+  setTodo: function(){
+    //TODO: update task list in view
 			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
 															.getService(Components.interfaces.nsIPrefService);
 			prefs = prefs.getBranch("extensions.todotxt.");
 
-			todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-			let ostream = FileUtils.openSafeFileOutputStream(todoFile);
-			let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-											createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-			converter.charset = "UTF-8";
-			let istream = converter.convertToInputStream(todo.render());
+			if(prefs.prefHasUserValue('todo-txt')){
 
-			// The last argument (the callback) is optional.
-			NetUtil.asyncCopy(istream, ostream, function(status) {
-				if (!Components.isSuccessCode(status)) {
-					// Handle error!
-					return;
-				}
+        todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+        let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+                              createInstance(Components.interfaces.nsIFileInputStream);
 
-			todotxtLogger.debug("todoClient.js: written Todo.txt");
+        fstream.init(todoFile, -1, 0, 0);
+        let data = NetUtil.readInputStreamToString(fstream, fstream.available());
+        this.todo = TodoTxt.parseFile(data);
+        todotxtLogger.debug("todoClient.js: Todo.txt parsed");
+      }else
+        this.todo = TodoTxt.create();
+  },
+
+	writeTodo: function(){
+        let todo = this.getTodo();
+        var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                                                        .getService(Components.interfaces.nsIPrefService);
+        prefs = prefs.getBranch("extensions.todotxt.");
+
+        todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+        let ostream = FileUtils.openSafeFileOutputStream(todoFile);
+        let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                                        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+        converter.charset = "UTF-8";
+        let istream = converter.convertToInputStream(todo.render());
+
+        // The last argument (the callback) is optional.
+        NetUtil.asyncCopy(istream, ostream, function(status) {
+            if (!Components.isSuccessCode(status)) {
+                // Handle error!
+                return;
+            }
+        });
+
+        todotxtLogger.debug("todoClient.js: written Todo.txt");
 	},
 	
   
