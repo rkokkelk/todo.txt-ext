@@ -50,6 +50,24 @@ let todoClient = {
 		return items;
 	},
 
+  deleteItem: function(item){
+    let todo = this.getTodo();
+    let found = false;
+    for each(todoItem in todo.items()){
+      if(todoItem.id() == item.id){
+          todo.removeItem(todoItem);
+          found = true;
+          break;
+      }
+    }
+
+    if(found) 
+      this.writeTodo();
+    else
+      throw Components.Exception("Deleted item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+
+  },
+
   setTodo: function(){
     //TODO: update task list in view
 			var prefs = Components.classes["@mozilla.org/preferences-service;1"]

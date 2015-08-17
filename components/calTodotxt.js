@@ -279,14 +279,15 @@ calTodoTxt.prototype = {
     todotxtLogger.debug('calTodotxt.js:deleteItem()');
     
     try {
-      let data = {
-        item: aItem,
-        calListener: aListener,
-        callback: this.deleteItem_callback.bind(this)
-      };
-      rtmClient.request('delete', data);
+      todoClient.deleteItem(aItem);
+      this.notifyOperationComplete(aListener,
+                                    Components.results.NS_OK,
+                                    Components.interfaces.calIOperationListener.DELETE,
+                                    aItem.id,
+                                    aItem);
+      this.observers.notify("onDeleteItem", [aItem]);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:deleteItem()', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js:deleteItem()', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.DELETE,
@@ -295,28 +296,6 @@ calTodoTxt.prototype = {
     }
   },
   
-  deleteItem_callback: function cSC_deleteItem_callback(aStatus, aItem, aListener) {
-    todotxtLogger.debug('calTodotxt.js:deleteItem_callback()');
-    
-    if (aStatus == rtmClient.results.RTM_API_OK) {    
-      delete this.mTaskCache[this.id][aItem.id];
-      
-      this.notifyOperationComplete(aListener,
-                                    Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.DELETE,
-                                    aItem.id,
-                                    aItem);
-      this.observers.notify("onDeleteItem", [aItem]);
-    } else {
-      todotxtLogger.debug('calTodotxt.js:deleteItem_callback()', 'Got an error from the API request');
-      this.notifyOperationComplete(aListener,
-                                    Components.results.NS_ERROR_UNEXPECTED,
-                                    Components.interfaces.calIOperationListener.DELETE,
-                                    null,
-                                    'Unable to delete task.');
-    }
-  },
-
   getItem: function cSC_getItem(aId, aListener) {
     todotxtLogger.debug('calTodotxt.js:getItem()');
     // do we need to implement something here?
