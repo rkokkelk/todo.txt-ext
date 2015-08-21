@@ -119,10 +119,11 @@ calTodoTxt.prototype = {
   /*
    * nsISupports
    */
-  QueryInterface: function (aIID) {
-    return cal.doQueryInterface(this, calTodoTxt.prototype, aIID, null, this);
-	},
-  
+  //TODO: find way for using global parametr
+  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
+                    Components.interfaces.calICalendar,
+                    Components.interfaces.nsIClassInfo]),
+
   /*
    * calICalendarProvider interface
    */
