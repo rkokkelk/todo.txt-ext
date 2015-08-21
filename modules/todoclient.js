@@ -31,24 +31,35 @@ let todoClient = {
 		for each(todoItem in todo.items({isComplete: false},'priority')){
 			item = cal.createTodo();
 
-			item.title = todoItem.textTokens().toString();
+			item.title = this.makeStr(todoItem.textTokens());
 			item.calendar = calendar;
 			item.id = todoItem.id();
 
 			if(todoItem.priority() != null)
-				item.priority = todoItem.priority().charCodeAt(0)-64;
-
-			if(todoItem.createdDate() != null){
-				let createDate = cal.createDateTime();
-				createDate.jsDAte = todoItem.createdDate();
-				createDate = createDate.getInTimezone(tzService.defaultTimezone);
-				item.startDate = createDate;
-			}
+				item.priority = (todoItem.priority().charCodeAt(0)-64)*2;
 
 			items.push(item);
 		}
 		return items;
 	},
+
+  addItem: function(newItem){
+    let todo = this.getTodo();
+    let found = false;
+
+    let todoItem = todo.addItem(newItem.title);
+    todoItem.setCreatedDate(null);
+
+    newItem.id = todoItem.id();
+
+    if(todoItem.priority() != null)
+      newItem.priority = (todoItem.priority().charCodeAt(0)-64)*2;
+
+    newItem.title = this.makeStr(todoItem.textTokens());
+
+    this.writeTodo();
+    return newItem;
+  },
 
   modifyItem: function(oldItem, newItem){
     let todo = this.getTodo();
@@ -68,7 +79,6 @@ let todoClient = {
       this.writeTodo();
     else
       throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
-
   },
 
   deleteItem: function(item){
@@ -838,6 +848,18 @@ let todoClient = {
     } else {
       return Array.isArray(val) ? val : [val];
     }
+  },
+
+  makeStr: function(array){
+    let result = "";
+    for(let i=0; i<array.length;i++){
+      result += array[i];
+
+      if(i != array.length -1)
+        result += " ";
+    }
+
+    return result;
   },
   
   makeDateStr: function(date) {

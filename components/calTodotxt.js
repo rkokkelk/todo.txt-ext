@@ -185,50 +185,21 @@ calTodoTxt.prototype = {
     todotxtLogger.debug('calTodotxt.js:adoptItem()');
     
     try {    
-      let isEvent = aItem.isCompleted == null;
-      if (this.itemType == 'events' && !isEvent) {
-        throw new Components.Exception('This calendar only accepts events.', Components.results.NS_ERROR_UNEXPECTED);
-      }
-      if (this.itemType == 'todos' && isEvent) {
-        throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
-      }
-      
-      let data = {
-        item: aItem,
-        listId: this.listId,
-        calListener: aListener,
-        callback: this.adoptItem_callback.bind(this)
-      };
+      let item = todoClient.addItem(aItem);
+      this.notifyOperationComplete(aListener,
+                                    Components.results.NS_OK,
+                                    Components.interfaces.calIOperationListener.ADD,
+                                    item.id,
+                                    item);
+      this.observers.notify("onAddItem", [item]);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:adoptItem()', 'ERROR');
+      todotxtLogger.debug('calTodotxt.js: addItem() (' + this.name + ')', 'ERROR ('+e.message+')');
       
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.ADD,
                                     null,
                                     e.message);
-    }
-  },
-  
-  adoptItem_callback: function cSC_adoptItem_callback(aStatus, aItem, aListener) {
-    todotxtLogger.debug('calTodotxt.js:adoptItem_callback()');
-        
-    if (aStatus == rtmClient.results.RTM_API_OK) {
-      this.mTaskCache[this.id][aItem.id] = aItem;
-      
-      this.notifyOperationComplete(aListener,
-                                    Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.ADD,
-                                    aItem.id,
-                                    aItem);
-      this.observers.notify("onAddItem", [aItem]);
-    } else {
-      todotxtLogger.debug('calTodotxt.js:adoptItem_callback', 'Got an error from the API request');
-      this.notifyOperationComplete(aListener,
-                                    Components.results.NS_ERROR_UNEXPECTED,
-                                    Components.interfaces.calIOperationListener.ADD,
-                                    null,
-                                    'Unable to add new task.');
     }
   },
   
@@ -299,7 +270,6 @@ calTodoTxt.prototype = {
       let wantTodos = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_TODO) != 0);
       
     	items = todoClient.getItems(this);
-     	todotxtLogger.debug('calTodotxt.js:getItems() (In else, items length: '+items.length);
 
     	aListener.onGetResult(this.superCalendar,
     												Components.results.NS_OK,
@@ -307,7 +277,11 @@ calTodoTxt.prototype = {
     												null,
     												items.length,
     												items);
-    	this.notifyOperationComplete(aListener, Components.results.NS_OK,Components.interfaces.calIOperationListener.GET,null,null);
+    	this.notifyOperationComplete(aListener, 
+    	                             Components.results.NS_OK,
+    	                             Components.interfaces.calIOperationListener.GET,
+    	                             null,
+    	                             null);
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,
@@ -315,62 +289,6 @@ calTodoTxt.prototype = {
                                     Components.interfaces.calIOperationListener.GET,
                                     null,
                                     e.message);
-    }
-  },
-  
-  getItems_callback: function cSC_getItems_callback(aStatus, aItems, aListener) {
-    todotxtLogger.debug('calTodotxt.js:getItems_callback() (' + this.name + ')');
-    
-    let calItemType;
-    if (this.itemType == 'events') {
-      calItemType = Components.interfaces.calIEvent;
-    } else {
-      calItemType = Components.interfaces.calITodo;
-    }
-    
-    // status code -1 indicates no API call was made and we're returning a cached result
-    // if the result is any other success code, we have to refresh the cache
-    if (aStatus == -1) {
-      aListener.onGetResult(this.superCalendar,
-                            Components.results.NS_OK,
-                            calItemType,
-                            null,
-                            aItems.length,
-                            aItems);
-      this.notifyOperationComplete(aListener,
-                                    Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.GET,
-                                    null,
-                                    null);
-    } else {
-      if (aStatus == rtmClient.results.RTM_API_OK) {
-        todotxtLogger.debug('calTodotxt.js:getItems_callback()', 'Refreshing the task cache');
-        this.mTaskCache[this.id] = {};
-        for (let i=0; i<aItems.length; i++) {
-          let item = aItems[i];
-          this.mTaskCache[this.id][item.id] = item;
-        }
-        this.pendingApiRequest = false;
-        
-        aListener.onGetResult(this.superCalendar,
-                              Components.results.NS_OK,
-                              calItemType,
-                              null,
-                              aItems.length,
-                              aItems);
-        this.notifyOperationComplete(aListener,
-                                      Components.results.NS_OK,
-                                      Components.interfaces.calIOperationListener.GET,
-                                      null,
-                                      null);
-      } else {
-        todotxtLogger.debug('calTodotxt.js:getItems_callback()', 'Got an error from the API request.');
-        this.notifyOperationComplete(aListener,
-                                      Components.results.NS_ERROR_UNEXPECTED,
-                                      Components.interfaces.calIOperationListener.GET,
-                                      null,
-                                      'Unable to get tasks.');
-      }
     }
   },
 
