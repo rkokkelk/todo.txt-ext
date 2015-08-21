@@ -88,28 +88,22 @@ calTodoTxt.prototype = {
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
-    for (let itemId in this.mTaskCache[this.id]) {
+    for (let itemId in taskCache){
       let cachedItem = this.mTaskCache[this.id][itemId];
-      let compDate;
-      if (this.itemType == 'events') {
-        compDate = cachedItem.startDate;
-      } else {
-        compDate = cachedItem.dueDate;
-      }
-      
-      if (!compDate) {
-        items.push(cachedItem);
-      } else {
-        let rangeStartComp = aRangeStart ? compDate.compare(aRangeStart) : 1;
-        let rangeEndComp = aRangeEnd ? compDate.compare(aRangeEnd) : -1;
-        
-        if (rangeStartComp >= 0 && rangeEndComp <= 0) {
-          items.push(cachedItem);
-        }
-      }
+      items.push(cachedItem);
     }
-    
-    this.getItems_callback(-1, items, aListener);
+
+    aListener.onGetResult(this.superCalendar,
+                          Components.results.NS_OK,
+                          Components.interfaces.calITodo,
+                          null,
+                          items.length,
+                          items);
+    this.notifyOperationComplete(aListener, 
+                                  Components.results.NS_OK,
+                                  Components.interfaces.calIOperationListener.GET,
+                                  null,
+                                  null);
   },
   
   /*
@@ -188,6 +182,7 @@ calTodoTxt.prototype = {
                                     Components.interfaces.calIOperationListener.ADD,
                                     item.id,
                                     item);
+      this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js: addItem() (' + this.name + ')', 'ERROR ('+e.message+')');
@@ -212,6 +207,7 @@ calTodoTxt.prototype = {
                                    Components.interfaces.calIOperationListener.MODIFY,
                                    aNewItem.id,
                                    aNewItem);
+      this.mTaskCache[this.id][aNewItem.id] = aNewItem;
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js: modifyItem() (' + this.name + ')', 'ERROR ('+e.message+')');
@@ -229,6 +225,7 @@ calTodoTxt.prototype = {
     
     try {
       todoClient.deleteItem(aItem);
+      delete this.mTaskCache[this.id][aItem.id];
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_OK,
                                     Components.interfaces.calIOperationListener.DELETE,
@@ -263,10 +260,12 @@ calTodoTxt.prototype = {
     }
     
     try {
-      let wantEvents = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_EVENT) != 0);
-      let wantTodos = ((aItemFilter & Components.interfaces.calICalendar.ITEM_FILTER_TYPE_TODO) != 0);
-      
     	items = todoClient.getItems(this);
+    	this.mLastSync = new Date();
+
+    	for each(item in items){
+    	  this.mTaskCache[this.id][item.id] = item;
+      }
 
     	aListener.onGetResult(this.superCalendar,
     												Components.results.NS_OK,
