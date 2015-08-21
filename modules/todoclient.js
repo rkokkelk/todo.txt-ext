@@ -13,15 +13,15 @@ let todoClient = {
 
 	todo: null,
 
-    getInterface: cal.InterfaceRequestor_getInterface,
+  getInterface: cal.InterfaceRequestor_getInterface,
 
-    getTodo: function(){
-  	
-     	if(!this.todo){
-     	  this.setTodo();
-		  }
-  	return this.todo;
-    },
+  getTodo: function(){
+  
+    if(!this.todo){
+      this.setTodo();
+    }
+  return this.todo;
+  },
 
 	getItems: function(calendar){
 		let todo = this.getTodo();
@@ -100,7 +100,6 @@ let todoClient = {
   },
 
   setTodo: function(){
-    //TODO: update task list in view
 			var prefs = Components.classes["@mozilla.org/preferences-service;1"]
 															.getService(Components.interfaces.nsIPrefService);
 			prefs = prefs.getBranch("extensions.todotxt.");
@@ -114,7 +113,7 @@ let todoClient = {
         fstream.init(todoFile, -1, 0, 0);
         let data = NetUtil.readInputStreamToString(fstream, fstream.available());
         this.todo = TodoTxt.parseFile(data);
-        todotxtLogger.debug("todoClient.js: Todo.txt parsed");
+        todotxtLogger.debug("todoClient.js: "+todoFile.leafName+" parsed");
       }else
         this.todo = TodoTxt.create();
   },

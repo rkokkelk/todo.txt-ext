@@ -17,14 +17,10 @@ Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 function calTodoTxt() {
   this.initProviderBase();
   
-  var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-
-	prefs = prefs.getBranch("extensions.todotxt.");
-
   todotxtLogger.debugMode = true;
   todotxtLogger.debug("calTodoTxt");
-  myPrefObserver.register();
+
+  myPrefObserver.register(this);
 }
 
 calTodoTxt.prototype = {
@@ -305,7 +301,12 @@ calTodoTxt.prototype = {
 };
 
 var myPrefObserver = {
-  register: function() {
+  
+  calendar: null,
+
+  register: function(cal) {
+
+    this.calendar = cal;
     // For this.branch we ask for the preferences for extensions.myextension. and children
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefService);
@@ -320,6 +321,7 @@ var myPrefObserver = {
   },
 
   unregister: function() {
+    this.calendar = null;
     this.branch.removeObserver("", this);
   },
 
@@ -327,11 +329,11 @@ var myPrefObserver = {
     switch (aData) {
       case "todo-txt":
         todoClient.setTodo();
+        this.calendar.refresh();
         break;
     }
   }
 }
-
 
 /** Module Registration */
 function NSGetFactory(cid) {
