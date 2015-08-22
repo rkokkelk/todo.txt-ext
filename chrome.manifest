@@ -7,5 +7,3 @@ locale      todotxt   fr      chrome/locale/fr/
 locale      todotxt   nl      chrome/locale/nl/
 
 manifest 		components/calTodotxt.manifest
-overlay     chrome://lightning/content/messenger-overlay-sidebar.xul  chrome://todotxt/content/todotxt.xul
-

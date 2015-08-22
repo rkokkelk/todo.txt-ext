@@ -10,9 +10,9 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import("resource://todotxt/todoclient.js");
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Components.utils.import("resource://todotxt/modules/logger.jsm");
+Components.utils.import("resource://todotxt/modules/todoclient.js");
+Components.utils.import("resource://todotxt/modules/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();

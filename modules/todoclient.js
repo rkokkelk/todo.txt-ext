@@ -267,6 +267,7 @@ let todoClient = {
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
         NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
 	},
+	
 
 	makeTitle: function(item){
     let itemTitle = "";
