@@ -4,10 +4,11 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:id>todotxt@xseth.nl</em:id>
+		<em:id>todoext@xseth.nl</em:id>
     <em:name>Todo.txt Extension</em:name>
     <em:version>1.0</em:version>
     <em:creator>Roy Kokkelkoren</em:creator>
+		<em:bootstrap>true</em:bootstrap>
 
 		<em:optionsURL>chrome://todotxt/content/options.xul</em:optionsURL>
 		<em:optionsType>2</em:optionsType>

@@ -3,8 +3,8 @@ Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Components.utils.import('resource://todotxt/modules/logger.jsm');
+Components.utils.import("resource://todotxt/modules/todo-txt-js/todotxt.js");
 
 
 EXPORTED_SYMBOLS = ['todoClient'];
@@ -66,7 +66,6 @@ let todoClient = {
 				item = item.substr(1);
 			return item;
 		});
-    todotxtLogger.debug("todoClient.js: projects: "+projects);
 		newItem.setCategories(projects.length,projects);
 
     newItem.id = todoItem.id();
