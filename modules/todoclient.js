@@ -31,11 +31,17 @@ let todoClient = {
 		for each(todoItem in todo.items({},'priority')){
 			item = cal.createTodo();
 
-			item.title = this.makeStr(todoItem.textTokens());
+    	item.title = this.makeTitle(todoItem);
 			item.calendar = calendar;
 			item.id = todoItem.id();
 
 			item.isCompleted = todoItem.isComplete();
+			let projects = todoItem.projects().map(function(item){
+				if(item.charAt(0) === '+')
+					item = item.substr(1);
+				return item;
+			});
+			item.setCategories(projects.length,projects);
 
 			if(todoItem.priority() != null)
 				item.priority = (todoItem.priority().charCodeAt(0)-64)*2;
@@ -55,8 +61,16 @@ let todoClient = {
     if(todoItem.priority() != null)
       newItem.priority = this.calPriority(todoItem.priority());
 
+		let projects = todoItem.projects().map(function(item){
+			if(item.charAt(0) === '+')
+				item = item.substr(1);
+			return item;
+		});
+    todotxtLogger.debug("todoClient.js: projects: "+projects);
+		newItem.setCategories(projects.length,projects);
+
     newItem.id = todoItem.id();
-    newItem.title = this.makeStr(todoItem.textTokens());
+    newItem.title = this.makeTitle(todoItem);
 
     this.writeTodo(todo);
     return newItem;
@@ -85,6 +99,13 @@ let todoClient = {
             todoItem.completeTask();
           else
             todoItem.uncompleteTask();
+
+					let contexts;
+					projects = newItem.getCategories({},{});
+
+					for(var i=0;i<projects.length;i++){
+						todoItem.addProject(projects[i]);
+					}
 
           todotxtLogger.debug("todoClient.js: modify Item "+todoItem.render());
           found = true;
@@ -159,17 +180,28 @@ let todoClient = {
         todotxtLogger.debug("todoClient.js: written Todo.txt, "+todoRender);
 	},
 	
-  makeStr: function(array){
-    let result = "";
-    for(let i=0; i<array.length;i++){
-      result += array[i];
 
-      if(i != array.length -1)
-        result += " ";
-    }
+	makeTitle: function(item){
 
-    return result;
-  },
+		makeStr = function(array){
+			let result = "";
+			for(let i=0; i<array.length;i++){
+				result += array[i];
+
+				if(i != array.length -1)
+					result += " ";
+			}
+			return result;
+		}
+
+		let result = makeStr(item.textTokens());
+
+		let contexts = item.contexts();
+		if(contexts.length > 0)
+			result += " "+makeStr(contexts);
+		
+		return result;
+	},
   
   makeDateStr: function(date) {
     let month = (date.month < 9) ? '0' + (date.month + 1) : (date.month + 1);
