@@ -138,9 +138,10 @@ let todoClient = {
   },
 
   setTodo: function(){
-       var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+      var prefs = Components.classes["@mozilla.org/preferences-service;1"]
 															.getService(Components.interfaces.nsIPrefService);
 			prefs = prefs.getBranch("extensions.todotxt.");
+			let parseBlob = "";
 
 			if(prefs.prefHasUserValue('todo-txt')){
 
@@ -150,10 +151,23 @@ let todoClient = {
 
         fstream.init(todoFile, -1, 0, 0);
         let data = NetUtil.readInputStreamToString(fstream, fstream.available());
-        this.todo = TodoTxt.parseFile(data);
-        todotxtLogger.debug("todoClient.js: "+todoFile.leafName+" parsed");
-      }else
-        this.todo = TodoTxt.create();
+        parseBlob += data;
+      } 
+
+			if(prefs.prefHasUserValue('done-txt')){
+
+        doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+        let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+                              createInstance(Components.interfaces.nsIFileInputStream);
+
+        fstream.init(doneFile, -1, 0, 0);
+        let data = NetUtil.readInputStreamToString(fstream, fstream.available());
+        parseBlob += "\n"+data;
+      } 
+
+      todotxtLogger.debug("todoClient.js: parseBlob, "+parseBlob);
+       
+      this.todo = TodoTxt.parseFile(parseBlob);
   },
 
 	writeTodo: function(todo){
@@ -162,22 +176,30 @@ let todoClient = {
         prefs = prefs.getBranch("extensions.todotxt.");
 
         todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-        let ostream = FileUtils.openSafeFileOutputStream(todoFile);
+        doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+        let oTodoStream = FileUtils.openSafeFileOutputStream(todoFile);
+        let oDoneStream = FileUtils.openSafeFileOutputStream(doneFile);
         let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
                                         createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
         converter.charset = "UTF-8";
-        let todoRender = todo.render({});
-        let istream = converter.convertToInputStream(todoRender);
+        let todoRender = todo.render({isComplete:false});
+        let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
+        let iTodoStream = converter.convertToInputStream(todoRender);
+        let iDoneStream = converter.convertToInputStream(doneRender);
+
+        writeCallback = function(status){
+            if (!Components.isSuccessCode(status)) {
+              throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
+              return;
+            }
+        };
 
         // The last argument (the callback) is optional.
-        NetUtil.asyncCopy(istream, ostream, function(status) {
-            if (!Components.isSuccessCode(status)) {
-                // Handle error!
-                return;
-            }
-        });
+        NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
+        NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
 
-        todotxtLogger.debug("todoClient.js: written Todo.txt, "+todoRender);
+        todotxtLogger.debug("todoClient.js: written todo.txt, "+todoRender);
+        todotxtLogger.debug("todoClient.js: written done.txt, "+doneRender);
 	},
 	
 
