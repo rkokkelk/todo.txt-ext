@@ -86,13 +86,15 @@ let todoClient = {
           todoItem.replaceWith(newItem.title);
 
           // Verify if priorty is altered
-          /*if(newItem.priority != null && newItem.priority != 0){
-            //TODO: parse Contexts & Projects
-            pri = this.calPriority(newItem.priority);
-            parseItem = '('+pri+') '+this.makeStr(todoItem.textTokens());
+          if(newItem.priority != null && newItem.priority != 0){
+            let pri = this.calPriority(newItem.priority);
+            let parseItem = this.makeTitle(todoItem);
+            if(pri != null)
+	            parseItem = '('+pri+') '+parseItem;
             todo.removeItem(todoItem);
             todoItem = todo.addItem(parseItem);
-          }*/
+            newItem.id = todoItem.id();
+          }
 
           // Verify if completed changed
           if(newItem.isCompleted)
@@ -239,16 +241,35 @@ let todoClient = {
     return hour + ':' + minute;
   },
 
+  // Priority 
+  // A --> 1, High
+  // B --> 2, Normal
+  // C --> 3, Low
   calPriority: function(pri){
+    todotxtLogger.debug("todoClient.js: calPriority, "+pri);
     if(typeof pri === 'string'){
-		  return (pri.charCodeAt(0)-64)*2;
+    	let p = pri.charAt(0);
+    	switch(p){
+				case "A":
+					return 1
+				case "B":
+						return 5;
+				case "C":
+						return 9;
+				default:
+						return 0;
+			}
     } else if (typeof pri === 'number'){
-      charCode = pri + 64;
-      if(charCode > 90)
-        charCode = 90;
-      todotxtLogger.debug("todoClient.js: ("+pri+") "+charCode);
-
-      return String.fromCharCode(charCode);
+    	switch(pri){
+				case 1:
+					return 'A';
+				case 5:
+					return 'B';
+				case 9:
+					return 'C';
+				default:
+					return null;
+			}
     }else
       throw Components.Exception("Priority Parser error",Components.results.NS_ERROR_UNEXPECTED);
   },
