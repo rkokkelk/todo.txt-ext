@@ -249,7 +249,6 @@ calTodoTxt.prototype = {
   
   getItems: function cSC_getItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
     todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')');
-    
     // we have to initialize these, and the calendar ID property isn't available
     // when the constructor is called
     if (!this.mTaskCache[this.id]) {
@@ -260,24 +259,29 @@ calTodoTxt.prototype = {
     }
     
     try {
-    	items = todoClient.getItems(this);
-    	this.mLastSync = new Date();
+    	if(this.mLastSync == null){
+    		items = todoClient.getItems(this,true);
 
-    	for each(item in items){
-    	  this.mTaskCache[this.id][item.id] = item;
-      }
+				this.mLastSync = new Date();
 
-    	aListener.onGetResult(this.superCalendar,
-    												Components.results.NS_OK,
-    												Components.interfaces.calITodo,
-    												null,
-    												items.length,
-    												items);
-    	this.notifyOperationComplete(aListener, 
-    	                             Components.results.NS_OK,
-    	                             Components.interfaces.calIOperationListener.GET,
-    	                             null,
-    	                             null);
+				for each(item in items){
+					this.mTaskCache[this.id][item.id] = item;
+				}
+
+				aListener.onGetResult(this.superCalendar,
+															Components.results.NS_OK,
+															Components.interfaces.calITodo,
+															null,
+															items.length,
+															items);
+				this.notifyOperationComplete(aListener, 
+																		Components.results.NS_OK,
+																		Components.interfaces.calIOperationListener.GET,
+																		null,
+																		null);
+			}else{
+				this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
+			}
     } catch (e) {
       todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR ('+e.message+')');
       this.notifyOperationComplete(aListener,

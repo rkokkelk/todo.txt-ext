@@ -15,16 +15,15 @@ let todoClient = {
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
-  getTodo: function(){
-  
-    if(!this.todo){
+  getTodo: function(refresh){
+    if(!this.todo || refresh){
       this.setTodo();
     }
     return this.todo;
   },
 
-	getItems: function(calendar){
-		let todo = this.getTodo();
+	getItems: function(calendar,refresh){
+		let todo = this.getTodo(refresh);
 		let items = [];
 		let tzService = cal.getTimezoneService();
 
@@ -109,7 +108,6 @@ let todoClient = {
 						todoItem.addProject(projects[i]);
 					}
 
-          todotxtLogger.debug("todoClient.js: modify Item "+todoItem.render());
           found = true;
           break;
       }
