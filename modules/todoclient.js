@@ -65,7 +65,6 @@ let todoClient = {
 				item = item.substr(1);
 			return item;
 		});
-    todotxtLogger.debug("todoClient.js: projects: "+projects);
 		newItem.setCategories(projects.length,projects);
 
     newItem.id = todoItem.id();
@@ -165,8 +164,6 @@ let todoClient = {
         parseBlob += "\n"+data;
       } 
 
-      todotxtLogger.debug("todoClient.js: parseBlob, "+parseBlob);
-       
       this.todo = TodoTxt.parseFile(parseBlob);
   },
 
@@ -188,20 +185,15 @@ let todoClient = {
         let iDoneStream = converter.convertToInputStream(doneRender);
 
         writeCallback = function(status){
-            if (!Components.isSuccessCode(status)) {
+            if (Components.isSuccessCode(status))
               throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
-              return;
-            }
+            else
+        			todotxtLogger.debug("todoClient.js: written to file");
         };
 
-        // The last argument (the callback) is optional.
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
         NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
-
-        todotxtLogger.debug("todoClient.js: written todo.txt, "+todoRender);
-        todotxtLogger.debug("todoClient.js: written done.txt, "+doneRender);
 	},
-	
 
 	makeTitle: function(item){
 

@@ -40,6 +40,21 @@ let todotxtLogger = {
       app = this.App;
       app.console.log(output);
     }
+  },
+
+  error: function(src, error) {
+    if (this.debugMode) {
+      let output = '';
+      if (src) {
+        output += '[' + src + ']';
+      }
+      if (error){
+      	output += e.result+' ('+e.message+')';
+      }
+      cal.LOG(output);
+      app = this.App;
+      app.console.log(output);
+    }
   }
 };
 
