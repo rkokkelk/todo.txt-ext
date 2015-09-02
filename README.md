@@ -17,13 +17,13 @@ The extension requires the following options:
 1. Location of your Todo.txt file
 2. Location of your Done.txt file
 
-After this configuration it is possible to see al finished and incomplete tasks and add, delete or modify them accordingly. 
+After this configuration it is possible to see every finished and incomplete tasks and add, delete or modify them accordingly. 
 
-**Todo.txt works best with a synchronisation application such as Dropbox or Owncloud, in order to prevent accidental overwriting of the file it might be usefull to set the refresh time of the calendar to a couple of minutes**
+**Todo.txt works best with a synchronisation application such as Dropbox or Owncloud, in order to prevent accidental overwriting of the file it might be useful to set the refresh time of the calendar to a couple of minutes**
 
 ## Syntax
 
-The extension can automatically assign the appropiate properties to a Thunderbird task based on the Todo.txt syntax. This means that when a user enters a new Task with Todo.txt syntax it will result in a correct Thunderbird task.
+The extension can automatically assign the appropriate properties to a Thunderbird task based on the Todo.txt syntax. This means that when a user enters a new Task with Todo.txt syntax it will result in a correct Thunderbird task.
 
 For example:
 `(A) foobar +Dev +Home @PR`
@@ -33,7 +33,7 @@ Entered as a new task within Thunderbird, it will automatically have the followi
 * Categories set to DEV & Home
 * Title containing *foobar @PR*
 
-Offcourse the Todo.txt file will contain the extact line as entered into Thunderbird.
+Offcourse the Todo.txt file will contain the exact line as entered into Thunderbird.
 
 # Thanks
 

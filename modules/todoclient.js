@@ -55,7 +55,6 @@ let todoClient = {
     let found = false;
 
     let todoItem = todo.addItem(newItem.title);
-    todoItem.setCreatedDate(null);
 
     if(todoItem.priority())
       newItem.priority = this.calPriority(todoItem.priority());
