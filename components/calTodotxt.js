@@ -220,7 +220,7 @@ calTodoTxt.prototype = {
                                    Components.results.NS_ERROR_UNEXPECTED,
                                    Components.interfaces.calIOperationListener.MODIFY,
                                    null,
-                                   'Unable to modify task.');
+                                   e.message);
 
     }
   },
@@ -264,14 +264,14 @@ calTodoTxt.prototype = {
     }
     
     try {
-    	if(this.mLastSync == null){
+    	if(!this.mLastSync){
     		items = todoClient.getItems(this,true);
 
 				this.mLastSync = new Date();
+    		this.mTaskCache[this.id] = {};
 
-				for each(item in items){
+				for each(item in items)
 					this.mTaskCache[this.id][item.id] = item;
-				}
 
 				aListener.onGetResult(this.superCalendar,
 															Components.results.NS_OK,
@@ -284,9 +284,9 @@ calTodoTxt.prototype = {
 																		Components.interfaces.calIOperationListener.GET,
 																		null,
 																		null);
-			}else{
+			}else
 				this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
-			}
+			
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:getItems()',e);
       this.notifyOperationComplete(aListener,

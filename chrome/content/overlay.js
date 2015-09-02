@@ -7,9 +7,8 @@ window.addEventListener("load", function(e) {
 	let found = false;
 
 	for each (calendar in calManager.getCalendars({})){
-		todotxtLogger.debug("overlay.js: providerID"+calendar.id);
 		if(calendar.providerID == ID){
-			todotxtLogger.debug("overlay.js: Calendar found");
+			todotxtLogger.debug("overlay.js","Calendar found");
 			found = true;
 			break;
 		}
@@ -21,7 +20,7 @@ window.addEventListener("load", function(e) {
 }, false);
 
 function createCal(calManager){
-	todotxtLogger.debug("overlay.js: Create calendar");
+	todotxtLogger.debug("overlay.js","Create calendar");
 	let url = cal.makeURL('todotxt://_unused');
 	let newCal = calManager.createCalendar('todotxt',url);
 	newCal.name = "Todo.txt";

@@ -42,8 +42,8 @@ let todoClient = {
 			});
 			item.setCategories(projects.length,projects);
 
-			if(todoItem.priority() != null)
-				item.priority = (todoItem.priority().charCodeAt(0)-64)*2;
+			if(todoItem.priority())
+     		item.priority = this.calPriority(todoItem.priority());
 
 			items.push(item);
 		}
@@ -57,7 +57,7 @@ let todoClient = {
     let todoItem = todo.addItem(newItem.title);
     todoItem.setCreatedDate(null);
 
-    if(todoItem.priority() != null)
+    if(todoItem.priority())
       newItem.priority = this.calPriority(todoItem.priority());
 
 		let projects = todoItem.projects().map(function(item){
@@ -75,24 +75,22 @@ let todoClient = {
   },
 
   modifyItem: function(oldItem, newItem){
-    let todo = this.getTodo();
     let found = false;
+    let todo = this.getTodo();
 
     for each(todoItem in todo.items()){
-      if(todoItem.id() == newItem.id){
+      if(todoItem.id() == oldItem.id){
 
-          todoItem.replaceWith(newItem.title);
-
+          let parseItem = newItem.title;
+    			
           // Verify if priorty is altered
-          if(newItem.priority != null && newItem.priority != 0){
+          if(newItem.priority && newItem.priority != 0){
             let pri = this.calPriority(newItem.priority);
-            let parseItem = this.makeTitle(todoItem);
-            if(pri != null)
+            if(pri)
 	            parseItem = '('+pri+') '+parseItem;
-            todo.removeItem(todoItem);
-            todoItem = todo.addItem(parseItem);
-            newItem.id = todoItem.id();
           }
+
+          todoItem.replaceWith(parseItem);
 
           // Verify if completed changed
           if(newItem.isCompleted)
@@ -112,9 +110,10 @@ let todoClient = {
       }
     }
 
-    if(found) 
+    if(found){
       this.writeTodo(todo);
-    else
+    	return todoItem.id();
+		}else
       throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
   },
 
@@ -186,9 +185,9 @@ let todoClient = {
 
         writeCallback = function(status){
             if (Components.isSuccessCode(status))
-              throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
+        			todotxtLogger.debug("todoClient.js","written to file");
             else
-        			todotxtLogger.debug("todoClient.js: written to file");
+              throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
         };
 
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
@@ -236,7 +235,6 @@ let todoClient = {
   // B --> 2, Normal
   // C --> 3, Low
   calPriority: function(pri){
-    todotxtLogger.debug("todoClient.js: calPriority, "+pri);
     if(typeof pri === 'string'){
     	let p = pri.charAt(0);
     	switch(p){

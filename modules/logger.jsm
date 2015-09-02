@@ -48,8 +48,9 @@ let todotxtLogger = {
       if (src) {
         output += '[' + src + ']';
       }
-      if (error){
-      	output += e.result+' ('+e.message+')';
+      if (!error){
+      	output += ' ERROR: ';
+      	output += error.result+' ('+error.message+')';
       }
       cal.LOG(output);
       app = this.App;
