@@ -15,16 +15,15 @@ let todoClient = {
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
-  getTodo: function(){
-  
-    if(!this.todo){
+  getTodo: function(refresh){
+    if(!this.todo || refresh){
       this.setTodo();
     }
     return this.todo;
   },
 
-	getItems: function(calendar){
-		let todo = this.getTodo();
+	getItems: function(calendar,refresh){
+		let todo = this.getTodo(refresh);
 		let items = [];
 		let tzService = cal.getTimezoneService();
 
@@ -43,8 +42,8 @@ let todoClient = {
 			});
 			item.setCategories(projects.length,projects);
 
-			if(todoItem.priority() != null)
-				item.priority = (todoItem.priority().charCodeAt(0)-64)*2;
+			if(todoItem.priority())
+     		item.priority = this.calPriority(todoItem.priority());
 
 			items.push(item);
 		}
@@ -56,9 +55,8 @@ let todoClient = {
     let found = false;
 
     let todoItem = todo.addItem(newItem.title);
-    todoItem.setCreatedDate(null);
 
-    if(todoItem.priority() != null)
+    if(todoItem.priority())
       newItem.priority = this.calPriority(todoItem.priority());
 
 		let projects = todoItem.projects().map(function(item){
@@ -66,7 +64,6 @@ let todoClient = {
 				item = item.substr(1);
 			return item;
 		});
-    todotxtLogger.debug("todoClient.js: projects: "+projects);
 		newItem.setCategories(projects.length,projects);
 
     newItem.id = todoItem.id();
@@ -77,22 +74,22 @@ let todoClient = {
   },
 
   modifyItem: function(oldItem, newItem){
-    let todo = this.getTodo();
     let found = false;
+    let todo = this.getTodo();
 
     for each(todoItem in todo.items()){
-      if(todoItem.id() == newItem.id){
+      if(todoItem.id() == oldItem.id){
 
-          todoItem.replaceWith(newItem.title);
-
+          let parseItem = newItem.title;
+    			
           // Verify if priorty is altered
-          /*if(newItem.priority != null && newItem.priority != 0){
-            //TODO: parse Contexts & Projects
-            pri = this.calPriority(newItem.priority);
-            parseItem = '('+pri+') '+this.makeStr(todoItem.textTokens());
-            todo.removeItem(todoItem);
-            todoItem = todo.addItem(parseItem);
-          }*/
+          if(newItem.priority && newItem.priority != 0){
+            let pri = this.calPriority(newItem.priority);
+            if(pri)
+	            parseItem = '('+pri+') '+parseItem;
+          }
+
+          todoItem.replaceWith(parseItem);
 
           // Verify if completed changed
           if(newItem.isCompleted)
@@ -107,15 +104,15 @@ let todoClient = {
 						todoItem.addProject(projects[i]);
 					}
 
-          todotxtLogger.debug("todoClient.js: modify Item "+todoItem.render());
           found = true;
           break;
       }
     }
 
-    if(found) 
+    if(found){
       this.writeTodo(todo);
-    else
+    	return todoItem.id();
+		}else
       throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
   },
 
@@ -165,8 +162,6 @@ let todoClient = {
         parseBlob += "\n"+data;
       } 
 
-      todotxtLogger.debug("todoClient.js: parseBlob, "+parseBlob);
-       
       this.todo = TodoTxt.parseFile(parseBlob);
   },
 
@@ -188,20 +183,15 @@ let todoClient = {
         let iDoneStream = converter.convertToInputStream(doneRender);
 
         writeCallback = function(status){
-            if (!Components.isSuccessCode(status)) {
+            if (Components.isSuccessCode(status))
+        			todotxtLogger.debug("todoClient.js","written to file");
+            else
               throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
-              return;
-            }
         };
 
-        // The last argument (the callback) is optional.
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
         NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
-
-        todotxtLogger.debug("todoClient.js: written todo.txt, "+todoRender);
-        todotxtLogger.debug("todoClient.js: written done.txt, "+doneRender);
 	},
-	
 
 	makeTitle: function(item){
 
@@ -239,16 +229,34 @@ let todoClient = {
     return hour + ':' + minute;
   },
 
+  // Priority 
+  // A --> 1, High
+  // B --> 2, Normal
+  // C --> 3, Low
   calPriority: function(pri){
     if(typeof pri === 'string'){
-		  return (pri.charCodeAt(0)-64)*2;
+    	let p = pri.charAt(0);
+    	switch(p){
+				case "A":
+					return 1
+				case "B":
+						return 5;
+				case "C":
+						return 9;
+				default:
+						return 0;
+			}
     } else if (typeof pri === 'number'){
-      charCode = pri + 64;
-      if(charCode > 90)
-        charCode = 90;
-      todotxtLogger.debug("todoClient.js: ("+pri+") "+charCode);
-
-      return String.fromCharCode(charCode);
+    	switch(pri){
+				case 1:
+					return 'A';
+				case 5:
+					return 'B';
+				case 9:
+					return 'C';
+				default:
+					return null;
+			}
     }else
       throw Components.Exception("Priority Parser error",Components.results.NS_ERROR_UNEXPECTED);
   },

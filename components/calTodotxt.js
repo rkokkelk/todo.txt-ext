@@ -18,7 +18,7 @@ function calTodoTxt() {
   this.initProviderBase();
   
   todotxtLogger.debugMode = true;
-  todotxtLogger.debug("calTodoTxt");
+  todotxtLogger.debug("calTodoTxt", "Constructor");
 
   myPrefObserver.register(this);
 }
@@ -84,7 +84,7 @@ calTodoTxt.prototype = {
   },
   
   getCachedItems: function cSC_getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
-    todotxtLogger.debug('calTodotxt.js:getCachedItems() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:getCachedItems()');
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
@@ -122,7 +122,7 @@ calTodoTxt.prototype = {
   },
   
   get displayName() {
-    return 'TodoTxt';
+    return 'Todo.txt';
   },
 
   createCalendar: function cSC_createCal() {
@@ -160,7 +160,7 @@ calTodoTxt.prototype = {
   },
 
   refresh: function cSC_refresh() {
-    todotxtLogger.debug('calTodotxt.js:refresh() (' + this.name + ')');
+    todotxtLogger.debug('calTodotxt.js:refresh()');
     
     // setting the last sync to null forces the next getItems call to make an API request rather than returning a cached result
     this.mLastSync = null;
@@ -176,6 +176,11 @@ calTodoTxt.prototype = {
     todotxtLogger.debug('calTodotxt.js:adoptItem()');
     
     try {    
+
+			let isEvent = aItem.isCompleted == null;
+			if(isEvent)
+				throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
+
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_OK,
@@ -185,7 +190,7 @@ calTodoTxt.prototype = {
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js: addItem() (' + this.name + ')', 'ERROR ('+e.message+')');
+      todotxtLogger.error('calTodotxt.js:addItem()',e);
       
       this.notifyOperationComplete(aListener,
                                     e.result,
@@ -210,12 +215,12 @@ calTodoTxt.prototype = {
       this.mTaskCache[this.id][aNewItem.id] = aNewItem;
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js: modifyItem() (' + this.name + ')', 'ERROR ('+e.message+')');
+      todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_ERROR_UNEXPECTED,
                                    Components.interfaces.calIOperationListener.MODIFY,
                                    null,
-                                   'Unable to modify task.');
+                                   e.message);
 
     }
   },
@@ -233,7 +238,7 @@ calTodoTxt.prototype = {
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:deleteItem()', 'ERROR ('+e.message+')');
+      todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.DELETE,
@@ -248,8 +253,7 @@ calTodoTxt.prototype = {
   },
   
   getItems: function cSC_getItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
-    todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')');
-    
+    todotxtLogger.debug('calTodotxt.js:getItems()');
     // we have to initialize these, and the calendar ID property isn't available
     // when the constructor is called
     if (!this.mTaskCache[this.id]) {
@@ -260,26 +264,31 @@ calTodoTxt.prototype = {
     }
     
     try {
-    	items = todoClient.getItems(this);
-    	this.mLastSync = new Date();
+    	if(!this.mLastSync){
+    		items = todoClient.getItems(this,true);
 
-    	for each(item in items){
-    	  this.mTaskCache[this.id][item.id] = item;
-      }
+				this.mLastSync = new Date();
+    		this.mTaskCache[this.id] = {};
 
-    	aListener.onGetResult(this.superCalendar,
-    												Components.results.NS_OK,
-    												Components.interfaces.calITodo,
-    												null,
-    												items.length,
-    												items);
-    	this.notifyOperationComplete(aListener, 
-    	                             Components.results.NS_OK,
-    	                             Components.interfaces.calIOperationListener.GET,
-    	                             null,
-    	                             null);
+				for each(item in items)
+					this.mTaskCache[this.id][item.id] = item;
+
+				aListener.onGetResult(this.superCalendar,
+															Components.results.NS_OK,
+															Components.interfaces.calITodo,
+															null,
+															items.length,
+															items);
+				this.notifyOperationComplete(aListener, 
+																		Components.results.NS_OK,
+																		Components.interfaces.calIOperationListener.GET,
+																		null,
+																		null);
+			}else
+				this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
+			
     } catch (e) {
-      todotxtLogger.debug('calTodotxt.js:getItems() (' + this.name + ')', 'ERROR ('+e.message+')');
+      todotxtLogger.error('calTodotxt.js:getItems()',e);
       this.notifyOperationComplete(aListener,
                                     e.result,
                                     Components.interfaces.calIOperationListener.GET,
@@ -326,6 +335,7 @@ var myPrefObserver = {
 
   observe: function(aSubject, aTopic, aData) {
     switch (aData) {
+      case "done-txt":
       case "todo-txt":
         todoClient.setTodo();
         this.calendar.refresh();

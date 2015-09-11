@@ -168,7 +168,7 @@ var TodoTxt = (function () {
 	    output.addItem = function(item) {
 	        if (typeof item.render === 'function') item = item.render();
 	        item = parseLineInternal(item, getLineNumber);
-	        if (!item.createdDate()) item.setCreatedDate(new Date());
+	        //if (!item.createdDate()) item.setCreatedDate(new Date());
 
 	        items.push(item);
 	        output.length = items.length;

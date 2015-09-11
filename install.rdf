@@ -4,10 +4,14 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <Description about="urn:mozilla:install-manifest">
-    <em:id>todotxt@xseth.nl</em:id>
+		<em:id>todo.txt@xseth.nl</em:id>
     <em:name>Todo.txt Extension</em:name>
-    <em:version>1.0</em:version>
+    <em:version>0.1</em:version>
+		<em:type>2</em:type>
     <em:creator>Roy Kokkelkoren</em:creator>
+		<em:description>Thunderbird extension for the Todo.txt application</em:description>
+		<em:homepageURL>https://github.com/rkokkelk/todo.txt-ext</em:homepageURL>
+		<em:icon64URL>chrome://todotxt/skin/icon-64.png</em:icon64URL>
 
 		<em:optionsURL>chrome://todotxt/content/options.xul</em:optionsURL>
 		<em:optionsType>2</em:optionsType>
@@ -15,8 +19,8 @@
     <em:targetApplication>
       <Description>
         <em:id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</em:id>
-        <em:minVersion>1.5</em:minVersion>
-        <em:maxVersion>5.0.*</em:maxVersion>
+        <em:minVersion>17.0</em:minVersion>
+        <em:maxVersion>31.*</em:maxVersion>
       </Description>
     </em:targetApplication>
    
