@@ -335,6 +335,9 @@ var myPrefObserver = {
 
   observe: function(aSubject, aTopic, aData) {
     switch (aData) {
+      case "thunderbird":
+          this.calendar.refresh();
+          break;
       case "done-txt":
       case "todo-txt":
         todoClient.setTodo();

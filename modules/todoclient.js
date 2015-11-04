@@ -26,24 +26,27 @@ let todoClient = {
 		let todo = this.getTodo(refresh);
 		let items = [];
 		let tzService = cal.getTimezoneService();
+    let prefs = this.getPreferences();
 
 		for each(todoItem in todo.items({},'priority')){
 			item = cal.createTodo();
 
-    	item.title = this.makeTitle(todoItem);
-			item.calendar = calendar;
 			item.id = todoItem.id();
-
+			item.calendar = calendar;
+    	item.title = this.makeTitle(todoItem);
 			item.isCompleted = todoItem.isComplete();
-			let projects = todoItem.projects().map(function(item){
-				if(item.charAt(0) === '+')
-					item = item.substr(1);
-				return item;
-			});
-			item.setCategories(projects.length,projects);
 
-			if(todoItem.priority())
-     		item.priority = this.calPriority(todoItem.priority());
+      if(prefs.getBoolPref("thunderbird")){
+        let projects = todoItem.projects().map(function(item){
+          if(item.charAt(0) === '+')
+            item = item.substr(1);
+          return item;
+        });
+        item.setCategories(projects.length,projects);
+
+        if(todoItem.priority())
+          item.priority = this.calPriority(todoItem.priority());
+      }
 
 			items.push(item);
 		}
@@ -53,18 +56,21 @@ let todoClient = {
   addItem: function(newItem){
     let todo = this.getTodo();
     let found = false;
-
+    let prefs = this.getPreferences();
     let todoItem = todo.addItem(newItem.title);
 
-    if(todoItem.priority())
-      newItem.priority = this.calPriority(todoItem.priority());
+    if(prefs.getBoolPref("thunderbird")){
 
-		let projects = todoItem.projects().map(function(item){
-			if(item.charAt(0) === '+')
-				item = item.substr(1);
-			return item;
-		});
-		newItem.setCategories(projects.length,projects);
+      if(todoItem.priority())
+        newItem.priority = this.calPriority(todoItem.priority());
+
+      let projects = todoItem.projects().map(function(item){
+        if(item.charAt(0) === '+')
+          item = item.substr(1);
+        return item;
+      });
+		  newItem.setCategories(projects.length,projects);
+    }
 
     newItem.id = todoItem.id();
     newItem.title = this.makeTitle(todoItem);
@@ -76,6 +82,7 @@ let todoClient = {
   modifyItem: function(oldItem, newItem){
     let found = false;
     let todo = this.getTodo();
+    let prefs = this.getPreferences();
 
     for each(todoItem in todo.items()){
       if(todoItem.id() == oldItem.id){
@@ -97,12 +104,12 @@ let todoClient = {
           else
             todoItem.uncompleteTask();
 
-					let contexts;
-					projects = newItem.getCategories({},{});
+          let contexts;
+          projects = newItem.getCategories({},{});
 
-					for(var i=0;i<projects.length;i++){
-						todoItem.addProject(projects[i]);
-					}
+          for(var i=0;i<projects.length;i++){
+            todoItem.addProject(projects[i]);
+          }
 
           found = true;
           break;
@@ -135,10 +142,8 @@ let todoClient = {
   },
 
   setTodo: function(){
-      var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-															.getService(Components.interfaces.nsIPrefService);
-			prefs = prefs.getBranch("extensions.todotxt.");
 			let parseBlob = "";
+      let prefs = this.getPreferences();
 
 			if(prefs.prefHasUserValue('todo-txt')){
 
@@ -166,9 +171,7 @@ let todoClient = {
   },
 
 	writeTodo: function(todo){
-        var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                                                        .getService(Components.interfaces.nsIPrefService);
-        prefs = prefs.getBranch("extensions.todotxt.");
+        let prefs = this.getPreferences();
 
         todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
         doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
@@ -194,26 +197,39 @@ let todoClient = {
 	},
 
 	makeTitle: function(item){
+    let itemTitle = "";
+    let prefs = this.getPreferences();
 
-		makeStr = function(array){
-			let result = "";
-			for(let i=0; i<array.length;i++){
-				result += array[i];
+    if(prefs.getBoolPref("thunderbird")){
 
-				if(i != array.length -1)
-					result += " ";
-			}
-			return result;
-		}
+      makeStr = function(array){
+        let result = "";
+        for(let i=0; i<array.length;i++){
+          result += array[i];
 
-		let result = makeStr(item.textTokens());
+          if(i != array.length -1)
+            result += " ";
+        }
+        return result;
+      };
 
-		let contexts = item.contexts();
-		if(contexts.length > 0)
-			result += " "+makeStr(contexts);
+      itemTitle = makeStr(item.textTokens());
+
+      let contexts = item.contexts();
+      if(contexts.length > 0)
+        itemTitle += " "+makeStr(contexts);
+    }else
+      itemTitle = item.render();
 		
-		return result;
+		return itemTitle;
 	},
+
+  getPreferences: function(){
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                            .getService(Components.interfaces.nsIPrefService);
+    prefs = prefs.getBranch("extensions.todotxt.");
+    return prefs;
+  },
   
   makeDateStr: function(date) {
     let month = (date.month < 9) ? '0' + (date.month + 1) : (date.month + 1);

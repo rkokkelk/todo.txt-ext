@@ -7,5 +7,6 @@
 
 	<setting pref="extensions.todotxt.todo-txt" type="file" title="Location of todo.txt file" />
 	<setting pref="extensions.todotxt.done-txt" type="file" title="Location of done.txt file" />
+	<setting pref="extensions.todotxt.thunderbird" type="bool" title="Use thunderbird's functionality, such as categories and priorities." />
 
 </vbox>
