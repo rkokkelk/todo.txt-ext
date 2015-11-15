@@ -46,6 +46,11 @@ let todoClient = {
 
         if(todoItem.priority())
           item.priority = this.calPriority(todoItem.priority());
+
+        if(todoItem.isComplete() && todoItem.completedDate()){
+          dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
+          item.completedDate = dateTime;
+        }
       }
 
 			items.push(item);
