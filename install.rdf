@@ -6,7 +6,7 @@
   <Description about="urn:mozilla:install-manifest">
 		<em:id>todo.txt@xseth.nl</em:id>
     <em:name>Todo.txt Extension</em:name>
-    <em:version>0.1</em:version>
+    <em:version>0.3</em:version>
 		<em:type>2</em:type>
     <em:creator>Roy Kokkelkoren</em:creator>
 		<em:description>Thunderbird extension for the Todo.txt application</em:description>
