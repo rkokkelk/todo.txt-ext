@@ -1,11 +1,17 @@
 <?xml version="1.0"?> 
+
+<!DOCTYPE window [
+	<!ENTITY % todotxt SYSTEM "chrome://todotxt/locale/options.dtd">
+	%todotxt;
+]> 
+
 <!--
     Google Tasks sync for Mozilla Thunderbird
 -->
  
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<setting pref="extensions.todotxt.todo-txt" type="file" title="Location of todo.txt file" />
+  <setting label="foobar" title="&todotxt.todofile;" pref="extensions.todotxt.todo-txt" type="file" />
 	<setting pref="extensions.todotxt.done-txt" type="file" title="Location of done.txt file" />
 	<setting pref="extensions.todotxt.thunderbird" type="bool" title="Use thunderbird's functionality, such as categories and priorities." />
 
