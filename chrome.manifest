@@ -2,6 +2,7 @@ content     todotxt   chrome/content/
 resource 		todotxt 	modules/
 
 locale      todotxt   en-US   chrome/locale/en-US/
+locale      todotxt   nl      chrome/locale/nl/
 
 manifest 		components/calTodotxt.manifest
 overlay     chrome://lightning/content/messenger-overlay-sidebar.xul  chrome://todotxt/content/todotxt.xul
