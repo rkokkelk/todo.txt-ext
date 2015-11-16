@@ -2,6 +2,7 @@ content     todotxt   chrome/content/
 resource 		todotxt 	modules/
 
 locale      todotxt   en-US   chrome/locale/en-US/
+locale      todotxt   de      chrome/locale/de/
 locale      todotxt   nl      chrome/locale/nl/
 
 manifest 		components/calTodotxt.manifest
