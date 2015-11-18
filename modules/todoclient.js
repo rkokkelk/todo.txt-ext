@@ -112,7 +112,6 @@ let todoClient = {
           if(newItem.entryDate && prefs.getBoolPref("creation")){
             date = newItem.entryDate;
             dateLine = date.year+"-"+(date.month+1)+"-"+date.day;
-            todotxtLogger.debug("dateLine",dateLine);
             parseItem = dateLine+' '+parseItem;
           }
     			
