@@ -23,10 +23,10 @@ let todoClient = {
   },
 
 	getItems: function(calendar,refresh){
-		let todo = this.getTodo(refresh);
 		let items = [];
-		let tzService = cal.getTimezoneService();
+		let todo = this.getTodo(refresh);
     let prefs = this.getPreferences();
+		let tzService = cal.getTimezoneService();
 
 		for each(todoItem in todo.items({},'priority')){
 			item = cal.createTodo();
@@ -47,6 +47,13 @@ let todoClient = {
         if(todoItem.priority())
           item.priority = this.calPriority(todoItem.priority());
 
+        // Set creation date
+        if(todoItem.createdDate()){
+          createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+          item.entryDate = createDate;
+        }
+
+        // Set complete date
         if(todoItem.isComplete() && todoItem.completedDate()){
           dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
           item.completedDate = dateTime;
@@ -255,6 +262,7 @@ let todoClient = {
   // B --> 2, Normal
   // C --> 3, Low
   calPriority: function(pri){
+    todotxtLogger.debug("Prio",pri);
     if(typeof pri === 'string'){
     	let p = pri.charAt(0);
     	switch(p){
