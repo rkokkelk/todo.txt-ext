@@ -48,7 +48,7 @@ let todoClient = {
           item.priority = this.calPriority(todoItem.priority());
 
         // Set creation date
-        if(todoItem.createdDate()){
+        if(todoItem.createdDate() && prefs.getBoolPref("creation")){
           createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
           item.entryDate = createDate;
         }
@@ -69,7 +69,7 @@ let todoClient = {
     let todo = this.getTodo();
     let found = false;
     let prefs = this.getPreferences();
-    let todoItem = todo.addItem(newItem.title);
+    let todoItem = todo.addItem(newItem.title, prefs.getBoolPref("creation"));
 
     if(prefs.getBoolPref("thunderbird")){
 
@@ -82,6 +82,12 @@ let todoClient = {
         return item;
       });
 		  newItem.setCategories(projects.length,projects);
+
+      // Set creation date
+      if(todoItem.createdDate() && prefs.getBoolPref("creation")){
+        createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+        newItem.entryDate = createDate;
+      }
     }
 
     newItem.id = todoItem.id();
@@ -100,6 +106,15 @@ let todoClient = {
       if(todoItem.id() == oldItem.id){
 
           let parseItem = newItem.title;
+
+          // Verify if property is set to true and createTime is present then
+          // add the new creationTime to the parseLine 
+          if(newItem.entryDate && prefs.getBoolPref("creation")){
+            date = newItem.entryDate;
+            dateLine = date.year+"-"+(date.month+1)+"-"+date.day;
+            todotxtLogger.debug("dateLine",dateLine);
+            parseItem = dateLine+' '+parseItem;
+          }
     			
           // Verify if priorty is altered
           if(newItem.priority && newItem.priority != 0){
@@ -262,7 +277,6 @@ let todoClient = {
   // B --> 2, Normal
   // C --> 3, Low
   calPriority: function(pri){
-    todotxtLogger.debug("Prio",pri);
     if(typeof pri === 'string'){
     	let p = pri.charAt(0);
     	switch(p){
