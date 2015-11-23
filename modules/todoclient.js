@@ -23,10 +23,10 @@ let todoClient = {
   },
 
 	getItems: function(calendar,refresh){
-		let todo = this.getTodo(refresh);
 		let items = [];
-		let tzService = cal.getTimezoneService();
+		let todo = this.getTodo(refresh);
     let prefs = this.getPreferences();
+		let tzService = cal.getTimezoneService();
 
 		for each(todoItem in todo.items({},'priority')){
 			item = cal.createTodo();
@@ -47,6 +47,13 @@ let todoClient = {
         if(todoItem.priority())
           item.priority = this.calPriority(todoItem.priority());
 
+        // Set creation date
+        if(todoItem.createdDate() && prefs.getBoolPref("creation")){
+          createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+          item.entryDate = createDate;
+        }
+
+        // Set complete date
         if(todoItem.isComplete() && todoItem.completedDate()){
           dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
           item.completedDate = dateTime;
@@ -62,7 +69,7 @@ let todoClient = {
     let todo = this.getTodo();
     let found = false;
     let prefs = this.getPreferences();
-    let todoItem = todo.addItem(newItem.title);
+    let todoItem = todo.addItem(newItem.title, prefs.getBoolPref("creation"));
 
     if(prefs.getBoolPref("thunderbird")){
 
@@ -75,6 +82,12 @@ let todoClient = {
         return item;
       });
 		  newItem.setCategories(projects.length,projects);
+
+      // Set creation date
+      if(todoItem.createdDate() && prefs.getBoolPref("creation")){
+        createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+        newItem.entryDate = createDate;
+      }
     }
 
     newItem.id = todoItem.id();
@@ -93,6 +106,14 @@ let todoClient = {
       if(todoItem.id() == oldItem.id){
 
           let parseItem = newItem.title;
+
+          // Verify if property is set to true and createTime is present then
+          // add the new creationTime to the parseLine 
+          if(newItem.entryDate && prefs.getBoolPref("creation")){
+            date = newItem.entryDate;
+            dateLine = date.year+"-"+(date.month+1)+"-"+date.day;
+            parseItem = dateLine+' '+parseItem;
+          }
     			
           // Verify if priorty is altered
           if(newItem.priority && newItem.priority != 0){

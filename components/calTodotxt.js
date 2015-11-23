@@ -335,6 +335,9 @@ var myPrefObserver = {
 
   observe: function(aSubject, aTopic, aData) {
     switch (aData) {
+      case "creation":
+          this.calendar.refresh();
+          break;
       case "thunderbird":
           this.calendar.refresh();
           break;
