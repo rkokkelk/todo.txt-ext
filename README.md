@@ -10,6 +10,10 @@ Thunderbird extension for the Todo.txt application. This extension tries to inte
 * Search for complete and incomplete Todo's within Thunderbird using search paramaters such as Contexts or Projects.
 * Use Todo.txt's syntax directly within Thunderbird.
 
+## Mozilla
+
+Further information and usage statistics can be found at [Mozzila](https://addons.mozilla.org/en-US/thunderbird/addon/todotxt-extension/)
+
 # Usage
 
 The extension requires the following options:
