@@ -4,7 +4,7 @@ Thunderbird extension for the Todo.txt application. This extension tries to inte
 
 ## Functionality
 
-* Add, delete or modify Todo's from within your Thunderbird
+* Add, delete or modify Todo's from within your Thunderbird.
 * Automatically use Thunderbirds functions from Todo.txt, such as categories and priorities.
 * Get a quick overview of all your tasks.
 * Search for complete and incomplete Todo's within Thunderbird using search paramaters such as Contexts or Projects.
@@ -12,7 +12,7 @@ Thunderbird extension for the Todo.txt application. This extension tries to inte
 
 ## Mozilla
 
-Further information and usage statistics can be found at [Mozzila](https://addons.mozilla.org/en-US/thunderbird/addon/todotxt-extension/)
+Further information and usage statistics can be found at [Mozzila](https://addons.mozilla.org/en-US/thunderbird/addon/todotxt-extension/).
 
 # Usage
 
@@ -23,7 +23,7 @@ The extension requires the following options:
 
 After this configuration it is possible to see every finished and incomplete tasks and add, delete or modify them accordingly. 
 
-**Todo.txt works best with a synchronisation application such as Dropbox or Owncloud, in order to prevent accidental overwriting of the file it might be useful to set the refresh time of the calendar to a couple of minutes**
+**Todo.txt works best with a synchronisation application such as Dropbox or Owncloud, in order to prevent accidental overwriting of the file it might be useful to set the refresh time of the calendar to a couple of minutes.**
 
 ## Syntax
 
@@ -37,7 +37,7 @@ Entered as a new task within Thunderbird, it will automatically have the followi
 * Categories set to DEV & Home
 * Title containing *foobar @PR*
 
-Offcourse the Todo.txt file will contain the exact line as entered into Thunderbird.
+Offcourse the Todo.txt file will contain the exact line as entered into Thunderbird including a creation date.
 
 # Thanks
 
