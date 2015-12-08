@@ -164,12 +164,14 @@ let todoClient = {
       this.writeTodo(todo);
     else
       throw Components.Exception("Deleted item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
-
   },
 
   setTodo: function(){
 			let parseBlob = "";
       let prefs = this.getPreferences();
+
+      let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
+            getService(Components.interfaces.nsIUTF8ConverterService);
 
 			if(prefs.prefHasUserValue('todo-txt')){
 
@@ -178,7 +180,8 @@ let todoClient = {
                               createInstance(Components.interfaces.nsIFileInputStream);
 
         fstream.init(todoFile, -1, 0, 0);
-        let data = NetUtil.readInputStreamToString(fstream, fstream.available());
+        let str = NetUtil.readInputStreamToString(fstream, fstream.available());
+        let data = utf8Converter.convertURISpecToUTF8(str, "UTF-8"); 
         parseBlob += data;
       } 
 
@@ -189,7 +192,8 @@ let todoClient = {
                               createInstance(Components.interfaces.nsIFileInputStream);
 
         fstream.init(doneFile, -1, 0, 0);
-        let data = NetUtil.readInputStreamToString(fstream, fstream.available());
+        let str = NetUtil.readInputStreamToString(fstream, fstream.available());
+        let data = utf8Converter.convertURISpecToUTF8(str, "UTF-8"); 
         parseBlob += "\n"+data;
       } 
 
