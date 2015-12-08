@@ -17,7 +17,7 @@ Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 function calTodoTxt() {
   this.initProviderBase();
   
-  todotxtLogger.debugMode = true;
+  todotxtLogger.debugMode = false;
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
   myPrefObserver.register(this);

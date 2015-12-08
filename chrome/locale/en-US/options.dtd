@@ -1,3 +1,4 @@
 <!ENTITY todotxt.todofile "Location of Todo.txt">
 <!ENTITY todotxt.donefile "Location of Done.txt">
 <!ENTITY todotxt.thunderbird "Use Thunderbird's functionality">
+<!ENTITY todotxt.creation "Use the Todo's creation timestamp">

@@ -1,3 +1,4 @@
 <!ENTITY todotxt.todofile "Lieu de Todo.txt">
 <!ENTITY todotxt.donefile "Lieu de Done.txt">
 <!ENTITY todotxt.thunderbird "Utilisez la fonctionnalité de Thunderbird">
+<!ENTITY todotxt.creation "Utiliser l'horodatage de création de todo">
