@@ -6,7 +6,6 @@ EXPORTED_SYMBOLS = ['todotxtLogger'];
 
 let todotxtLogger = {
   
-  mDebugMode: false,
   app: null,
   
   get App(){
@@ -18,13 +17,15 @@ let todotxtLogger = {
   },
 
   get debugMode() {
-    return this.mDebugMode;
+    mDebugMode = true;
+    return mDebugMode;
   },
   set debugMode(aValue) {
     this.mDebugMode = aValue;
   },
   
   debug: function(src, msg) {
+    app = this.App;
     if (this.debugMode) {
       let output = '';
       if (src) {
