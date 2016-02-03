@@ -52,6 +52,17 @@ let todoClient = {
         let str_context = this.makeStr(contexts);
         item.setProperty('location', str_context);
 
+        // Define due date
+        let addons = todoItem.addons();
+        if(addons['due']){
+          // jsDueDate is parsed to 01:00:00, 
+          // because no time is used set back to 00:00:00
+          let jsDueDate = new Date(addons['due']);
+          jsDueDate.setHours(0,0,0);
+          let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
+          item.dueDate = dueDate;
+        }
+
         // Set creation date
         if(todoItem.createdDate() && prefs.getBoolPref("creation")){
           createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
@@ -90,8 +101,8 @@ let todoClient = {
 		  
       // Set contexts
       let contexts = todoItem.contexts();
-      let str_context = this.makeStr(contexts);
-      newItem.setProperty('location', str_context);
+      let strContext = this.makeStr(contexts);
+      newItem.setProperty('location', strContext);
 
       // Set creation date
       if(todoItem.createdDate() && prefs.getBoolPref("creation")){
@@ -127,6 +138,14 @@ let todoClient = {
           }
 
           todoItem.replaceWith(parseItem);
+
+          if(newItem.dueDate){
+            let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.calendarDefaultTimezone());
+            let dateStr = this.makeDateStr(dueDate);
+            todoItem.setAddOn('due', dateStr);
+          }else{
+            todoItem.removeAddOn('due');
+          }
 
           // Verify if property is set to true and createTime is present then
           // add creationDate
@@ -284,10 +303,13 @@ let todoClient = {
   },
   
   makeDateStr: function(date) {
-    let month = (date.month < 9) ? '0' + (date.month + 1) : (date.month + 1);
-    let day = (date.day < 10) ? '0' + date.day : date.day;
+    let day = date.getDate();
+    let month = (date.getMonth()+1);
+
+    day = (day < 10) ? '0' + day : day;
+    month = (month < 10) ? '0' + month : month;
     
-    return date.year + '-' + month + '-' + day;
+    return date.getFullYear() + '-' + month + '-' + day;
   },
   
   makeTimeStr: function(date) {
