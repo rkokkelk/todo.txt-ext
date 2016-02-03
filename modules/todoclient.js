@@ -118,14 +118,6 @@ let todoClient = {
           id = todoItem.id();
           let parseItem = newItem.title;
 
-          // Verify if property is set to true and createTime is present then
-          // add the new creationTime to the parseLine 
-          if(newItem.entryDate && prefs.getBoolPref("creation")){
-            date = newItem.entryDate;
-            dateLine = date.year+"-"+(date.month+1)+"-"+date.day;
-            parseItem = dateLine+' '+parseItem;
-          }
-
           // Verify if priorty is altered
           // ToDo: verify if statement correct
           if(newItem.priority && newItem.priority != 0){
@@ -136,6 +128,12 @@ let todoClient = {
 
           todoItem.replaceWith(parseItem);
 
+          // Verify if property is set to true and createTime is present then
+          // add creationDate
+          if(newItem.entryDate && prefs.getBoolPref("creation")){
+            let jsDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
+            todoItem.setCreatedDate(jsDate);
+          }
           // add new contexts
           newContexts = this.makeArray(newItem.getProperty('location'));
           for(let j=0; j<newContexts.length; j++){
