@@ -119,14 +119,12 @@ let todoClient = {
   },
 
   modifyItem: function(oldItem, newItem){
-    let id;
     let todo = this.getTodo();
     let prefs = this.getPreferences();
 
     for each(todoItem in todo.items()){
       if(todoItem.id() == oldItem.id){
 
-          id = todoItem.id();
           let parseItem = newItem.title;
 
           // Verify if priorty is altered
@@ -170,15 +168,12 @@ let todoClient = {
             todoItem.addProject(projects[i]);
           }
 
-          break;
+          this.writeTodo(todo);
+          return todoItem.id();
       }
     }
 
-    if(id){
-      this.writeTodo(todo);
-    	return id;
-		}else
-      throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+    throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
   },
 
   deleteItem: function(item){
@@ -187,15 +182,11 @@ let todoClient = {
     for each(todoItem in todo.items()){
       if(todoItem.id() == item.id){
           todo.removeItem(todoItem);
-          found = true;
-          break;
+          this.writeTodo(todo);
+          return;
       }
     }
-
-    if(found) 
-      this.writeTodo(todo);
-    else
-      throw Components.Exception("Deleted item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+    throw Components.Exception("Deleted item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
   },
 
   setTodo: function(){
@@ -208,6 +199,9 @@ let todoClient = {
 			if(prefs.prefHasUserValue('todo-txt')){
 
         todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+        if(!todoFile.exists())
+          throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+
         let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
                               createInstance(Components.interfaces.nsIFileInputStream);
 
@@ -220,6 +214,9 @@ let todoClient = {
 			if(prefs.prefHasUserValue('done-txt')){
 
         doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+        if(!doneFile.exists())
+          throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+
         let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
                               createInstance(Components.interfaces.nsIFileInputStream);
 
@@ -237,6 +234,12 @@ let todoClient = {
 
         todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
         doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+
+        if(!todoFile.exists())
+          throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+        if(!doneFile.exists())
+          throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+          
         let oTodoStream = FileUtils.openSafeFileOutputStream(todoFile);
         let oDoneStream = FileUtils.openSafeFileOutputStream(doneFile);
         let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
