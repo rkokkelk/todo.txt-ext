@@ -47,6 +47,11 @@ let todoClient = {
         if(todoItem.priority())
           item.priority = this.calPriority(todoItem.priority());
 
+        // Set contexts
+        let contexts = todoItem.contexts();
+        let str_context = this.makeStr(contexts);
+        item.setProperty('location', str_context);
+
         // Set creation date
         if(todoItem.createdDate() && prefs.getBoolPref("creation")){
           createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
@@ -82,6 +87,11 @@ let todoClient = {
         return item;
       });
 		  newItem.setCategories(projects.length,projects);
+		  
+      // Set contexts
+      let contexts = todoItem.contexts();
+      let str_context = this.makeStr(contexts);
+      newItem.setProperty('location', str_context);
 
       // Set creation date
       if(todoItem.createdDate() && prefs.getBoolPref("creation")){
@@ -98,13 +108,14 @@ let todoClient = {
   },
 
   modifyItem: function(oldItem, newItem){
-    let found = false;
+    let id;
     let todo = this.getTodo();
     let prefs = this.getPreferences();
 
     for each(todoItem in todo.items()){
       if(todoItem.id() == oldItem.id){
 
+          id = todoItem.id();
           let parseItem = newItem.title;
 
           // Verify if property is set to true and createTime is present then
@@ -114,8 +125,9 @@ let todoClient = {
             dateLine = date.year+"-"+(date.month+1)+"-"+date.day;
             parseItem = dateLine+' '+parseItem;
           }
-    			
+
           // Verify if priorty is altered
+          // ToDo: verify if statement correct
           if(newItem.priority && newItem.priority != 0){
             let pri = this.calPriority(newItem.priority);
             if(pri)
@@ -124,27 +136,30 @@ let todoClient = {
 
           todoItem.replaceWith(parseItem);
 
+          // add new contexts
+          newContexts = this.makeArray(newItem.getProperty('location'));
+          for(let j=0; j<newContexts.length; j++){
+            todoItem.addContext(newContexts[j]);
+          }
+
           // Verify if completed changed
           if(newItem.isCompleted)
             todoItem.completeTask();
           else
             todoItem.uncompleteTask();
 
-          let contexts;
           projects = newItem.getCategories({},{});
-
           for(var i=0;i<projects.length;i++){
             todoItem.addProject(projects[i]);
           }
 
-          found = true;
           break;
       }
     }
 
-    if(found){
+    if(id){
       this.writeTodo(todo);
-    	return todoItem.id();
+    	return id;
 		}else
       throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
   },
@@ -195,7 +210,7 @@ let todoClient = {
         let str = NetUtil.readInputStreamToString(fstream, fstream.available());
         let data = utf8Converter.convertURISpecToUTF8(str, "UTF-8"); 
         parseBlob += "\n"+data;
-      } 
+  } 
 
       this.todo = TodoTxt.parseFile(parseBlob);
   },
@@ -230,29 +245,38 @@ let todoClient = {
     let itemTitle = "";
     let prefs = this.getPreferences();
 
-    if(prefs.getBoolPref("thunderbird")){
-
-      makeStr = function(array){
-        let result = "";
-        for(let i=0; i<array.length;i++){
-          result += array[i];
-
-          if(i != array.length -1)
-            result += " ";
-        }
-        return result;
-      };
-
-      itemTitle = makeStr(item.textTokens());
-
-      let contexts = item.contexts();
-      if(contexts.length > 0)
-        itemTitle += " "+makeStr(contexts);
-    }else
+    if(prefs.getBoolPref("thunderbird"))
+      itemTitle = this.makeStr(item.textTokens());
+    else
       itemTitle = item.render();
 		
 		return itemTitle;
 	},
+
+  makeArray:function(string){
+    let result = [];
+
+    if(!string) return result;
+    tmp_result = string.split(' ');
+
+    for(let i=0; i<tmp_result.length;i++){
+      tmp_word = tmp_result[i].trim();
+      if (tmp_word) result.push(tmp_word);
+    }
+    return result;
+  },
+
+  makeStr:function(array, separator){
+    let result = "";
+    if(separator == undefined) separator = ' ';
+    for(let i=0; i<array.length;i++){
+      result += array[i];
+
+      if(i != array.length -1)
+        result += separator;
+    }
+    return result;
+  },
 
   getPreferences: function(){
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
