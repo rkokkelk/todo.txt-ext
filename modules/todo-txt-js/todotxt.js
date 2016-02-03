@@ -10,7 +10,7 @@ var TodoTxt = (function () {
 	var reTwoDigits = /^\d{2}$/;
 	var rePriority = /^\([A-Z]\)$/;
 	var reBlankLine = /^\s*$/;
-  var reAddOn = /[^\:]+\:[^\:]/;
+  var reAddOn = /[^\:]+\:[^\:\/\/]/;
 	
 	
 	var create = function(){
