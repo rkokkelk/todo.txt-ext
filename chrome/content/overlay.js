@@ -2,9 +2,18 @@ Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
-	var ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+	let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
 	var calManager = cal.getCalendarManager();
 	let found = false;
+
+  // Add observers to trigger when add-on is uninstalled
+  AddonManager.addAddonListener({
+    onUninstalling: function(addon) {
+      if (addon.id == "todo.txt@xseth.nl")
+        removeCal(calManager);
+        todotxtLogger.debug("overlay.js","Uninstalling");
+    },
+  });
 
 	for each (calendar in calManager.getCalendars({})){
 		if(calendar.providerID == ID){
@@ -25,4 +34,15 @@ function createCal(calManager){
 	let newCal = calManager.createCalendar('todotxt',url);
 	newCal.name = "Todo.txt";
 	calManager.registerCalendar(newCal);
+}
+
+function removeCal(calManager){
+	let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+	for each (calendar in calManager.getCalendars({})){
+		if(calendar.providerID == ID){
+	    calManager.removeCalendar(calendar);
+			todotxtLogger.debug("overlay.js","Calendar found and removed");
+			break;
+		}
+  }
 }
