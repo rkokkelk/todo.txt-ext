@@ -12,7 +12,7 @@ Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 EXPORTED_SYMBOLS = ['calTodoTxt'];
 
-
+/*
 function calTodoTxt() {
   //Components.utils.import("chrome://todotxt/content/logger.jsm");
   //Components.utils.import("chrome://todotxt/content/todoclient.js");
@@ -22,13 +22,21 @@ function calTodoTxt() {
   
   myPrefObserver.register(this);
 }
+*/
 
 calTodoTxt.prototype = {
   __proto__: cal.ProviderBase.prototype,
   
-  classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
+  //classID: "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}",
+  classID: Components.ID("00C350E2-3F65-11E5-8E8B-FBF81D5D46B0"),
   contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-  classDescription: "TodoTxt",
+  classInfo: XPCOMUtils.generateCI({
+      classDescription: "TodoTxt",
+      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
+      classID: Components.ID("00C350E2-3F65-11E5-8E8B-FBF81D5D46B0"),
+      interfaces: [Components.interfaces.calICalendar]
+  }),
+  //classDescription: "TodoTxt",
   
   getInterfaces: function getInterfaces(count) {
     const ifaces = [Components.interfaces.calICalendarProvider,
@@ -110,10 +118,11 @@ calTodoTxt.prototype = {
    * nsISupports
    */
   //TODO: find way for using global parametr
-  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo]),
+  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendar]),
 
+  //QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
+   //                 Components.interfaces.calICalendar,
+   //                 Components.interfaces.nsIClassInfo]),
   /*
    * calICalendarProvider interface
    */
@@ -334,4 +343,4 @@ var myPrefObserver = {
   }
 }
 
-const NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
+//const NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
