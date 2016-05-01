@@ -5,7 +5,7 @@ Thunderbird extension for the Todo.txt application. This extension tries to inte
 ## Functionality
 
 * Add, delete or modify Todo's from within your Thunderbird.
-* Automatically use Thunderbirds functions from Todo.txt, such as categories ,priorities, due dates etc.
+* Automatically use Thunderbirds functions from Todo.txt, such as categories, priorities, due dates etc.
 * Get a quick overview of all your tasks.
 * Search for complete and incomplete Todo's within Thunderbird using search parameters such as Contexts or Projects.
 * Use Todo.txt's syntax directly within Thunderbird.
