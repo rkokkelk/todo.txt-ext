@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
 		<em:id>todoext@xseth.nl</em:id>
-    <em:name>Todo.txt Extension</em:name>
+    <em:name>Todotxt</em:name>
     <em:version>1.0</em:version>
     <em:creator>Roy Kokkelkoren</em:creator>
 		<em:bootstrap>true</em:bootstrap>

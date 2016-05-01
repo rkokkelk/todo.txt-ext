@@ -1,10 +1,7 @@
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://todotxt/modules/logger.jsm");
-Components.utils.import("resource://todotxt/components/calTodotxt.js");
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-
 function install(aData,aReason){
 
 }
@@ -12,14 +9,17 @@ function install(aData,aReason){
 function uninstall(){}
 
 function startup(aData,aReason){
+  Components.utils.import("chrome://todotxt/content/logger.jsm");
+  Components.utils.import("chrome://todotxt/content/calTodotxt.js");
 
-	let resource = Services.io.getProtocolHandler("resource")
-         .QueryInterface(Components.interfaces.nsIResProtocolHandler);
 
-  let alias = Services.io.newFileURI(aData.installPath);
-  if (!aData.installPath.isDirectory())
-    alias = Services.io.newURI("jar:" + alias.spec + "!/", null, null);
-  resource.setSubstitution("todotxt", alias);
+//j	let resource = Services.io.getProtocolHandler("resource")
+//         .QueryInterface(Components.interfaces.nsIResProtocolHandler);
+
+ // let alias = Services.io.newFileURI(aData.installPath);
+ // if (!aData.installPath.isDirectory())
+ //   alias = Services.io.newURI("jar:" + alias.spec + "!/", null, null);
+ // resource.setSubstitution("todotxt", alias);
 
   var compman=Components.manager;
   let comreg = compman.QueryInterface(Components.interfaces.nsIComponentRegistrar);
@@ -30,11 +30,16 @@ function startup(aData,aReason){
   calTodo =  calTodoTxt.prototype;
   var factory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
 
-  if(!comreg.isContractIDRegistered('@mozilla.org/calendar/calendar;1?type=todotxt'))
+  if(!comreg.isContractIDRegistered('@mozilla.org/calendar/calendar;1?type=todotxt')){
     comreg.registerFactory(calTodo.classID, 'calTodoTxt', calTodo.contractID, factory);
+    todotxtLogger.debug('Registrate ContractID '+calTodo.contractID);
+  }else
+    todotxtLogger.debug('ContractID already registrated');
 
   if(!comreg.isContractIDRegistered('@mozilla.org/calendar/calendar;1?type=todotxt'))
 	  throw Components.Exception("Todo.txt calendar not registrated", Components.results.NS_ERROR_UNEXPECTED);
+  else
+    todotxtLogger.debug('ContractID registred');
 
 	let found = false;
 	var calManager = cal.getCalendarManager();
@@ -42,8 +47,12 @@ function startup(aData,aReason){
 	
 	if (!Components.classes[calTodo.contractID])
 		  throw Components.Exception("Todo.txt classes not found", Components.results.NS_ERROR_UNEXPECTED);
+  else
+    todotxtLogger.debug("Classes found.");
 
-	let tmp = Components.classes[calTodo.contractID].createInstance(Components.interfaces.calICalendar);
+
+	let tmp = Components.classes[calTodo.contractID].
+	  createInstance();
   if(!tmp)
 		  throw Components.Exception("Todo.txt create instance failed", Components.results.NS_ERROR_UNEXPECTED);
     
@@ -58,7 +67,7 @@ function startup(aData,aReason){
 	if(!found){
 		let url = cal.makeURL('todotxt://_unused');
 		let newCal = calManager.createCalendar('todotxt',url);
-    todotxtLogger.debug("Calendar: "+newCal);
+   // todotxtLogger.debug("Calendar: "+newCal);
 		if(!newCal)
 		  throw Components.Exception("Could not create Todo.txt Calendar", Components.results.NS_ERROR_UNEXPECTED);
     
