@@ -109,6 +109,13 @@ let todoClient = {
         createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
         newItem.entryDate = createDate;
       }
+
+      // Set due date
+      if(newItem.dueDate){
+        let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.calendarDefaultTimezone());
+        let dateStr = this.makeDateStr(dueDate);
+        todoItem.setAddOn('due', dateStr);
+      }
     }
 
     newItem.id = todoItem.id();
