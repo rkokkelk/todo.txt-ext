@@ -1,8 +1,5 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://todotxt/modules/logger.jsm");
-Components.utils.import("resource://todotxt/components/calTodotxt.js");
 
 function install(aData,aReason){
 
@@ -11,6 +8,7 @@ function install(aData,aReason){
 function uninstall(){}
 
 function startup(aData,aReason){
+  Components.utils.import("chrome://todotxt/content/logger.jsm");
   todotxtLogger.debugMode = true;
   todotxtLogger.debug("calTodoTxt");
 
