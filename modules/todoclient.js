@@ -57,7 +57,7 @@ let todoClient = {
         if(addons['due']){
           // jsDueDate is parsed to 01:00:00, 
           // because no time is used set back to 00:00:00
-          let jsDueDate = new Date(addons['due']);
+          let jsDueDate = this.parseDate(addons['due']);
           jsDueDate.setHours(0,0,0);
           let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
           item.dueDate = dueDate;
@@ -320,6 +320,13 @@ let todoClient = {
     let minute = (date.minute < 10) ? '0' + date.minute : date.minute;
     
     return hour + ':' + minute;
+  },
+  // Due to errors parsing ISO format in accordance with local time,
+  // use the following function to parse String dates
+  // parse a date in yyyy-mm-dd format
+  parseDate: function(input) {
+    var parts = input.split('-');
+    return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
   },
 
   // Priority 
