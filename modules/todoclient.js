@@ -200,38 +200,17 @@ let todoClient = {
 			let parseBlob = "";
       let prefs = this.getPreferences();
 
-      let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
-            getService(Components.interfaces.nsIUTF8ConverterService);
 
-			if(prefs.prefHasUserValue('todo-txt')){
+			if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
+          throw Components.Exception("Please specify files in properties",Components.results.NS_ERROR_UNEXPECTED);
 
-        todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-        if(!todoFile.exists())
-          throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-        let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-                              createInstance(Components.interfaces.nsIFileInputStream);
-
-        fstream.init(todoFile, -1, 0, 0);
-        let str = NetUtil.readInputStreamToString(fstream, fstream.available());
-        let data = utf8Converter.convertURISpecToUTF8(str, "UTF-8"); 
-        parseBlob += data;
-      } 
-
-			if(prefs.prefHasUserValue('done-txt')){
-
-        doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
-        if(!doneFile.exists())
-          throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
-
-        let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-                              createInstance(Components.interfaces.nsIFileInputStream);
-
-        fstream.init(doneFile, -1, 0, 0);
-        let str = NetUtil.readInputStreamToString(fstream, fstream.available());
-        let data = utf8Converter.convertURISpecToUTF8(str, "UTF-8"); 
-        parseBlob += "\n"+data;
-  } 
+      parseBlob += this.readFile(todoFile);
+      todotxtLogger.debug("readFile","String1 ["+parseBlob+"]");
+      parseBlob += this.readFile(doneFile);
+      todotxtLogger.debug("readFile","String2 ["+parseBlob+"]");
 
       this.todo = TodoTxt.parseFile(parseBlob);
   },
@@ -267,6 +246,27 @@ let todoClient = {
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
         NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
 	},
+
+  readFile: function(file){
+    let str = "";
+
+    if(!file.exists())
+      throw Components.Exception("File["+file.leafName+"] does not exists",
+          Components.results.NS_ERROR_UNEXPECTED);
+
+    let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
+                          createInstance(Components.interfaces.nsIFileInputStream);
+    let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
+            getService(Components.interfaces.nsIUTF8ConverterService);
+
+    fstream.init(file, -1, 0, 0);
+    let bytesAvailable = fstream.available();
+
+    if(bytesAvailable > 0)
+      str = NetUtil.readInputStreamToString(fstream, bytesAvailable);
+
+    return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
+  },
 
 	makeTitle: function(item){
     let itemTitle = "";
