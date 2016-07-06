@@ -7,11 +7,11 @@ let todotxtLogger = {
   app: null,
   
   get App(){
-  	if(!this.app){
-  		this.app = Components.classes["@mozilla.org/steel/application;1"]
-  													.getService(Components.interfaces.steelIApplication);
-  	}
-  	return this.app;
+    if(!this.app){
+      this.app = Components.classes["@mozilla.org/steel/application;1"]
+                            .getService(Components.interfaces.steelIApplication);
+    }
+    return this.app;
   },
 
   get debugMode() {
@@ -48,8 +48,8 @@ let todotxtLogger = {
         output += '[' + src + ']';
       }
       if (!error){
-      	output += ' ERROR: ';
-      	output += error.result+' ('+error.message+')';
+        output += ' ERROR: ';
+        output += error.result+' ('+error.message+')';
       }
       cal.LOG(output);
       app = this.App;

@@ -11,7 +11,7 @@ EXPORTED_SYMBOLS = ['todoClient'];
 
 let todoClient = {
 
-	todo: null,
+  todo: null,
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
@@ -22,19 +22,19 @@ let todoClient = {
     return this.todo;
   },
 
-	getItems: function(calendar,refresh){
-		let items = [];
-		let todo = this.getTodo(refresh);
+  getItems: function(calendar,refresh){
+    let items = [];
+    let todo = this.getTodo(refresh);
     let prefs = this.getPreferences();
-		let tzService = cal.getTimezoneService();
+    let tzService = cal.getTimezoneService();
 
-		for each(todoItem in todo.items({},'priority')){
-			item = cal.createTodo();
+    for each(todoItem in todo.items({},'priority')){
+      item = cal.createTodo();
 
-			item.id = todoItem.id();
-			item.calendar = calendar;
-    	item.title = this.makeTitle(todoItem);
-			item.isCompleted = todoItem.isComplete();
+      item.id = todoItem.id();
+      item.calendar = calendar;
+      item.title = this.makeTitle(todoItem);
+      item.isCompleted = todoItem.isComplete();
 
       if(prefs.getBoolPref("thunderbird")){
         let projects = todoItem.projects().map(function(item){
@@ -76,10 +76,10 @@ let todoClient = {
         }
       }
 
-			items.push(item);
-		}
-		return items;
-	},
+      items.push(item);
+    }
+    return items;
+  },
 
   addItem: function(newItem){
     let todo = this.getTodo();
@@ -97,8 +97,8 @@ let todoClient = {
           item = item.substr(1);
         return item;
       });
-		  newItem.setCategories(projects.length,projects);
-		  
+      newItem.setCategories(projects.length,projects);
+      
       // Set contexts
       let contexts = todoItem.contexts();
       let strContext = this.makeStr(contexts);
@@ -139,7 +139,7 @@ let todoClient = {
           if(newItem.priority && newItem.priority != 0){
             let pri = this.calPriority(newItem.priority);
             if(pri)
-	            parseItem = '('+pri+') '+parseItem;
+              parseItem = '('+pri+') '+parseItem;
           }
 
           todoItem.replaceWith(parseItem);
@@ -197,11 +197,11 @@ let todoClient = {
   },
 
   setTodo: function(){
-			let parseBlob = "";
+      let parseBlob = "";
       let prefs = this.getPreferences();
 
 
-			if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
+      if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
           throw Components.Exception("Please specify files in properties",Components.results.NS_ERROR_UNEXPECTED);
 
       todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
@@ -215,7 +215,7 @@ let todoClient = {
       this.todo = TodoTxt.parseFile(parseBlob);
   },
 
-	writeTodo: function(todo){
+  writeTodo: function(todo){
         let prefs = this.getPreferences();
 
         todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
@@ -238,14 +238,14 @@ let todoClient = {
 
         writeCallback = function(status){
             if (Components.isSuccessCode(status))
-        			todotxtLogger.debug("todoClient.js","written to file");
+              todotxtLogger.debug("todoClient.js","written to file");
             else
               throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
         };
 
         NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
         NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
-	},
+  },
 
   readFile: function(file){
     let str = "";
@@ -268,7 +268,7 @@ let todoClient = {
     return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
   },
 
-	makeTitle: function(item){
+  makeTitle: function(item){
     let itemTitle = "";
     let prefs = this.getPreferences();
 
@@ -276,9 +276,9 @@ let todoClient = {
       itemTitle = this.makeStr(item.textTokens());
     else
       itemTitle = item.render();
-		
-		return itemTitle;
-	},
+    
+    return itemTitle;
+  },
 
   makeArray:function(string){
     let result = [];
@@ -342,28 +342,28 @@ let todoClient = {
   // C --> 3, Low
   calPriority: function(pri){
     if(typeof pri === 'string'){
-    	let p = pri.charAt(0);
-    	switch(p){
-				case "A":
-					return 1
-				case "B":
-						return 5;
-				case "C":
-						return 9;
-				default:
-						return 0;
-			}
+      let p = pri.charAt(0);
+      switch(p){
+        case "A":
+          return 1
+        case "B":
+            return 5;
+        case "C":
+            return 9;
+        default:
+            return 0;
+      }
     } else if (typeof pri === 'number'){
-    	switch(pri){
-				case 1:
-					return 'A';
-				case 5:
-					return 'B';
-				case 9:
-					return 'C';
-				default:
-					return null;
-			}
+      switch(pri){
+        case 1:
+          return 'A';
+        case 5:
+          return 'B';
+        case 9:
+          return 'C';
+        default:
+          return null;
+      }
     }else
       throw Components.Exception("Priority Parser error",Components.results.NS_ERROR_UNEXPECTED);
   },

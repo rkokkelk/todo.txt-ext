@@ -1,8 +1,8 @@
 <?xml version="1.0"?> 
 
 <!DOCTYPE window [
-	<!ENTITY % todotxt SYSTEM "chrome://todotxt/locale/options.dtd">
-	%todotxt;
+  <!ENTITY % todotxt SYSTEM "chrome://todotxt/locale/options.dtd">
+  %todotxt;
 ]> 
  
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
