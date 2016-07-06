@@ -37,7 +37,7 @@ calTodoTxt.prototype = {
                     Components.interfaces.nsISupports];
     count.value = ifaces.length;
     return ifaces;
-	},
+  },
   
   getHelperForLanguage: function getHelperForLanguage(language) {
     return null;
@@ -141,8 +141,8 @@ calTodoTxt.prototype = {
   },
 
   get providerID() {
-  	return "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
-	},
+    return "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+  },
 
   get canRefresh() {
     return true;
@@ -177,9 +177,9 @@ calTodoTxt.prototype = {
     
     try {    
 
-			let isEvent = aItem.isCompleted == null;
-			if(isEvent)
-				throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
+      let isEvent = aItem.isCompleted == null;
+      if(isEvent)
+        throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
 
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,
@@ -264,29 +264,29 @@ calTodoTxt.prototype = {
     }
     
     try {
-    	if(!this.mLastSync){
-    		items = todoClient.getItems(this,true);
+      if(!this.mLastSync){
+        items = todoClient.getItems(this,true);
 
-				this.mLastSync = new Date();
-    		this.mTaskCache[this.id] = {};
+        this.mLastSync = new Date();
+        this.mTaskCache[this.id] = {};
 
-				for each(item in items)
-					this.mTaskCache[this.id][item.id] = item;
+        for each(item in items)
+          this.mTaskCache[this.id][item.id] = item;
 
-				aListener.onGetResult(this.superCalendar,
-															Components.results.NS_OK,
-															Components.interfaces.calITodo,
-															null,
-															items.length,
-															items);
-				this.notifyOperationComplete(aListener, 
-																		Components.results.NS_OK,
-																		Components.interfaces.calIOperationListener.GET,
-																		null,
-																		null);
-			}else
-				this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
-			
+        aListener.onGetResult(this.superCalendar,
+                              Components.results.NS_OK,
+                              Components.interfaces.calITodo,
+                              null,
+                              items.length,
+                              items);
+        this.notifyOperationComplete(aListener, 
+                                    Components.results.NS_OK,
+                                    Components.interfaces.calIOperationListener.GET,
+                                    null,
+                                    null);
+      }else
+        this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
+      
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:getItems()',e);
       this.notifyOperationComplete(aListener,
