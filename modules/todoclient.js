@@ -208,9 +208,8 @@ let todoClient = {
       doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
       parseBlob += this.readFile(todoFile);
-      todotxtLogger.debug("readFile","String1 ["+parseBlob+"]");
       parseBlob += this.readFile(doneFile);
-      todotxtLogger.debug("readFile","String2 ["+parseBlob+"]");
+      todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
 
       this.todo = TodoTxt.parseFile(parseBlob);
   },
@@ -265,6 +264,8 @@ let todoClient = {
     if(bytesAvailable > 0)
       str = NetUtil.readInputStreamToString(fstream, bytesAvailable);
 
+    // Verify if str contains newline at end
+    if(str.substr(str.length-1) != "\n") str += "\n";
     return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
   },
 
