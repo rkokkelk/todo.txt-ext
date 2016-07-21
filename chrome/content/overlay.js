@@ -1,4 +1,5 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
@@ -23,8 +24,17 @@ window.addEventListener("load", function(e) {
     }
   }
 
-  if(!found){
+  if(!found)
     createCal(calManager);
+
+  // if todo.txt & done.txt loc is not set, show properties
+  let prefs = Components.classes["@mozilla.org/preferences-service;1"]
+                          .getService(Components.interfaces.nsIPrefService);
+  prefs =  prefs.getBranch("extensions.todotxt.");
+
+  if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt')){
+    Services.wm.getMostRecentWindow('navigator:browser')
+      .BrowserOpenAddonsMgr('addons://detail/todotxt/preferences');
   }
 }, false);
 
