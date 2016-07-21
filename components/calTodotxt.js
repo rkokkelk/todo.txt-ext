@@ -6,6 +6,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
+Components.utils.import("resource://gre/modules/Timer.jsm");
 
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
@@ -297,13 +298,11 @@ calTodoTxt.prototype = {
     }
   },
 
-  startBatch: function cSC_startBatch()
-  {
+  startBatch: function cSC_startBatch(){
     todotxtLogger.debug('calTodotxt.js:startBatch()');
   },
   
-  endBatch: function cSC_endBatch()
-  {
+  endBatch: function cSC_endBatch(){
     todotxtLogger.debug('calTodotxt.js:endBatch()');
   }
 };
@@ -311,14 +310,14 @@ calTodoTxt.prototype = {
 var myPrefObserver = {
   
   calendar: null,
+  intervalID: null,
 
   register: function(cal) {
-
     this.calendar = cal;
+
     // For this.branch we ask for the preferences for extensions.myextension. and children
     var prefs = Components.classes["@mozilla.org/preferences-service;1"]
                       .getService(Components.interfaces.nsIPrefService);
-
     this.branch = prefs.getBranch("extensions.todotxt.");
 
     if (!("addObserver" in this.branch))
@@ -326,11 +325,22 @@ var myPrefObserver = {
 
     // Finally add the observer.
     this.branch.addObserver("", this, false);
+
+    // Add periodical verification of todo files, every 10s
+    let _this = this;
+    this.intervalID = setInterval(function(){
+      _this.verifyTodo(_this.calendar);
+    }, 10*1000);
   },
 
   unregister: function() {
     this.calendar = null;
     this.branch.removeObserver("", this);
+
+    if(this.intervalID)
+      clearInterval(this.intervalID);
+
+    todotxtLogger.debug('calTodotxt.js:unregister');
   },
 
   observe: function(aSubject, aTopic, aData) {
@@ -346,6 +356,48 @@ var myPrefObserver = {
         todoClient.setTodo();
         this.calendar.refresh();
         break;
+    }
+  },
+
+  // Verify if todo & done file changed by
+  // comparing MD5 checksum, if different refresh calendar
+  verifyTodo: function(calendar){
+    let data;
+    let prefs = todoClient.getPreferences();
+
+    // this tells updateFromStream to read the entire file
+    const PR_UINT32_MAX = 0xffffffff;
+
+    // Use MD5, hash if for comparison and needs to be fast not secure
+    let ch = Components.classes["@mozilla.org/security/hash;1"]
+                         .createInstance(Components.interfaces.nsICryptoHash);
+    ch.init(ch.MD5);
+
+    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+
+    var todoIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                              .createInstance(Components.interfaces.nsIFileInputStream);
+    var doneIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                              .createInstance(Components.interfaces.nsIFileInputStream);
+
+    // open files for reading
+    todoIstream.init(todoFile, 0x01, 0444, 0);
+    doneIstream.init(doneFile, 0x01, 0444, 0);
+
+    ch.updateFromStream(todoIstream, PR_UINT32_MAX);
+    ch.updateFromStream(doneIstream, PR_UINT32_MAX);
+
+    let old_checksum = this.todoCheckSum;
+    this.todoCheckSum = ch.finish(true);
+    todotxtLogger.debug('calTodotxt.js:verifyTodo','hash ['+this.todoCheckSum+']');
+
+    // Verify if not first run, old_checksum != undef
+    if(old_checksum != undefined){
+      if(old_checksum != this.todoCheckSum){
+        todotxtLogger.debug('verifyTodo','refresh');
+        calendar.refresh();
+      }
     }
   }
 }
