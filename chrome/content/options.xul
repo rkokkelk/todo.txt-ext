@@ -11,4 +11,5 @@
   <setting pref="extensions.todotxt.done-txt" type="file" title="&todotxt.donefile;" />
   <setting pref="extensions.todotxt.thunderbird" type="bool" title="&todotxt.thunderbird;" />
   <setting pref="extensions.todotxt.creation" type="bool" title="&todotxt.creation;"/>
+  <setting pref="extensions.todotxt.showFullTitle" type="bool" title="&todotxt.showFullTitle;"/>
 </vbox>

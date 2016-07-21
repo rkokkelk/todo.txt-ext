@@ -37,20 +37,22 @@ let todoClient = {
       item.isCompleted = todoItem.isComplete();
 
       if(prefs.getBoolPref("thunderbird")){
-        let projects = todoItem.projects().map(function(item){
-          if(item.charAt(0) === '+')
-            item = item.substr(1);
-          return item;
-        });
-        item.setCategories(projects.length,projects);
+        if(!prefs.getBoolPref('showFullTitle')){
+          let projects = todoItem.projects().map(function(item){
+            if(item.charAt(0) === '+')
+              item = item.substr(1);
+            return item;
+          });
+          item.setCategories(projects.length,projects);
+
+          // Set contexts
+          let contexts = todoItem.contexts();
+          let str_context = this.makeStr(contexts);
+          item.setProperty('location', str_context);
+        }
 
         if(todoItem.priority())
           item.priority = this.calPriority(todoItem.priority());
-
-        // Set contexts
-        let contexts = todoItem.contexts();
-        let str_context = this.makeStr(contexts);
-        item.setProperty('location', str_context);
 
         // Define due date
         let addons = todoItem.addons();
@@ -92,17 +94,20 @@ let todoClient = {
       if(todoItem.priority())
         newItem.priority = this.calPriority(todoItem.priority());
 
-      let projects = todoItem.projects().map(function(item){
-        if(item.charAt(0) === '+')
-          item = item.substr(1);
-        return item;
-      });
-      newItem.setCategories(projects.length,projects);
-      
-      // Set contexts
-      let contexts = todoItem.contexts();
-      let strContext = this.makeStr(contexts);
-      newItem.setProperty('location', strContext);
+      if(!prefs.getBoolPref('showFullTitle')){
+
+        let projects = todoItem.projects().map(function(item){
+          if(item.charAt(0) === '+')
+            item = item.substr(1);
+          return item;
+        });
+        newItem.setCategories(projects.length,projects);
+        
+        // Set contexts
+        let contexts = todoItem.contexts();
+        let strContext = this.makeStr(contexts);
+        newItem.setProperty('location', strContext);
+      }
 
       // Set creation date
       if(todoItem.createdDate() && prefs.getBoolPref("creation")){
@@ -158,10 +163,13 @@ let todoClient = {
             let jsDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
             todoItem.setCreatedDate(jsDate);
           }
-          // add new contexts
-          newContexts = this.makeArray(newItem.getProperty('location'));
-          for(let j=0; j<newContexts.length; j++){
-            todoItem.addContext(newContexts[j]);
+
+          if(!prefs.getBoolPref('showFullTitle')){
+            // add new contexts
+            newContexts = this.makeArray(newItem.getProperty('location'));
+            for(let j=0; j<newContexts.length; j++){
+              todoItem.addContext(newContexts[j]);
+            }
           }
 
           // Verify if completed changed
@@ -170,9 +178,11 @@ let todoClient = {
           else
             todoItem.uncompleteTask();
 
-          projects = newItem.getCategories({},{});
-          for(var i=0;i<projects.length;i++){
-            todoItem.addProject(projects[i]);
+          if(!prefs.getBoolPref('showFullTitle')){
+            projects = newItem.getCategories({},{});
+            for(var i=0;i<projects.length;i++){
+              todoItem.addProject(projects[i]);
+            }
           }
 
           this.writeTodo(todo);
@@ -197,53 +207,53 @@ let todoClient = {
   },
 
   setTodo: function(){
-      let parseBlob = "";
-      let prefs = this.getPreferences();
+    let parseBlob = "";
+    let prefs = this.getPreferences();
 
 
-      if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
-          throw Components.Exception("Please specify files in properties",Components.results.NS_ERROR_UNEXPECTED);
+    if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
+        throw Components.Exception("Please specify files in properties",Components.results.NS_ERROR_UNEXPECTED);
 
-      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-      parseBlob += this.readFile(todoFile);
-      parseBlob += this.readFile(doneFile);
-      todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+    parseBlob += this.readFile(todoFile);
+    parseBlob += this.readFile(doneFile);
+    todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
 
-      this.todo = TodoTxt.parseFile(parseBlob);
+    this.todo = TodoTxt.parseFile(parseBlob);
   },
 
   writeTodo: function(todo){
-        let prefs = this.getPreferences();
+    let prefs = this.getPreferences();
 
-        todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-        doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-        if(!todoFile.exists())
-          throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
-        if(!doneFile.exists())
-          throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
-          
-        let oTodoStream = FileUtils.openSafeFileOutputStream(todoFile);
-        let oDoneStream = FileUtils.openSafeFileOutputStream(doneFile);
-        let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                                        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        converter.charset = "UTF-8";
-        let todoRender = todo.render({isComplete:false});
-        let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
-        let iTodoStream = converter.convertToInputStream(todoRender);
-        let iDoneStream = converter.convertToInputStream(doneRender);
+    if(!todoFile.exists())
+      throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+    if(!doneFile.exists())
+      throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
+      
+    let oTodoStream = FileUtils.openSafeFileOutputStream(todoFile);
+    let oDoneStream = FileUtils.openSafeFileOutputStream(doneFile);
+    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                                    createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+    let todoRender = todo.render({isComplete:false});
+    let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
+    let iTodoStream = converter.convertToInputStream(todoRender);
+    let iDoneStream = converter.convertToInputStream(doneRender);
 
-        writeCallback = function(status){
-            if (Components.isSuccessCode(status))
-              todotxtLogger.debug("todoClient.js","written to file");
-            else
-              throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
-        };
+    writeCallback = function(status){
+        if (Components.isSuccessCode(status))
+          todotxtLogger.debug("todoClient.js","written to file");
+        else
+          throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
+    };
 
-        NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
-        NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
+    NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
+    NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
   },
 
   readFile: function(file){
@@ -273,8 +283,19 @@ let todoClient = {
     let itemTitle = "";
     let prefs = this.getPreferences();
 
-    if(prefs.getBoolPref("thunderbird"))
-      itemTitle = this.makeStr(item.textTokens());
+    if(prefs.getBoolPref('thunderbird'))
+
+      // Show Projects & Contexts in title
+      if(prefs.getBoolPref('showFullTitle')){
+        itemTitle = item.render();
+        // Filter out priority, start date & adds-ons
+        for each(let regex in [
+            /^\([A-Za-z]{1}\)\s*/,
+            /^\d{4}-\d{2}-\d{2}\s*/,
+            /[\w\d-_]+:[\w\d-_]+\s*/])
+          itemTitle = itemTitle.replace(regex,"");
+      } else
+        itemTitle = this.makeStr(item.textTokens());
     else
       itemTitle = item.render();
     
