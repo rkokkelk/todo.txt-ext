@@ -1,2 +1,3 @@
+# Ignore different builds
+todotxt_*.xpi
 todotxt.xpi
-todo.xpi
