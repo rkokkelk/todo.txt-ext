@@ -220,9 +220,9 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevents different ID's, set interval because write 
       // is not immediately finished
-      setTimeout(new function(){
+      setTimeout(function(){
         myPrefObserver.checkSum = myPrefObserver.calculateMD5();
-      }, 5000);
+      }, 1000);
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -264,12 +264,11 @@ calTodoTxt.prototype = {
     todotxtLogger.debug('calTodotxt.js:getItems()');
     // we have to initialize these, and the calendar ID property isn't available
     // when the constructor is called
-    if (!this.mTaskCache[this.id]) {
+    if (!this.mTaskCache[this.id])
       this.mTaskCache[this.id] = {};
-    }
-    if (!this.mPendingApiRequestListeners[this.id]) {
+    
+    if (!this.mPendingApiRequestListeners[this.id])
       this.mPendingApiRequestListeners[this.id] = [];
-    }
     
     try {
       if(!this.mLastSync){
@@ -334,11 +333,11 @@ var myPrefObserver = {
     // Finally add the observer.
     this.branch.addObserver("", this, false);
 
-    // Add periodical verification of todo files, every 20s
+    // Add periodical verification of todo files, every 15s
     let _this = this;
     this.intervalID = setInterval(function(){
       _this.verifyTodo(_this);
-    }, 20*1000);
+    }, 15*1000);
   },
 
   unregister: function() {
