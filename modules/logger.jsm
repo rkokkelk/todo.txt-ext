@@ -21,11 +21,17 @@ let todotxtLogger = {
   set debugMode(aValue) {
     this.mDebugMode = aValue;
   },
+
+  getDateTime: function(){
+    let result = '';
+    let curDate = new Date();
+    return new Date().toLocaleString();
+  },
   
   debug: function(src, msg) {
     app = this.App;
     if (this.debugMode) {
-      let output = '';
+      let output = '('+this.getDateTime()+') ';
       if (src) {
         output += '[' + src + ']';
       }
@@ -43,7 +49,7 @@ let todotxtLogger = {
 
   error: function(src, error) {
     if (this.debugMode) {
-      let output = '';
+      let output = '('+this.getDateTime()+') ';
       if (src) {
         output += '[' + src + ']';
       }
