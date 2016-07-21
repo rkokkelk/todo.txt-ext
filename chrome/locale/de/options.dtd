@@ -2,3 +2,4 @@
 <!ENTITY todotxt.donefile "Lage von Done.txt">
 <!ENTITY todotxt.thunderbird "Benutzen Thunderbird's Funktionalität">
 <!ENTITY todotxt.creation "Benutzen die Todo's Schaffung Zeitstempel">
+<!ENTITY todotxt.showFullTitle "Anzeigen Projekte und Contexts im Titel">
