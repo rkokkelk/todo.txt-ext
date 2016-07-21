@@ -2,3 +2,4 @@
 <!ENTITY todotxt.donefile "Locatie van het Done.txt bestand">
 <!ENTITY todotxt.thunderbird "Gebruik de functionaliteit van Thunderbird">
 <!ENTITY todotxt.creation "Gebruik de startdatum van de Todo's in Thunderbird">
+<!ENTITY todotxt.showFullTitle "Toon projecten en context in de titel">
