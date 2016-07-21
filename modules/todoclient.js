@@ -221,7 +221,7 @@ let todoClient = {
     parseBlob += this.readFile(doneFile);
     todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
 
-      this.todo = TodoTxt.parseFile(parseBlob);
+    this.todo = TodoTxt.parseFile(parseBlob);
   },
 
   writeTodo: function(todo){

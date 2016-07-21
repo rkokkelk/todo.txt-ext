@@ -56,6 +56,7 @@ calTodoTxt.prototype = {
   get pendingApiRequest() {
     return this.mPendingApiRequest;
   },
+
   set pendingApiRequest(aValue) {
     this.mPendingApiRequest = aValue;
     
@@ -215,6 +216,13 @@ calTodoTxt.prototype = {
                                    aNewItem);
       this.mTaskCache[this.id][aNewItem.id] = aNewItem;
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
+      
+      // Update checksum because file changes and thus
+      // prevents different ID's, set interval because write 
+      // is not immediately finished
+      setTimeout(new function(){
+        myPrefObserver.checkSum = myPrefObserver.calculateMD5();
+      }, 5000);
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -222,7 +230,6 @@ calTodoTxt.prototype = {
                                    Components.interfaces.calIOperationListener.MODIFY,
                                    null,
                                    e.message);
-
     }
   },
   
@@ -311,6 +318,7 @@ var myPrefObserver = {
   
   calendar: null,
   intervalID: null,
+  checkSum: null,
 
   register: function(cal) {
     this.calendar = cal;
@@ -326,11 +334,11 @@ var myPrefObserver = {
     // Finally add the observer.
     this.branch.addObserver("", this, false);
 
-    // Add periodical verification of todo files, every 10s
+    // Add periodical verification of todo files, every 20s
     let _this = this;
     this.intervalID = setInterval(function(){
-      _this.verifyTodo(_this.calendar);
-    }, 10*1000);
+      _this.verifyTodo(_this);
+    }, 20*1000);
   },
 
   unregister: function() {
@@ -348,8 +356,8 @@ var myPrefObserver = {
       case "creation":
       case "thunderbird":
       case "showFullTitle":
-          this.calendar.refresh();
-          break;
+        this.calendar.refresh();
+        break;
       case "done-txt":
       case "todo-txt":
         todoClient.setTodo();
@@ -360,8 +368,21 @@ var myPrefObserver = {
 
   // Verify if todo & done file changed by
   // comparing MD5 checksum, if different refresh calendar
-  verifyTodo: function(calendar){
-    let data;
+  verifyTodo: function(ref){
+
+    let old_checksum = ref.checkSum;
+    ref.checkSum = this.calculateMD5();
+
+    // Verify if not first run, old_checksum != undef
+    if(old_checksum){
+      if(old_checksum != ref.checkSum){
+        todotxtLogger.debug('verifyTodo','refresh');
+        ref.calendar.refresh();
+      }
+    }
+  },
+
+  calculateMD5: function(){
     let prefs = todoClient.getPreferences();
 
     // this tells updateFromStream to read the entire file
@@ -386,18 +407,9 @@ var myPrefObserver = {
 
     ch.updateFromStream(todoIstream, PR_UINT32_MAX);
     ch.updateFromStream(doneIstream, PR_UINT32_MAX);
-
-    let old_checksum = this.todoCheckSum;
-    this.todoCheckSum = ch.finish(true);
-    todotxtLogger.debug('calTodotxt.js:verifyTodo','hash ['+this.todoCheckSum+']');
-
-    // Verify if not first run, old_checksum != undef
-    if(old_checksum != undefined){
-      if(old_checksum != this.todoCheckSum){
-        todotxtLogger.debug('verifyTodo','refresh');
-        calendar.refresh();
-      }
-    }
+    let result =  ch.finish(true);
+    todotxtLogger.debug('calTodotxt.js:calculateMD5','hash ['+result+']');
+    return result
   }
 }
 
