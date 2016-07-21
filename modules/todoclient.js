@@ -306,10 +306,9 @@ let todoClient = {
   },
 
   getPreferences: function(){
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+    let prefs = Components.classes["@mozilla.org/preferences-service;1"]
                             .getService(Components.interfaces.nsIPrefService);
-    prefs = prefs.getBranch("extensions.todotxt.");
-    return prefs;
+    return prefs.getBranch("extensions.todotxt.");
   },
   
   makeDateStr: function(date) {
@@ -328,6 +327,7 @@ let todoClient = {
     
     return hour + ':' + minute;
   },
+
   // Due to errors parsing ISO format in accordance with local time,
   // use the following function to parse String dates
   // parse a date in yyyy-mm-dd format
@@ -338,8 +338,8 @@ let todoClient = {
 
   // Priority 
   // A --> 1, High
-  // B --> 2, Normal
-  // C --> 3, Low
+  // B --> 5, Normal
+  // C --> 9, Low
   calPriority: function(pri){
     if(typeof pri === 'string'){
       let p = pri.charAt(0);
