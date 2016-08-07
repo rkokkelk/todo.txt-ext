@@ -18,6 +18,9 @@ while getopts "d" opt; do
   esac
 done
 
+echo "Remove old builds"
+rm ./todotxt_*.xpi 
+
 echo "Build version [$VERSION]"
 # Ensure that debugMode is set to false
 
