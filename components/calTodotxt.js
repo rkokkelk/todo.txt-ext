@@ -18,10 +18,15 @@ Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 function calTodoTxt() {
   this.initProviderBase();
   
-  todotxtLogger.debugMode = false;
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
-  myPrefObserver.register(this);
+  prefObserver.register(this);
+  timerObserver.register(this);
+  
+  // Add periodical verification of todo files, every 15s
+  timer = Components.classes["@mozilla.org/timer;1"]
+    .createInstance(Components.interfaces.nsITimer);
+  timer.init(timerObserver, 15*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 calTodoTxt.prototype = {
@@ -218,11 +223,11 @@ calTodoTxt.prototype = {
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
       
       // Update checksum because file changes and thus
-      // prevents different ID's, set interval because write 
+      // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      setTimeout(function(){
-        myPrefObserver.checkSum = myPrefObserver.calculateMD5();
-      }, 1000);
+      let timer = Components.classes["@mozilla.org/timer;1"]
+        .createInstance(Components.interfaces.nsITimer);
+      timer.initWithCallback(timerObserver, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -313,11 +318,84 @@ calTodoTxt.prototype = {
   }
 };
 
-var myPrefObserver = {
+/*
+ * Observer for notices of timers for synchronization process
+ */
+var timerObserver = {
+
+  calendar: null,
+  checkSum: null,
+
+  register: function(cal) {
+    this.calendar = cal;
+    todotxtLogger.debug('timerObserver','register');
+  },
+
+  unregister: function() {
+    this.calendar = null;
+    if(this.timer) timer.cancel();
+
+    todotxtLogger.debug('timerObserver','unregister');
+  },
+
+  // Verify if todo & done file changed by
+  // comparing MD5 checksum, if different refresh calendar
+  observe: function(aSubject, aTopic, aData) {
+    todotxtLogger.debug('timerObserver:observer','subject['+aSubject+'] topic['+aTopic+']');
+    let old_checksum = this.checkSum;
+    this.checkSum = this.calculateMD5();
+
+    // Verify if not first run, old_checksum != undef
+    if(old_checksum){
+      if(old_checksum != this.checkSum){
+        todotxtLogger.debug('timerObserver','refresh');
+        this.calendar.refresh();
+      }
+    }
+  },
+
+  notify: function(timer){
+    todotxtLogger.debug('timerObserver','notify');
+    this.checkSum = this.calculateMD5();
+  },
+
+  calculateMD5: function(){
+    let prefs = todoClient.getPreferences();
+
+    // this tells updateFromStream to read the entire file
+    const PR_UINT32_MAX = 0xffffffff;
+
+    // Use MD5, hash for comparison and needs to be fast not secure
+    let ch = Components.classes["@mozilla.org/security/hash;1"]
+                         .createInstance(Components.interfaces.nsICryptoHash);
+    ch.init(ch.MD5);
+
+    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+
+    let todoIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                              .createInstance(Components.interfaces.nsIFileInputStream);
+    let doneIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
+                              .createInstance(Components.interfaces.nsIFileInputStream);
+
+    // open files for reading
+    todoIstream.init(todoFile, 0x01, 0444, 0);
+    doneIstream.init(doneFile, 0x01, 0444, 0);
+    ch.updateFromStream(todoIstream, PR_UINT32_MAX);
+    ch.updateFromStream(doneIstream, PR_UINT32_MAX);
+
+    let result =  ch.finish(true);
+    todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
+    return result
+  }
+};
+
+/* 
+ * Observer for changing properties
+ */
+var prefObserver = {
   
   calendar: null,
-  intervalID: null,
-  checkSum: null,
 
   register: function(cal) {
     this.calendar = cal;
@@ -332,22 +410,12 @@ var myPrefObserver = {
 
     // Finally add the observer.
     this.branch.addObserver("", this, false);
-
-    // Add periodical verification of todo files, every 15s
-    let _this = this;
-    this.intervalID = setInterval(function(){
-      _this.verifyTodo(_this);
-    }, 15*1000);
   },
 
   unregister: function() {
     this.calendar = null;
     this.branch.removeObserver("", this);
-
-    if(this.intervalID)
-      clearInterval(this.intervalID);
-
-    todotxtLogger.debug('calTodotxt.js:unregister');
+    todotxtLogger.debug('prefObserver:unregister');
   },
 
   observe: function(aSubject, aTopic, aData) {
@@ -363,54 +431,8 @@ var myPrefObserver = {
         this.calendar.refresh();
         break;
     }
-  },
-
-  // Verify if todo & done file changed by
-  // comparing MD5 checksum, if different refresh calendar
-  verifyTodo: function(ref){
-
-    let old_checksum = ref.checkSum;
-    ref.checkSum = this.calculateMD5();
-
-    // Verify if not first run, old_checksum != undef
-    if(old_checksum){
-      if(old_checksum != ref.checkSum){
-        todotxtLogger.debug('verifyTodo','refresh');
-        ref.calendar.refresh();
-      }
-    }
-  },
-
-  calculateMD5: function(){
-    let prefs = todoClient.getPreferences();
-
-    // this tells updateFromStream to read the entire file
-    const PR_UINT32_MAX = 0xffffffff;
-
-    // Use MD5, hash if for comparison and needs to be fast not secure
-    let ch = Components.classes["@mozilla.org/security/hash;1"]
-                         .createInstance(Components.interfaces.nsICryptoHash);
-    ch.init(ch.MD5);
-
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
-
-    var todoIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-    var doneIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-
-    // open files for reading
-    todoIstream.init(todoFile, 0x01, 0444, 0);
-    doneIstream.init(doneFile, 0x01, 0444, 0);
-
-    ch.updateFromStream(todoIstream, PR_UINT32_MAX);
-    ch.updateFromStream(doneIstream, PR_UINT32_MAX);
-    let result =  ch.finish(true);
-    todotxtLogger.debug('calTodotxt.js:calculateMD5','hash ['+result+']');
-    return result
   }
-}
+};
 
 /** Module Registration */
 function NSGetFactory(cid) {
