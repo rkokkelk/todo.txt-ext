@@ -381,8 +381,12 @@ var timerObserver = {
     // open files for reading
     todoIstream.init(todoFile, 0x01, 0444, 0);
     doneIstream.init(doneFile, 0x01, 0444, 0);
-    ch.updateFromStream(todoIstream, PR_UINT32_MAX);
-    ch.updateFromStream(doneIstream, PR_UINT32_MAX);
+
+    // Make sure that Istream is not empty
+    if(todoIstream.available() > 0)
+      ch.updateFromStream(todoIstream, PR_UINT32_MAX);
+    if(doneIstream.available() > 0)
+      ch.updateFromStream(doneIstream, PR_UINT32_MAX);
 
     let result =  ch.finish(true);
     todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
