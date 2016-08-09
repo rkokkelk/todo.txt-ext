@@ -8,23 +8,23 @@ FILE="todotxt_${VERSION}.xpi"
 
 function show_help {
   echo "usage: build.sh [-d | -h]"
-  echo "Options and arguments" 
+  echo "Options and arguments"
   echo "-d    : Enabling debugging, will show debug messages in Thunderbird [NOT FOR PRODUCTION]"
   echo "-h    : Show this help"
 }
 
 while getopts "dh" opt; do
   case $opt in
-		d)
-			DEV=true
-			;;
-		h)
+    d)
+      DEV=true
+      ;;
+    h)
       show_help
       exit 0
       ;;
     \?)
       show_help
-			exit 1
+      exit 1
       ;;
   esac
 done
