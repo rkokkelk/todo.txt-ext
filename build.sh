@@ -31,11 +31,11 @@ done
 
 echo "Building version [$VERSION]"
 
-PREV_BUILDS=$(ls todotxt_*)
-if [ $? ];
+PREV_BUILDS="$(ls todotxt_* 2>/dev/null)"
+if [ -n "$PREV_BUILDS" ];
 then
   echo "Removing old builds [$PREV_BUILDS]"
-  rm todotxt_*.xpi
+  rm $PREV_BUILDS
 fi
 
 # Ensure that debugMode is set to false
