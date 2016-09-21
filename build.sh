@@ -3,8 +3,6 @@
 # Build script for add-on
 # resulting in zip formatted file todotxt_$version$.xpi
 
-VERSION=$(sed -n 's/.*<em:version>\(.*\)<\/em:version>/\1/p' install.rdf)
-FILE="todotxt_${VERSION}.xpi"
 
 function show_help {
   echo "usage: build.sh [-d | -h]"
@@ -28,6 +26,15 @@ while getopts "dh" opt; do
       ;;
   esac
 done
+
+if [ -e install.rdf ]; then
+  VERSION=$(sed -n 's/.*<em:version>\(.*\)<\/em:version>/\1/p' install.rdf)
+  FILE="todotxt_${VERSION}.xpi"
+else
+  echo '[ERROR] build.sh not executed from add-on directory, exiting!'
+  exit 1
+fi
+
 
 echo "Building version [$VERSION]"
 
