@@ -185,9 +185,9 @@ calTodoTxt.prototype = {
     
     try {    
 
-      let isEvent = aItem.isCompleted == null;
-      if(isEvent)
-        throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
+      if(aItem.isCompleted == null)
+        throw new Components.Exception('This calendar only accepts tasks, no events.',
+            Components.results.NS_ERROR_UNEXPECTED);
 
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,

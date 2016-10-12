@@ -40,7 +40,6 @@ var timerObserver = {
   // Verify if todo & done file changed by
   // comparing MD5 checksum, if different refresh calendar
   observe: function(aSubject, aTopic, aData) {
-    todotxtLogger.debug('timerObserver:observer','subject['+aSubject+'] topic['+aTopic+']');
     let old_checksum = this.checkSum;
     this.checkSum = this.calculateMD5();
 

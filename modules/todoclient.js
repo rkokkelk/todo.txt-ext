@@ -1,9 +1,8 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
 Components.utils.import('resource://todotxt/logger.jsm');
+Components.utils.import('resource://todotxt/fileUtil.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 
@@ -126,7 +125,7 @@ let todoClient = {
     newItem.id = todoItem.id();
     newItem.title = this.makeTitle(todoItem);
 
-    this.writeTodo(todo);
+    fileUtil.writeTodo(todo);
     return newItem;
   },
 
@@ -185,7 +184,7 @@ let todoClient = {
             }
           }
 
-          this.writeTodo(todo);
+          fileUtil.writeTodo(todo);
           return todoItem.id();
       }
     }
@@ -199,7 +198,7 @@ let todoClient = {
     for each(todoItem in todo.items()){
       if(todoItem.id() == item.id){
           todo.removeItem(todoItem);
-          this.writeTodo(todo);
+          fileUtil.writeTodo(todo);
           return;
       }
     }
@@ -217,67 +216,13 @@ let todoClient = {
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    parseBlob += this.readFile(todoFile);
-    parseBlob += this.readFile(doneFile);
+    parseBlob += fileUtil.readFile(todoFile);
+    parseBlob += fileUtil.readFile(doneFile);
     todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
 
     this.todo = TodoTxt.parseFile(parseBlob);
   },
 
-  writeTodo: function(todo){
-    let prefs = this.getPreferences();
-
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
-
-    if(!todoFile.exists())
-      throw Components.Exception("todo.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
-    if(!doneFile.exists())
-      throw Components.Exception("done.txt file does not exists",Components.results.NS_ERROR_UNEXPECTED);
-      
-    let oTodoStream = FileUtils.openSafeFileOutputStream(todoFile);
-    let oDoneStream = FileUtils.openSafeFileOutputStream(doneFile);
-    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                                    createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-    converter.charset = "UTF-8";
-    let todoRender = todo.render({isComplete:false});
-    let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
-    let iTodoStream = converter.convertToInputStream(todoRender);
-    let iDoneStream = converter.convertToInputStream(doneRender);
-
-    writeCallback = function(status){
-        if (Components.isSuccessCode(status))
-          todotxtLogger.debug("todoClient.js","written to file");
-        else
-          throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
-    };
-
-    NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
-    NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
-  },
-
-  readFile: function(file){
-    let str = "";
-
-    if(!file.exists())
-      throw Components.Exception("File["+file.leafName+"] does not exists",
-          Components.results.NS_ERROR_UNEXPECTED);
-
-    let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-                          createInstance(Components.interfaces.nsIFileInputStream);
-    let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
-            getService(Components.interfaces.nsIUTF8ConverterService);
-
-    fstream.init(file, -1, 0, 0);
-    let bytesAvailable = fstream.available();
-
-    if(bytesAvailable > 0)
-      str = NetUtil.readInputStreamToString(fstream, bytesAvailable);
-
-    // Verify if str contains newline at end
-    if(str.substr(str.length-1) != "\n") str += "\n";
-    return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
-  },
 
   makeTitle: function(item){
     let itemTitle = "";
