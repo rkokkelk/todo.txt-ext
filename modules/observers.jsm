@@ -4,17 +4,12 @@
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import("resource://gre/modules/Timer.jsm");
-
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/util.jsm");
 Components.utils.import("resource://todotxt/logger.jsm");
+Components.utils.import("resource://todotxt/fileUtil.jsm");
 Components.utils.import("resource://todotxt/todoclient.jsm");
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 EXPORTED_SYMBOLS = ['timerObserver','prefObserver'];
 
@@ -41,15 +36,19 @@ var timerObserver = {
   // Verify if todo & done file changed by
   // comparing MD5 checksum, if different refresh calendar
   observe: function(aSubject, aTopic, aData) {
-    let old_checksum = this.checkSum;
-    this.checkSum = this.calculateMD5();
+    try{
+      let old_checksum = this.checkSum;
+      this.checkSum = this.calculateMD5();
 
-    // Verify if not first run, old_checksum != undef
-    if(old_checksum){
-      if(old_checksum != this.checkSum){
-        todotxtLogger.debug('timerObserver','refresh');
-        this.calendar.refresh();
+      // Verify if not first run, old_checksum != undef
+      if(old_checksum){
+        if(old_checksum != this.checkSum){
+          todotxtLogger.debug('timerObserver','refresh');
+          this.calendar.refresh();
+        }
       }
+    } catch(e){
+      todotxtLogger.error('timerObserver:observe',e);
     }
   },
 
@@ -72,14 +71,9 @@ var timerObserver = {
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    let todoIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-    let doneIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-
     // open files for reading
-    todoIstream.init(todoFile, 0x01, 0444, 0);
-    doneIstream.init(doneFile, 0x01, 0444, 0);
+    todoIstream = fileUtil.getInputStream(todoFile);
+    doneIstream = fileUtil.getInputStream(doneFile);
 
     // Make sure that Istream is not empty
     if(todoIstream.available() > 0)
@@ -134,5 +128,9 @@ var prefObserver = {
         this.calendar.refresh();
         break;
     }
+    
+    // Reset notifications so that new errors
+    // can be displayed
+    todotxtLogger.resetNotifcations();
   }
 };
