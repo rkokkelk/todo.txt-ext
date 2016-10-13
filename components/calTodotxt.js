@@ -12,8 +12,8 @@ Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import("resource://todotxt/observers.js");
-Components.utils.import("resource://todotxt/todoclient.js");
+Components.utils.import("resource://todotxt/observers.jsm");
+Components.utils.import("resource://todotxt/todoclient.jsm");
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {

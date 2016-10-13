@@ -27,7 +27,7 @@ let fileUtil = {
 
     writeCallback = function(status){
         if (Components.isSuccessCode(status))
-          todotxtLogger.debug("todoClient.js","written to file");
+          todotxtLogger.debug("fileUtil.jsm","written to file");
         else
           throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
     };
