@@ -1,8 +1,13 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
 Components.utils.import('resource://todotxt/util.jsm');
 Components.utils.import('resource://todotxt/logger.jsm');
+Components.utils.import('resource://todotxt/exception.jsm');
 Components.utils.import('resource://todotxt/fileUtil.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
@@ -189,7 +194,7 @@ let todoClient = {
       }
     }
 
-    throw Components.Exception("Modify item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+    throw exception.ITEM_NOT_FOUND();
   },
 
   deleteItem: function(item){
@@ -202,7 +207,8 @@ let todoClient = {
           return;
       }
     }
-    throw Components.Exception("Deleted item not found in Todo.txt",Components.results.NS_ERROR_UNEXPECTED);
+    
+    throw exception.ITEM_NOT_FOUND();
   },
 
   setTodo: function(){
@@ -210,7 +216,7 @@ let todoClient = {
     let prefs = util.getPreferences();
 
     if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
-        throw Components.Exception("Please specify files in properties",Components.results.NS_ERROR_UNEXPECTED);
+      throw exception.FILES_NOT_SPECIFIED();
 
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);

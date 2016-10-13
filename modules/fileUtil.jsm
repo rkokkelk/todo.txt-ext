@@ -2,6 +2,7 @@ Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
 Components.utils.import('resource://todotxt/logger.jsm');
+Components.utils.import('resource://todotxt/exception.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 EXPORTED_SYMBOLS = ['fileUtil'];
@@ -29,7 +30,7 @@ let fileUtil = {
         if (Components.isSuccessCode(status))
           todotxtLogger.debug("fileUtil.jsm","written to file");
         else
-          throw Components.Exception("Cannot write to file",Components.results.NS_ERROR_UNEXPECTED);
+         throw exception.FILE_CANNOT_WRITE(file);
     };
 
     NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
@@ -48,10 +49,8 @@ let fileUtil = {
   },
 
   readInputStream: function(file){
-    if(!file.exists()){
-      throw Components.Exception("File ["+file.leafName+"] does not exists",
-          Components.results.NS_ERROR_UNEXPECTED);
-    }
+    if(!file.exists())
+      throw exception.FILE_NOT_FOUND(file);
 
     let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
                           createInstance(Components.interfaces.nsIFileInputStream);
@@ -65,14 +64,9 @@ let fileUtil = {
   },
 
   createOutputStream: function(file){
-    if(!file.exists()){
-      throw Components.Exception("File ["+file.leafName+"] does not exists",
-          Components.results.NS_ERROR_UNEXPECTED);
-    }
+    if(!file.exists())
+      throw exceptions.FILE_NOT_FOUND(file);
       
     return FileUtils.openSafeFileOutputStream(file);
   },
-
-  fileExists: function(file){
-  }
 }
