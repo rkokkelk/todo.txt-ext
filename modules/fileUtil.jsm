@@ -1,6 +1,7 @@
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
+Components.utils.import('resource://todotxt/util.jsm');
 Components.utils.import('resource://todotxt/logger.jsm');
 Components.utils.import('resource://todotxt/exception.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
@@ -10,13 +11,13 @@ EXPORTED_SYMBOLS = ['fileUtil'];
 let fileUtil = {
 
   writeTodo: function(todo){
-    let prefs = this.getPreferences();
+    let prefs = util.getPreferences();
 
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    oTodoStream = self.createOutputStream(todoFile);
-    odoneStream = self.createOutputStream(doneFile);
+    oTodoStream = this.getOutputStream(todoFile);
+    odoneStream = this.getOutputStream(doneFile);
 
     let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
                                     createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
@@ -48,13 +49,18 @@ let fileUtil = {
     return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
   },
 
-  readInputStream: function(file){
+  getInputStream: function(file){
     if(!file.exists())
       throw exception.FILE_NOT_FOUND(file);
 
     let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
                           createInstance(Components.interfaces.nsIFileInputStream);
-    fstream.init(file, -1, 0, 0);
+    fstream.init(file, 0x01, 0, 0);
+    return fstream;
+  },
+
+  readInputStream: function(file){
+    let fstream = this.getInputStream(file);
     let bytesAvailable = fstream.available();
 
     if(bytesAvailable > 0)
@@ -63,7 +69,7 @@ let fileUtil = {
       return "";
   },
 
-  createOutputStream: function(file){
+  getOutputStream: function(file){
     if(!file.exists())
       throw exceptions.FILE_NOT_FOUND(file);
       
