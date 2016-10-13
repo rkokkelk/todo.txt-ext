@@ -11,6 +11,7 @@ Components.utils.import("resource://gre/modules/Timer.jsm");
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
+Components.utils.import("resource://todotxt/util.jsm");
 Components.utils.import("resource://todotxt/logger.jsm");
 Components.utils.import("resource://todotxt/todoclient.jsm");
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
@@ -58,7 +59,7 @@ var timerObserver = {
   },
 
   calculateMD5: function(){
-    let prefs = todoClient.getPreferences();
+    let prefs = util.getPreferences();
 
     // this tells updateFromStream to read the entire file
     const PR_UINT32_MAX = 0xffffffff;
