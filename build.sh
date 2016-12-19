@@ -1,8 +1,7 @@
 #!/bin/bash
 #
-# Build script for add-on
-# resulting in zip formatted file todotxt_$version$.xpi
-
+# Build script for add-on resulting in zip formmated file
+# todotxt_$version$.xpi
 
 function show_help {
   echo "usage: build.sh [-d | -h]"
@@ -14,6 +13,7 @@ function show_help {
 while getopts "dh" opt; do
   case $opt in
     d)
+      echo "Building add-on with DEBUGGING enabled!"
       DEV=true
       ;;
     h)
@@ -35,12 +35,10 @@ else
   exit 1
 fi
 
-
 echo "Building version [$VERSION]"
 
 PREV_BUILDS="$(ls todotxt_* 2>/dev/null)"
-if [ -n "$PREV_BUILDS" ];
-then
+if [ -n "$PREV_BUILDS" ]; then
   echo "Removing old builds [$PREV_BUILDS]"
   rm $PREV_BUILDS
 fi

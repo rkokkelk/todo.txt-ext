@@ -6,7 +6,6 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import('resource://todotxt/logger.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
-
 EXPORTED_SYMBOLS = ['todoClient'];
 
 let todoClient = {
