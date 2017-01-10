@@ -39,6 +39,13 @@ var exception = {
       Components.results.NS_ERROR_UNEXPECTED);
   },
 
+  EVENT_ENCOUNTERED: function(){
+    let message = this.strings.GetStringFromName('EVENT_ENCOUNTERED')
+
+    return Components.Exception(message,
+      Components.results.NS_ERROR_UNEXPECTED);
+  },
+
   UNKNOWN: function(){
     let message = this.strings.GetStringFromName('UNKNOWN')
 
