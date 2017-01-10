@@ -30,6 +30,11 @@ let todotxtLogger = {
   getDateTime: function(){
     return new Date().toLocaleString();
   },
+
+  appLog: function(msg){
+    app = this.App;
+    app.console.log(msg);
+  },
   
   debug: function(src, msg) {
     app = this.App;
@@ -45,8 +50,7 @@ let todotxtLogger = {
         output += msg;
       }
       cal.LOG(output);
-      app = this.App;
-      app.console.log(output);
+      this.appLog(output);
     }
   },
 
@@ -57,13 +61,13 @@ let todotxtLogger = {
       if (src) {
         output += '[' + src + ']';
       }
-      if (error){
-        output += ' ERROR: ';
+      output += ' ERROR: ';
+
+      if (error)
         output += error.message;
-      }
+      
       cal.LOG(output);
-      app = this.App;
-      app.console.log(output);
+      this.appLog(output);
     }
   },
 
@@ -74,20 +78,23 @@ let todotxtLogger = {
   },
 
   showNotification: function(message){
+    // Time between messages is 30 seconds
     let seconds = 30*1000;
 
     // prevent notifications pop-up overload
-    // time delay is 20,40,80,160,etc seconds
+    // time delay is 30,60,120,240,etc seconds
     if(this.notif[message] == null){
+
       this.notif[message] = {};
       this.notif[message]['count'] = 0;
       this.notif[message]['time'] = this.getEpoch() + seconds;
     }else{
-      if(this.getEpoch() < this.notif[message]['time'])
+      if(this.getEpoch() < this.notif[message]['time']){
         return;
-      else{
+      }else{
         let count = this.notif[message]['count'] + 1;
         let time = this.getEpoch() + (seconds * Math.pow(2,count));
+
         this.notif[message]['count'] = count;
         this.notif[message]['time'] = time;
       }
@@ -95,6 +102,6 @@ let todotxtLogger = {
 
     let prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                     .getService(Components.interfaces.nsIPromptService);
-    prompts.alert(null,'Warning',message);
+    prompts.alert(null,'Warning Todo.txt',message);
   },
 };
