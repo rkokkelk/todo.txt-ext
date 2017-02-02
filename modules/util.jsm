@@ -2,7 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import('resource://todotxt/exception.jsm');
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
+
+Cu.import('resource://todotxt/exception.jsm');
 
 EXPORTED_SYMBOLS = ['util'];
 
@@ -57,8 +61,8 @@ var util = {
   },
 
   getPreferences: function(){
-    let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                            .getService(Components.interfaces.nsIPrefService);
+    let prefs = Cc["@mozilla.org/preferences-service;1"]
+                            .getService(Ci.nsIPrefService);
     return prefs.getBranch("extensions.todotxt.");
   },
   

@@ -2,14 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/Timer.jsm");
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
 
-Components.utils.import("resource://todotxt/util.jsm");
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import("resource://todotxt/fileUtil.jsm");
-Components.utils.import("resource://todotxt/todoclient.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/Timer.jsm");
+
+Cu.import("resource://todotxt/util.jsm");
+Cu.import("resource://todotxt/logger.jsm");
+Cu.import("resource://todotxt/fileUtil.jsm");
+Cu.import("resource://todotxt/todoclient.jsm");
 
 EXPORTED_SYMBOLS = ['timerObserver','prefObserver'];
 
@@ -64,12 +68,12 @@ var timerObserver = {
     const PR_UINT32_MAX = 0xffffffff;
 
     // Use MD5, hash for comparison and needs to be fast not secure
-    let ch = Components.classes["@mozilla.org/security/hash;1"]
-                         .createInstance(Components.interfaces.nsICryptoHash);
+    let ch = Cc["@mozilla.org/security/hash;1"]
+                         .createInstance(Ci.nsICryptoHash);
     ch.init(ch.MD5);
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getComplexValue("todo-txt", Ci.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Ci.nsIFile);
 
     // open files for reading
     todoIstream = fileUtil.getInputStream(todoFile);
@@ -98,12 +102,12 @@ var prefObserver = {
     this.calendar = cal;
 
     // For this.branch we ask for the preferences for extensions.myextension. and children
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
+    var prefs = Cc["@mozilla.org/preferences-service;1"]
+                      .getService(Ci.nsIPrefService);
     this.branch = prefs.getBranch("extensions.todotxt.");
 
     if (!("addObserver" in this.branch))
-        this.branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
+        this.branch.QueryInterface(Ci.nsIPrefBranch2);
 
     // Finally add the observer.
     this.branch.addObserver("", this, false);

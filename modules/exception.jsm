@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/Services.jsm");
+const Cu = Components.utils
+const Cr = Components.results
+
+Cu.import("resource://gre/modules/Services.jsm");
 
 EXPORTED_SYMBOLS = ['exception'];
 
@@ -15,41 +18,41 @@ var exception = {
     let message = this.strings.GetStringFromName('FILE_NOT_FOUND') + ' ' + file.leafName;
 
     return Components.Exception(message,
-        Components.results.NS_ERROR_UNEXPECTED);
+        Cr.NS_ERROR_UNEXPECTED);
   },
 
   FILE_CANNOT_WRITE: function(file){
     let message = this.strings.GetStringFromName('FILE_CANNOT_WRITE') + ' ' + file.leafName;
 
     return Components.Exception(message,
-      Components.results.NS_ERROR_UNEXPECTED);
+      Cr.NS_ERROR_UNEXPECTED);
   },
 
   FILES_NOT_SPECIFIED: function(){
     let message = this.strings.GetStringFromName('FILES_NOT_SPECIFIED')
 
     return Components.Exception(message,
-      Components.results.NS_ERROR_UNEXPECTED);
+      Cr.NS_ERROR_UNEXPECTED);
   },
 
   ITEM_NOT_FOUND: function(){
     let message = this.strings.GetStringFromName('ITEM_NOT_FOUND')
 
     return Components.Exception(message,
-      Components.results.NS_ERROR_UNEXPECTED);
+      Cr.NS_ERROR_UNEXPECTED);
   },
 
   EVENT_ENCOUNTERED: function(){
     let message = this.strings.GetStringFromName('EVENT_ENCOUNTERED')
 
     return Components.Exception(message,
-      Components.results.NS_ERROR_UNEXPECTED);
+      Cr.NS_ERROR_UNEXPECTED);
   },
 
   UNKNOWN: function(){
     let message = this.strings.GetStringFromName('UNKNOWN')
 
     return Components.Exception(message,
-      Components.results.NS_ERROR_UNEXPECTED);
+      Cr.NS_ERROR_UNEXPECTED);
   }
 };

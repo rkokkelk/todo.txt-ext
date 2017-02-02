@@ -1,4 +1,8 @@
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
+
+Cu.import("resource://calendar/modules/calUtils.jsm");
 
 EXPORTED_SYMBOLS = ['todotxtLogger'];
 
@@ -9,8 +13,8 @@ let todotxtLogger = {
   
   get App(){
     if(!this.app){
-      this.app = Components.classes["@mozilla.org/steel/application;1"]
-                   .getService(Components.interfaces.steelIApplication);
+      this.app = Cc["@mozilla.org/steel/application;1"]
+                   .getService(Ci.steelIApplication);
     }
     return this.app;
   },
@@ -100,8 +104,8 @@ let todotxtLogger = {
       }
     }
 
-    let prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
-                    .getService(Components.interfaces.nsIPromptService);
+    let prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+                    .getService(Ci.nsIPromptService);
     prompts.alert(null,'Warning Todo.txt',message);
   },
 };

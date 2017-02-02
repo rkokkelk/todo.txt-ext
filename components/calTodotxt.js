@@ -2,20 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
-Components.utils.import("resource://gre/modules/Timer.jsm");
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
 
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("resource://gre/modules/NetUtil.jsm");
+Cu.import("resource://gre/modules/Timer.jsm");
 
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/observers.jsm");
-Components.utils.import("resource://todotxt/todoclient.jsm");
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Cu.import("resource://calendar/modules/calUtils.jsm");
+Cu.import("resource://calendar/modules/calProviderUtils.jsm");
+
+Cu.import("resource://todotxt/logger.jsm");
+Cu.import('resource://todotxt/exception.jsm');
+Cu.import("resource://todotxt/observers.jsm");
+Cu.import("resource://todotxt/todoclient.jsm");
+Cu.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
@@ -26,9 +30,9 @@ function calTodoTxt() {
   timerObserver.register(this);
   
   // Add periodical verification of todo files, every 15s
-  timer = Components.classes["@mozilla.org/timer;1"]
-    .createInstance(Components.interfaces.nsITimer);
-  timer.init(timerObserver, 15*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+  timer = Cc["@mozilla.org/timer;1"]
+    .createInstance(Ci.nsITimer);
+  timer.init(timerObserver, 15*1000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 calTodoTxt.prototype = {
@@ -39,10 +43,10 @@ calTodoTxt.prototype = {
   classDescription: "TodoTxt",
   
   getInterfaces: function getInterfaces(count) {
-    const ifaces = [Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports];
+    const ifaces = [Ci.calICalendarProvider,
+                    Ci.calICalendar,
+                    Ci.nsIClassInfo,
+                    Ci.nsISupports];
     count.value = ifaces.length;
     return ifaces;
   },
@@ -51,7 +55,7 @@ calTodoTxt.prototype = {
     return null;
   },
   
-  implementationLanguage: Components.interfaces.nsIProgrammingLanguage.JAVASCRIPT,
+  implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
   flags: 0,
   
   mUri: null,
@@ -104,13 +108,13 @@ calTodoTxt.prototype = {
 
     aListener.onGetResult(this.superCalendar,
                           Components.results.NS_OK,
-                          Components.interfaces.calITodo,
+                          Ci.calITodo,
                           null,
                           items.length,
                           items);
     this.notifyOperationComplete(aListener, 
                                   Components.results.NS_OK,
-                                  Components.interfaces.calIOperationListener.GET,
+                                  Ci.calIOperationListener.GET,
                                   null,
                                   null);
   },
@@ -119,9 +123,9 @@ calTodoTxt.prototype = {
    * nsISupports
    */
   //TODO: find way for using global parametr
-  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo]),
+  QueryInterface: XPCOMUtils.generateQI([Ci.calICalendarProvider,
+                    Ci.calICalendar,
+                    Ci.nsIClassInfo]),
 
   /*
    * calICalendarProvider interface
@@ -192,7 +196,7 @@ calTodoTxt.prototype = {
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.ADD,
+                                    Ci.calIOperationListener.ADD,
                                     item.id,
                                     item);
       this.mTaskCache[this.id][item.id] = item;
@@ -202,7 +206,7 @@ calTodoTxt.prototype = {
       
       this.notifyOperationComplete(aListener,
                                     e.result,
-                                    Components.interfaces.calIOperationListener.ADD,
+                                    Ci.calIOperationListener.ADD,
                                     null,
                                     e.message);
     }
@@ -217,7 +221,7 @@ calTodoTxt.prototype = {
     
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_OK,
-                                   Components.interfaces.calIOperationListener.MODIFY,
+                                   Ci.calIOperationListener.MODIFY,
                                    aNewItem.id,
                                    aNewItem);
       this.mTaskCache[this.id][aNewItem.id] = aNewItem;
@@ -226,14 +230,14 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      let timer = Components.classes["@mozilla.org/timer;1"]
-        .createInstance(Components.interfaces.nsITimer);
-      timer.initWithCallback(timerObserver, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+      let timer = Cc["@mozilla.org/timer;1"]
+        .createInstance(Ci.nsITimer);
+      timer.initWithCallback(timerObserver, 1*1000, Ci.nsITimer.TYPE_ONE_SHOT);
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
                                    Components.results.NS_ERROR_UNEXPECTED,
-                                   Components.interfaces.calIOperationListener.MODIFY,
+                                   Ci.calIOperationListener.MODIFY,
                                    null,
                                    e.message);
     }
@@ -247,7 +251,7 @@ calTodoTxt.prototype = {
       delete this.mTaskCache[this.id][aItem.id];
       this.notifyOperationComplete(aListener,
                                     Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.DELETE,
+                                    Ci.calIOperationListener.DELETE,
                                     aItem.id,
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
@@ -255,7 +259,7 @@ calTodoTxt.prototype = {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
                                     e.result,
-                                    Components.interfaces.calIOperationListener.DELETE,
+                                    Ci.calIOperationListener.DELETE,
                                     null,
                                     e.message);
     }
@@ -288,13 +292,13 @@ calTodoTxt.prototype = {
 
         aListener.onGetResult(this.superCalendar,
                               Components.results.NS_OK,
-                              Components.interfaces.calITodo,
+                              Ci.calITodo,
                               null,
                               items.length,
                               items);
         this.notifyOperationComplete(aListener, 
                                     Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.GET,
+                                    Ci.calIOperationListener.GET,
                                     null,
                                     null);
       }else
@@ -304,7 +308,7 @@ calTodoTxt.prototype = {
       todotxtLogger.error('calTodotxt.js:getItems()',e);
       this.notifyOperationComplete(aListener,
                                     e.result,
-                                    Components.interfaces.calIOperationListener.GET,
+                                    Ci.calIOperationListener.GET,
                                     null,
                                     e.message);
     }

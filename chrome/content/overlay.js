@@ -1,6 +1,10 @@
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import('resource://gre/modules/Services.jsm');
-Components.utils.import("resource://todotxt/logger.jsm");
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
+
+Cu.import("resource://calendar/modules/calUtils.jsm");
+Cu.import('resource://gre/modules/Services.jsm');
+Cu.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
   let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
@@ -28,8 +32,8 @@ window.addEventListener("load", function(e) {
     createCal(calManager);
 
   // if todo.txt & done.txt loc is not set, show properties
-  let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                          .getService(Components.interfaces.nsIPrefService);
+  let prefs = Cc["@mozilla.org/preferences-service;1"]
+                          .getService(Ci.nsIPrefService);
   prefs =  prefs.getBranch("extensions.todotxt.");
 
   if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt')){

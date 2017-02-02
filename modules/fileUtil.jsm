@@ -1,10 +1,14 @@
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
+const Cc = Components.classes
+const Cu = Components.utils
+const Ci = Components.interfaces
 
-Components.utils.import('resource://todotxt/util.jsm');
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("resource://gre/modules/NetUtil.jsm");
+
+Cu.import('resource://todotxt/util.jsm');
+Cu.import('resource://todotxt/logger.jsm');
+Cu.import('resource://todotxt/exception.jsm');
+Cu.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 EXPORTED_SYMBOLS = ['fileUtil'];
 
@@ -13,14 +17,14 @@ let fileUtil = {
   writeTodo: function(todo){
     let prefs = util.getPreferences();
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getComplexValue("todo-txt", Ci.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Ci.nsIFile);
 
     oTodoStream = this.getOutputStream(todoFile);
     oDoneStream = this.getOutputStream(doneFile);
 
-    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                                    createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].
+                                    createInstance(Ci.nsIScriptableUnicodeConverter);
     converter.charset = "UTF-8";
     let todoRender = todo.render({isComplete:false});
     let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
@@ -41,8 +45,8 @@ let fileUtil = {
   readFile: function(file){
     let str = this.readInputStream(file);
 
-    let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
-            getService(Components.interfaces.nsIUTF8ConverterService);
+    let utf8Converter = Cc["@mozilla.org/intl/utf8converterservice;1"].
+            getService(Ci.nsIUTF8ConverterService);
 
     // Verify if str contains newline at end
     if(str.substr(str.length-1) != "\n") str += "\n";
@@ -53,8 +57,8 @@ let fileUtil = {
     if(!file.exists())
       throw exception.FILE_NOT_FOUND(file);
 
-    let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-                          createInstance(Components.interfaces.nsIFileInputStream);
+    let fstream = Cc["@mozilla.org/network/file-input-stream;1"].
+                          createInstance(Ci.nsIFileInputStream);
     fstream.init(file, 0x01, 0, 0);
     return fstream;
   },

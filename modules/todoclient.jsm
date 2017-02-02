@@ -2,14 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
+const Cu = Components.utils
+const Ci = Components.interfaces
 
-Components.utils.import('resource://todotxt/util.jsm');
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import('resource://todotxt/fileUtil.jsm');
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Cu.import("resource://calendar/modules/calUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+
+Cu.import('resource://todotxt/util.jsm');
+Cu.import('resource://todotxt/logger.jsm');
+Cu.import('resource://todotxt/exception.jsm');
+Cu.import('resource://todotxt/fileUtil.jsm');
+Cu.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 EXPORTED_SYMBOLS = ['todoClient'];
 
@@ -218,8 +221,8 @@ let todoClient = {
     if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
       throw exception.FILES_NOT_SPECIFIED();
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getComplexValue("todo-txt", Ci.nsIFile);
+    doneFile = prefs.getComplexValue("done-txt", Ci.nsIFile);
 
     parseBlob += fileUtil.readFile(todoFile);
     parseBlob += fileUtil.readFile(doneFile);
