@@ -17,7 +17,7 @@ let fileUtil = {
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
     oTodoStream = this.getOutputStream(todoFile);
-    odoneStream = this.getOutputStream(doneFile);
+    oDoneStream = this.getOutputStream(doneFile);
 
     let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
                                     createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
