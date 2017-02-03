@@ -163,7 +163,6 @@ let todoClient = {
 
           // Verify if property is set to true and createTime is present then
           // add creationDate
-          todotxtLogger.debug("todoclient.jsm:modifyItem", 'Before entrydate');
           if(newItem.entryDate && prefs.getBoolPref("creation")){
             let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
             todoItem.setCreatedDate(xpConnectDate);
