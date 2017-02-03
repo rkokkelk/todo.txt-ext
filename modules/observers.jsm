@@ -131,6 +131,6 @@ var prefObserver = {
     
     // Reset notifications so that new errors
     // can be displayed
-    todotxtLogger.resetNotifcations();
+    todotxtLogger.resetNotifications();
   }
 };
