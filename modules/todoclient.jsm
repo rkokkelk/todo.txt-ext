@@ -199,7 +199,7 @@ let todoClient = {
   },
 
   deleteItem: function(item){
-    let todo = util.getTodo();
+    let todo = this.getTodo();
     let found = false;
     for each(todoItem in todo.items()){
       if(todoItem.id() == item.id){
