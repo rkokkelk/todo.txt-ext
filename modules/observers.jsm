@@ -23,6 +23,12 @@ var timerObserver = {
 
   register: function(cal) {
     this.calendar = cal;
+
+    // Add periodical verification of todo files, every 30s
+    timer = Components.classes["@mozilla.org/timer;1"]
+      .createInstance(Components.interfaces.nsITimer);
+    timer.init(this, 30*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+
     todotxtLogger.debug('timerObserver','register');
   },
 
@@ -55,6 +61,12 @@ var timerObserver = {
   notify: function(timer){
     todotxtLogger.debug('timerObserver','notify');
     this.checkSum = this.calculateMD5();
+  },
+
+  updateMD5: function(){
+    let timer = Components.classes["@mozilla.org/timer;1"]
+      .createInstance(Components.interfaces.nsITimer);
+    timer.initWithCallback(timerObserver, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
   },
 
   calculateMD5: function(){

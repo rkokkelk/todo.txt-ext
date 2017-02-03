@@ -24,11 +24,6 @@ function calTodoTxt() {
 
   prefObserver.register(this);
   timerObserver.register(this);
-  
-  // Add periodical verification of todo files, every 15s
-  timer = Components.classes["@mozilla.org/timer;1"]
-    .createInstance(Components.interfaces.nsITimer);
-  timer.init(timerObserver, 15*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 calTodoTxt.prototype = {
@@ -197,6 +192,8 @@ calTodoTxt.prototype = {
                                     item);
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
+      
+      timerObserver.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -226,9 +223,7 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      let timer = Components.classes["@mozilla.org/timer;1"]
-        .createInstance(Components.interfaces.nsITimer);
-      timer.initWithCallback(timerObserver, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+      timerObserver.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -251,6 +246,8 @@ calTodoTxt.prototype = {
                                     aItem.id,
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
+      // Update checksum
+      timerObserver.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
