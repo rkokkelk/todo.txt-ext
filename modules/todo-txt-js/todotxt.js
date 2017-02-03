@@ -510,7 +510,9 @@ var TodoTxt = (function () {
   };
 
     var isDate = function(value) {
-        return (value && typeof value == 'object' && toString.call(value) == '[object Date]') || false;
+        valueExists = (value && typeof value == 'object');
+        objType = (toString.call(value) == '[object Date]' || toString.call(value) == '[xpconnect wrapped native prototype]');
+        return (valueExists && objType) || false;
     };
 
     var isSameCalendarDate = function (dt1, dt2) {
