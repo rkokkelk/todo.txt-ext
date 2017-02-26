@@ -1,4 +1,5 @@
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
+Components.utils.import("resource://gre/modules/osfile.jsm")
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
 
 Components.utils.import('resource://todotxt/util.jsm');
@@ -16,26 +17,25 @@ let fileUtil = {
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    oTodoStream = this.getOutputStream(todoFile);
-    oDoneStream = this.getOutputStream(doneFile);
-
-    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                                    createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-    converter.charset = "UTF-8";
     let todoRender = todo.render({isComplete:false});
     let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
-    let iTodoStream = converter.convertToInputStream(todoRender);
-    let iDoneStream = converter.convertToInputStream(doneRender);
 
-    writeCallback = function(status){
-        if (Components.isSuccessCode(status))
-          todotxtLogger.debug("fileUtil.jsm","written to file");
-        else
-         throw exception.FILE_CANNOT_WRITE(file);
-    };
+    this.writeToFile(todoFile, todoRender);
+    this.writeToFile(doneFile, doneRender);
+  },
 
-    NetUtil.asyncCopy(iTodoStream, oTodoStream, writeCallback);
-    NetUtil.asyncCopy(iDoneStream, oDoneStream, writeCallback);
+  writeToFile: function(file, input){
+    let promise = OS.File.writeAtomic(file.path, input, {encoding: "utf-8", flush: true});
+
+    onFulfill = function(aVal){
+        todotxtLogger.debug("fileUtil.jsm","written to file");
+    }
+
+    onReject = function(aReason){
+        throw exception.FILE_CANNOT_WRITE(file);
+    }
+
+    promise.then(onFulfill, onReject);
   },
 
   readFile: function(file){
@@ -60,6 +60,8 @@ let fileUtil = {
   },
 
   readInputStream: function(file){
+    // TODO: change to OS.File.read
+    // https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/OSFile.jsm/OS.File_for_the_main_thread#OS.File.read()
     let fstream = this.getInputStream(file);
     let bytesAvailable = fstream.available();
 
