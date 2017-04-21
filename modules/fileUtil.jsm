@@ -39,42 +39,18 @@ let fileUtil = {
   },
 
   readFile: function(file){
-    let str = this.readInputStream(file);
+    let promise = OS.File.read(file.path, { encoding: 'utf-8' });
 
-    let utf8Converter = Components.classes["@mozilla.org/intl/utf8converterservice;1"].
-            getService(Components.interfaces.nsIUTF8ConverterService);
+    onSucces = function(result){
+      // Verify if str contains newline at end
+      if(result.substr(result.length-1) != "\n") result += "\n";
+      return result;
+    };
 
-    // Verify if str contains newline at end
-    if(str.substr(str.length-1) != "\n") str += "\n";
-    return utf8Converter.convertURISpecToUTF8(str, "UTF-8");
-  },
-
-  getInputStream: function(file){
-    if(!file.exists())
+    onError = function(aVal){
       throw exception.FILE_NOT_FOUND(file);
+    };
 
-    let fstream = Components.classes["@mozilla.org/network/file-input-stream;1"].
-                          createInstance(Components.interfaces.nsIFileInputStream);
-    fstream.init(file, 0x01, 0, 0);
-    return fstream;
-  },
-
-  readInputStream: function(file){
-    // TODO: change to OS.File.read
-    // https://developer.mozilla.org/en-US/docs/Mozilla/JavaScript_code_modules/OSFile.jsm/OS.File_for_the_main_thread#OS.File.read()
-    let fstream = this.getInputStream(file);
-    let bytesAvailable = fstream.available();
-
-    if(bytesAvailable > 0)
-      return NetUtil.readInputStreamToString(fstream, bytesAvailable);
-    else
-      return "";
-  },
-
-  getOutputStream: function(file){
-    if(!file.exists())
-      throw exceptions.FILE_NOT_FOUND(file);
-      
-    return FileUtils.openSafeFileOutputStream(file);
+    return promise.then(onSucces, onError);
   },
 }
