@@ -221,10 +221,14 @@ let todoClient = {
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    parseBlob += fileUtil.readFile(todoFile);
-    parseBlob += fileUtil.readFile(doneFile);
-    todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+    Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+      parseBlob += result[0];
+      parseBlob += result[1];
 
-    this.todo = TodoTxt.parseFile(parseBlob);
+      todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+      todoClient.todo = TodoTxt.parseFile(parseBlob);
+    }, function (aError) {
+      throw exception.UNKNOWN();
+    });
   },
 };
