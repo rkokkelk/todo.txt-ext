@@ -212,8 +212,11 @@ let todoClient = {
   },
 
   setTodo: function(){
-    let parseBlob = "";
     let prefs = util.getPreferences();
+
+    // Set empty todo object to prevent warning
+    // obj will be replaced once files ar read
+    todoClient.todo = TodoTxt.parseFile("");
 
     if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
       throw exception.FILES_NOT_SPECIFIED();
@@ -222,6 +225,7 @@ let todoClient = {
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
     Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+      let parseBlob = "";
       parseBlob += result[0];
       parseBlob += result[1];
 
