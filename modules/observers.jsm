@@ -70,32 +70,36 @@ var timerObserver = {
   },
 
   calculateMD5: function(){
+    let result = "";
     let prefs = util.getPreferences();
 
-    // this tells updateFromStream to read the entire file
-    const PR_UINT32_MAX = 0xffffffff;
-
     // Use MD5, hash for comparison and needs to be fast not secure
-    let ch = Components.classes["@mozilla.org/security/hash;1"]
-                         .createInstance(Components.interfaces.nsICryptoHash);
+    let ch = Components.classes["@mozilla.org/security/hash;1"].
+                         createInstance(Components.interfaces.nsICryptoHash);
+    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+
     ch.init(ch.MD5);
 
     todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    // open files for reading
-    todoIstream = fileUtil.getInputStream(todoFile);
-    doneIstream = fileUtil.getInputStream(doneFile);
+    Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+      let parseBlob = "";
+      parseBlob += result[0];
+      parseBlob += result[1];
 
-    // Make sure that Istream is not empty
-    if(todoIstream.available() > 0)
-      ch.updateFromStream(todoIstream, PR_UINT32_MAX);
-    if(doneIstream.available() > 0)
-      ch.updateFromStream(doneIstream, PR_UINT32_MAX);
+      let converterResult = {};
+      let data = converter.convertToByteArray(parseBlob, converterResult);
+      ch.update(data, data.length);
 
-    let result =  ch.finish(true);
-    todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
-    return result
+      result = ch.finish(true);
+      todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
+      return result
+    }, function (aError) {
+      throw exception.UNKNOWN();
+    });
   }
 };
 
