@@ -16,7 +16,9 @@ window.addEventListener("load", function(e) {
     },
   });
 
-  for each (calendar in calManager.getCalendars({})){
+  let calendars = calManager.getCalendars({});
+  for (let i=0; i < calendars.length; i++){
+    calendar = calendars[i];
     if(calendar.providerID == ID){
       todotxtLogger.debug("overlay.js","Calendar found");
       found = true;
@@ -48,7 +50,9 @@ function createCal(calManager){
 
 function removeCal(calManager){
   let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
-  for each (calendar in calManager.getCalendars({})){
+  let calendars = calManager.getCalendars({});
+  for (let i=0; i < calendars.length; i++){
+    calendar = calendars[i];
     if(calendar.providerID == ID){
       calManager.removeCalendar(calendar);
       todotxtLogger.debug("overlay.js","Calendar found and removed");

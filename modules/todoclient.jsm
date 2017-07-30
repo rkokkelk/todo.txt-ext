@@ -26,7 +26,9 @@ let todoClient = {
     let prefs = util.getPreferences();
     let tzService = cal.getTimezoneService();
 
-    for each(todoItem in todo.items({},'priority')){
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       item = cal.createTodo();
 
       item.id = todoItem.id();
@@ -132,7 +134,9 @@ let todoClient = {
     let todo = this.getTodo();
     let prefs = util.getPreferences();
 
-    for each(todoItem in todo.items()){
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       if(todoItem.id() == oldItem.id){
 
           let parseItem = newItem.title;
@@ -178,8 +182,8 @@ let todoClient = {
 
           if(!prefs.getBoolPref('showFullTitle')){
             projects = newItem.getCategories({},{});
-            for(var i=0;i<projects.length;i++){
-              todoItem.addProject(projects[i]);
+            for(let b=0; b < projects.length; b++){
+              todoItem.addProject(projects[b]);
             }
           }
 
@@ -194,7 +198,10 @@ let todoClient = {
   deleteItem: function(item){
     let todo = this.getTodo();
     let found = false;
-    for each(todoItem in todo.items()){
+
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       if(todoItem.id() == item.id){
           todo.removeItem(todoItem);
           fileUtil.writeTodo(todo);

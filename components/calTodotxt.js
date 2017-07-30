@@ -92,7 +92,10 @@ calTodoTxt.prototype = {
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
-    for (let itemId in taskCache){
+
+    for (let i=0; i < taskCache.length; i++){
+      let itemId = taskCache[i];
+      todoItem = todoItems[i];
       let cachedItem = this.mTaskCache[this.id][itemId];
       items.push(cachedItem);
     }
@@ -279,8 +282,8 @@ calTodoTxt.prototype = {
       this.mLastSync = new Date();
       this.mTaskCache[this.id] = {};
 
-      for each(item in items)
-        this.mTaskCache[this.id][item.id] = item;
+        for (item in items)
+          this.mTaskCache[this.id][item.id] = item;
 
       aListener.onGetResult(this.superCalendar,
                             Components.results.NS_OK,
