@@ -27,15 +27,15 @@ let fileUtil = {
   writeToFile: function(file, input){
     let promise = OS.File.writeAtomic(file.path, input, {encoding: "utf-8", flush: true});
 
-    onFulfill = function(aVal){
-        todotxtLogger.debug("fileUtil.jsm","written to file");
+    onSucces = function(aVal){
+        todotxtLogger.debug("fileUtil.jsm", "written to file");
     }
 
-    onReject = function(aReason){
+    onError = function(aReason){
         throw exception.FILE_CANNOT_WRITE(file);
     }
 
-    promise.then(onFulfill, onReject);
+    promise.then(onSucces, onError);
   },
 
   readFile: function(file){
