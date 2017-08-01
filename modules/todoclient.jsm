@@ -15,20 +15,14 @@ EXPORTED_SYMBOLS = ['todoClient'];
 
 let todoClient = {
 
-  todo: null,
+  // Start with empty todo
+  todo: TodoTxt.parseFile(""),
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
-  getTodo: function(refresh){
-    if(!this.todo || refresh){
-      this.setTodo();
-    }
-    return this.todo;
-  },
-
   getItems: function(calendar,refresh){
     let items = [];
-    let todo = this.getTodo(refresh);
+    let todo = this.getTodo(calendar, refresh);
     let prefs = util.getPreferences();
     let tzService = cal.getTimezoneService();
 
@@ -209,6 +203,19 @@ let todoClient = {
     }
     
     throw exception.ITEM_NOT_FOUND();
+  },
+
+  getTodo: function(calendar, refresh){
+
+    if(refresh){
+      this.setTodo().then((todo) => {
+        todoClient.todo = todo;
+        calendar.observers.notify("onLoad", [calendar]);
+      }).catch((error) => {
+        throw exception.UNKNOWN();
+      });
+    }
+    return this.todo;
   },
 
   setTodo: function(){
