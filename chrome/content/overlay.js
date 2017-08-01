@@ -4,7 +4,8 @@ Components.utils.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
   let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
-  var calManager = cal.getCalendarManager();
+  var calManager = Components.classes["@mozilla.org/calendar/manager;1"].
+        getService(Components.interfaces.calICalendarManager);
   let found = false;
 
   // Add observers to trigger when add-on is uninstalled
@@ -42,7 +43,7 @@ window.addEventListener("load", function(e) {
 
 function createCal(calManager){
   todotxtLogger.debug("overlay.js","Create calendar");
-  let url = cal.makeURL('todotxt://_unused');
+  let url = makeCalendarURI();
   let newCal = calManager.createCalendar('todotxt',url);
   newCal.name = "Todo.txt";
   calManager.registerCalendar(newCal);
@@ -59,4 +60,10 @@ function removeCal(calManager){
       break;
     }
   }
+}
+
+function makeCalendarURI(aURL, aOriginCharset, aBaseURI) {
+    let ioService = Components.classes["@mozilla.org/network/io-service;1"]
+                        .getService(Components.interfaces.nsIIOService);
+    return ioService.newURI('todotxt://_unused', null, null);
 }
