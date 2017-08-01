@@ -212,27 +212,29 @@ let todoClient = {
   },
 
   setTodo: function(){
-    let prefs = util.getPreferences();
+    return new Promise((resolve, reject) => {
+      let prefs = util.getPreferences();
 
-    // Set empty todo object to prevent warning
-    // obj will be replaced once files ar read
-    todoClient.todo = TodoTxt.parseFile("");
+      // Set empty todo object to prevent warning
+      // obj will be replaced once files ar read
+      todoClient.todo = TodoTxt.parseFile("");
 
-    if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
-      throw exception.FILES_NOT_SPECIFIED();
+      if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
+        throw exception.FILES_NOT_SPECIFIED();
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
-      let parseBlob = "";
-      parseBlob += result[0];
-      parseBlob += result[1];
+      Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+        let parseBlob = "";
+        parseBlob += result[0];
+        parseBlob += result[1];
 
-      todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
-      todoClient.todo = TodoTxt.parseFile(parseBlob);
-    }, function (aError) {
-      throw exception.UNKNOWN();
+        todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+        resolve(TodoTxt.parseFile(parseBlob));
+      }, function (aError) {
+        reject(aError);
+      });
     });
   },
 };
