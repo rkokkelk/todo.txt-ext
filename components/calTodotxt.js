@@ -162,7 +162,7 @@ calTodoTxt.prototype = {
   getProperty: function cSC_getProperty(aName) {
     return this.__proto__.__proto__.getProperty.apply(this, arguments);
   },
-
+    
   refresh: function cSC_refresh() {
     todotxtLogger.debug('calTodotxt.js:refresh()');
     
@@ -274,28 +274,25 @@ calTodoTxt.prototype = {
       this.mPendingApiRequestListeners[this.id] = [];
     
     try {
-      if(!this.mLastSync){
-        items = todoClient.getItems(this,true);
+      items = todoClient.getItems(this, (this.mLastSync == null));
 
-        this.mLastSync = new Date();
-        this.mTaskCache[this.id] = {};
+      this.mLastSync = new Date();
+      this.mTaskCache[this.id] = {};
 
-        for each(item in items)
-          this.mTaskCache[this.id][item.id] = item;
+      for each(item in items)
+        this.mTaskCache[this.id][item.id] = item;
 
-        aListener.onGetResult(this.superCalendar,
-                              Components.results.NS_OK,
-                              Components.interfaces.calITodo,
-                              null,
-                              items.length,
-                              items);
-        this.notifyOperationComplete(aListener, 
-                                    Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.GET,
-                                    null,
+      aListener.onGetResult(this.superCalendar,
+                            Components.results.NS_OK,
+                            Components.interfaces.calITodo,
+                            null,
+                            items.length,
+                            items);
+      this.notifyOperationComplete(aListener, 
+                                  Components.results.NS_OK,
+                                  Components.interfaces.calIOperationListener.GET,
+                                  null,
                                     null);
-      }else
-        this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
       
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:getItems()',e);
