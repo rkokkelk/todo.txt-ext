@@ -41,11 +41,6 @@ function calTodoTxt() {
 
   prefObserver.register(this);
   timerObserver.register(this);
-  
-  // Add periodical verification of todo files, every 15s
-  timer = Cc["@mozilla.org/timer;1"]
-    .createInstance(Ci.nsITimer);
-  timer.init(timerObserver, 15*1000, Ci.nsITimer.TYPE_REPEATING_SLACK);
 }
 
 calTodoTxt.prototype = {
@@ -214,6 +209,8 @@ calTodoTxt.prototype = {
                                     item);
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
+      
+      timerObserver.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -243,9 +240,7 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      let timer = Cc["@mozilla.org/timer;1"]
-        .createInstance(Ci.nsITimer);
-      timer.initWithCallback(timerObserver, 1*1000, Ci.nsITimer.TYPE_ONE_SHOT);
+      timerObserver.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -294,13 +289,12 @@ calTodoTxt.prototype = {
       this.mPendingApiRequestListeners[this.id] = [];
     
     try {
-      if(!this.mLastSync){
-        items = todoClient.getItems(this,true);
+      items = todoClient.getItems(this, (this.mLastSync == null));
 
-        this.mLastSync = new Date();
-        this.mTaskCache[this.id] = {};
+      this.mLastSync = new Date();
+      this.mTaskCache[this.id] = {};
 
-        for each(item in items)
+        for (item in items)
           this.mTaskCache[this.id][item.id] = item;
 
         aListener.onGetResult(this.superCalendar,
@@ -314,8 +308,6 @@ calTodoTxt.prototype = {
                                     Ci.calIOperationListener.GET,
                                     null,
                                     null);
-      }else
-        this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
       
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:getItems()',e);

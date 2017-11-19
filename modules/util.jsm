@@ -34,12 +34,16 @@ var util = {
       // Show Projects & Contexts in title
       if(prefs.getBoolPref('showFullTitle')){
         itemTitle = item.render();
+
         // Filter out priority, start date & adds-ons
-        for each(let regex in [
+        regex = [
             /^\([A-Za-z]{1}\)\s*/,
             /^\d{4}-\d{2}-\d{2}\s*/,
-            /[\w\d-_]+:[\w\d-_]+\s*/])
-          itemTitle = itemTitle.replace(regex,"");
+            /[\w\d-_]+:[\w\d-_]+\s*/]
+              
+        for (let i=0; i< regex.length; i++){
+          itemTitle = itemTitle.replace(regex[i],"");
+        }
       } else
         itemTitle = this.makeStr(item.textTokens());
     else

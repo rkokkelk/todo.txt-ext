@@ -40,6 +40,12 @@ var timerObserver = {
 
   register: function(cal) {
     this.calendar = cal;
+
+    // Add periodical verification of todo files, every 30s
+    timer = Components.classes["@mozilla.org/timer;1"]
+      .createInstance(Components.interfaces.nsITimer);
+    timer.init(this, 30*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
+
     todotxtLogger.debug('timerObserver','register');
   },
 
@@ -74,33 +80,43 @@ var timerObserver = {
     this.checkSum = this.calculateMD5();
   },
 
-  calculateMD5: function(){
-    let prefs = util.getPreferences();
+  updateMD5: function(){
+    let timer = Components.classes["@mozilla.org/timer;1"]
+      .createInstance(Components.interfaces.nsITimer);
+    timer.initWithCallback(timerObserver, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+  },
 
-    // this tells updateFromStream to read the entire file
-    const PR_UINT32_MAX = 0xffffffff;
+  calculateMD5: function(){
+    let result = "";
+    let prefs = util.getPreferences();
 
     // Use MD5, hash for comparison and needs to be fast not secure
     let ch = Cc["@mozilla.org/security/hash;1"]
                          .createInstance(Ci.nsICryptoHash);
+    let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                        createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+    converter.charset = "UTF-8";
+
     ch.init(ch.MD5);
 
     todoFile = prefs.getComplexValue("todo-txt", Ci.nsIFile);
     doneFile = prefs.getComplexValue("done-txt", Ci.nsIFile);
 
-    // open files for reading
-    todoIstream = fileUtil.getInputStream(todoFile);
-    doneIstream = fileUtil.getInputStream(doneFile);
+    Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+      let parseBlob = "";
+      parseBlob += result[0];
+      parseBlob += result[1];
 
-    // Make sure that Istream is not empty
-    if(todoIstream.available() > 0)
-      ch.updateFromStream(todoIstream, PR_UINT32_MAX);
-    if(doneIstream.available() > 0)
-      ch.updateFromStream(doneIstream, PR_UINT32_MAX);
+      let converterResult = {};
+      let data = converter.convertToByteArray(parseBlob, converterResult);
+      ch.update(data, data.length);
 
-    let result =  ch.finish(true);
-    todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
-    return result
+      result = ch.finish(true);
+      todotxtLogger.debug('timerObserver:calculateMD5','hash ['+result+']');
+      return result
+    }, function (aError) {
+      throw exception.UNKNOWN();
+    });
   }
 };
 
@@ -148,6 +164,6 @@ var prefObserver = {
     
     // Reset notifications so that new errors
     // can be displayed
-    todotxtLogger.resetNotifcations();
+    todotxtLogger.resetNotifications();
   }
 };

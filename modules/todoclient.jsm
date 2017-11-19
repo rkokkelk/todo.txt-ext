@@ -31,24 +31,20 @@ EXPORTED_SYMBOLS = ['todoClient'];
 
 let todoClient = {
 
-  todo: null,
+  // Start with empty todo
+  todo: TodoTxt.parseFile(""),
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
-  getTodo: function(refresh){
-    if(!this.todo || refresh){
-      this.setTodo();
-    }
-    return this.todo;
-  },
-
   getItems: function(calendar,refresh){
     let items = [];
-    let todo = this.getTodo(refresh);
+    let todo = this.getTodo(calendar, refresh);
     let prefs = util.getPreferences();
     let tzService = cal.getTimezoneService();
 
-    for each(todoItem in todo.items({},'priority')){
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       item = cal.createTodo();
 
       item.id = todoItem.id();
@@ -154,7 +150,9 @@ let todoClient = {
     let todo = this.getTodo();
     let prefs = util.getPreferences();
 
-    for each(todoItem in todo.items()){
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       if(todoItem.id() == oldItem.id){
 
           let parseItem = newItem.title;
@@ -180,8 +178,8 @@ let todoClient = {
           // Verify if property is set to true and createTime is present then
           // add creationDate
           if(newItem.entryDate && prefs.getBoolPref("creation")){
-            let jsDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
-            todoItem.setCreatedDate(jsDate);
+            let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
+            todoItem.setCreatedDate(xpConnectDate);
           }
 
           if(!prefs.getBoolPref('showFullTitle')){
@@ -200,8 +198,8 @@ let todoClient = {
 
           if(!prefs.getBoolPref('showFullTitle')){
             projects = newItem.getCategories({},{});
-            for(var i=0;i<projects.length;i++){
-              todoItem.addProject(projects[i]);
+            for(let b=0; b < projects.length; b++){
+              todoItem.addProject(projects[b]);
             }
           }
 
@@ -214,9 +212,12 @@ let todoClient = {
   },
 
   deleteItem: function(item){
-    let todo = util.getTodo();
+    let todo = this.getTodo();
     let found = false;
-    for each(todoItem in todo.items()){
+
+    todoItems = todo.items({},'priority');
+    for (let i=0; i < todoItems.length; i++){
+      todoItem = todoItems[i];
       if(todoItem.id() == item.id){
           todo.removeItem(todoItem);
           fileUtil.writeTodo(todo);
@@ -227,20 +228,43 @@ let todoClient = {
     throw exception.ITEM_NOT_FOUND();
   },
 
+  getTodo: function(calendar, refresh){
+
+    if(refresh){
+      this.setTodo().then((todo) => {
+        todoClient.todo = todo;
+        calendar.observers.notify("onLoad", [calendar]);
+      }).catch((error) => {
+        throw exception.UNKNOWN();
+      });
+    }
+    return this.todo;
+  },
+
   setTodo: function(){
-    let parseBlob = "";
-    let prefs = util.getPreferences();
+    return new Promise((resolve, reject) => {
+      let prefs = util.getPreferences();
 
-    if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
-      throw exception.FILES_NOT_SPECIFIED();
+      // Set empty todo object to prevent warning
+      // obj will be replaced once files ar read
+      todoClient.todo = TodoTxt.parseFile("");
 
-    todoFile = prefs.getComplexValue("todo-txt", Ci.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Ci.nsIFile);
+      if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
+        throw exception.FILES_NOT_SPECIFIED();
 
-    parseBlob += fileUtil.readFile(todoFile);
-    parseBlob += fileUtil.readFile(doneFile);
-    todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
+      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
 
-    this.todo = TodoTxt.parseFile(parseBlob);
+      Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+        let parseBlob = "";
+        parseBlob += result[0];
+        parseBlob += result[1];
+
+        todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
+        resolve(TodoTxt.parseFile(parseBlob));
+      }, function (aError) {
+        reject(aError);
+      });
+    });
   },
 };
