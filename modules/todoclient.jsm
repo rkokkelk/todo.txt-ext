@@ -57,12 +57,23 @@ let todoClient = {
         // Define due date
         let addons = todoItem.addons();
         if(addons['due']){
-          // jsDueDate is parsed to 01:00:00, 
-          // because no time is used set back to 00:00:00
-          let jsDueDate = util.parseDate(addons['due']);
-          jsDueDate.setHours(0,0,0);
-          let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
-          item.dueDate = dueDate;
+          if (Array.isArray(addons['due'])){
+            for (let b=0; b < addons['due'].length; b++){
+              try{
+                let jsDueDate = util.parseDate(addons['due'][b]);
+                jsDueDate.setHours(0,0,0);
+                let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
+                item.dueDate = dueDate;
+              }catch(e){
+                todotxtLogger.error('todoclient.jsm:getItems','Invalid due date: '+addons['due'][b])
+              }
+            }
+          } else {
+            let jsDueDate = util.parseDate(addons['due']);
+            jsDueDate.setHours(0,0,0);
+            let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
+            item.dueDate = dueDate;
+          }
         }
 
         // Set creation date
