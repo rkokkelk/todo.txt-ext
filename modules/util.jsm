@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+Components.utils.import('resource://todotxt/logger.jsm');
 Components.utils.import('resource://todotxt/exception.jsm');
 
 EXPORTED_SYMBOLS = ['util'];
@@ -87,6 +88,9 @@ var util = {
   // use the following function to parse String dates
   // parse a date in yyyy-mm-dd format
   parseDate: function(input) {
+
+    // jsDueDate is parsed to 01:00:00, 
+    // because no time is used set back to 00:00:00
     var parts = input.split('-');
     return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
   },
