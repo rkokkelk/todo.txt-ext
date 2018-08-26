@@ -11,17 +11,36 @@ EXPORTED_SYMBOLS = ['fileUtil'];
 
 let fileUtil = {
 
-  writeTodo: function(todo){
+  getTodoFile: function(silent_ignore){
+    return this.getFilePreference('todo-txt', silent_ignore);
+  }
+
+  getDoneFile: function(silent_ignore){
+    return this.getFilePreference('done-txt', silent_ignore);
+  }
+
+  getFilePreference: function(tag, silent_ignore){
     let prefs = util.getPreferences();
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    if(!prefs.prefHasUserValue(tag) && silent_ignore)
+      return null;
+
+    else if(!prefs.prefHasUserValue(tag) && silent_ignore)
+      throw exception.FILES_NOT_SPECIFIED();
+
+    else{
+      return prefs.getComplexValue(tag, Components.interfaces.nsIFile);
+    }
+  }
+
+  writeTodo: function(todo){
+    let prefs = util.getPreferences();
 
     let todoRender = todo.render({isComplete:false});
     let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
 
-    this.writeToFile(todoFile, todoRender);
-    this.writeToFile(doneFile, doneRender);
+    this.writeToFile(this.getTodoFile(false), todoRender);
+    this.writeToFile(this.getDoneFile(false), doneRender);
   },
 
   writeToFile: function(file, input){
