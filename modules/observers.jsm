@@ -70,6 +70,7 @@ var timerObserver = {
   },
 
   calculateMD5: function(){
+    let data_array = [];
     let result = "";
     let prefs = util.getPreferences();
 
@@ -82,13 +83,19 @@ var timerObserver = {
 
     ch.init(ch.MD5);
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = fileUtil.getTodoFile(true);
+    doneFile = fileUtil.getDoneFile(true);
 
-    Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+    if (todoFile)
+      data_array.push(fileUtil.readFile(todoFile);
+    if (doneFile)
+      data_array.push(fileUtil.readFile(doneFile);
+
+    Promise.all(data_array).then(function (result) {
       let parseBlob = "";
-      parseBlob += result[0];
-      parseBlob += result[1];
+
+      for (i = 0; i < result.length; i++) {
+        parseBlob += result[i];
 
       let converterResult = {};
       let data = converter.convertToByteArray(parseBlob, converterResult);
