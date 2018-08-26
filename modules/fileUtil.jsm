@@ -13,11 +13,11 @@ let fileUtil = {
 
   getTodoFile: function(silent_ignore){
     return this.getFilePreference('todo-txt', silent_ignore);
-  }
+  },
 
   getDoneFile: function(silent_ignore){
     return this.getFilePreference('done-txt', silent_ignore);
-  }
+  },
 
   getFilePreference: function(tag, silent_ignore){
     let prefs = util.getPreferences();
@@ -25,13 +25,12 @@ let fileUtil = {
     if(!prefs.prefHasUserValue(tag) && silent_ignore)
       return null;
 
-    else if(!prefs.prefHasUserValue(tag) && silent_ignore)
+    else if(!prefs.prefHasUserValue(tag) && !silent_ignore)
       throw exception.FILES_NOT_SPECIFIED();
 
-    else{
+    else
       return prefs.getComplexValue(tag, Components.interfaces.nsIFile);
-    }
-  }
+  },
 
   writeTodo: function(todo){
     let prefs = util.getPreferences();

@@ -244,8 +244,8 @@ let todoClient = {
       // obj will be replaced once files ar read
       todoClient.todo = TodoTxt.parseFile("");
 
-      todoFile = fileUtils.getTodoFile(false);
-      doneFile = fileUtils.getDoneFile(false);
+      todoFile = fileUtil.getTodoFile(false);
+      doneFile = fileUtil.getDoneFile(false);
 
       Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
         let parseBlob = "";

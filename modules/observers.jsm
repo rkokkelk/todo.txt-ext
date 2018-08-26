@@ -87,14 +87,14 @@ var timerObserver = {
     doneFile = fileUtil.getDoneFile(true);
 
     if (todoFile)
-      data_array.push(fileUtil.readFile(todoFile);
+      data_array.push(fileUtil.readFile(todoFile));
     if (doneFile)
-      data_array.push(fileUtil.readFile(doneFile);
+      data_array.push(fileUtil.readFile(doneFile));
 
     Promise.all(data_array).then(function (result) {
       let parseBlob = "";
 
-      for (i = 0; i < result.length; i++) {
+      for (i = 0; i < result.length; i++)
         parseBlob += result[i];
 
       let converterResult = {};
