@@ -1,6 +1,6 @@
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
 
-EXPORTED_SYMBOLS = ['todotxtLogger'];
+this.EXPORTED_SYMBOLS = ['todotxtLogger'];
 
 let todotxtLogger = {
   

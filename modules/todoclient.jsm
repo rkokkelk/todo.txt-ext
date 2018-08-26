@@ -11,7 +11,7 @@ Components.utils.import('resource://todotxt/exception.jsm');
 Components.utils.import('resource://todotxt/fileUtil.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
-EXPORTED_SYMBOLS = ['todoClient'];
+this.EXPORTED_SYMBOLS = ['todoClient'];
 
 let todoClient = {
 

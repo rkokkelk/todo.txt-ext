@@ -7,7 +7,7 @@ Components.utils.import('resource://todotxt/logger.jsm');
 Components.utils.import('resource://todotxt/exception.jsm');
 Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
-EXPORTED_SYMBOLS = ['fileUtil'];
+this.EXPORTED_SYMBOLS = ['fileUtil'];
 
 let fileUtil = {
 

@@ -11,7 +11,7 @@ Components.utils.import("resource://todotxt/logger.jsm");
 Components.utils.import("resource://todotxt/fileUtil.jsm");
 Components.utils.import("resource://todotxt/todoclient.jsm");
 
-EXPORTED_SYMBOLS = ['timerObserver','prefObserver'];
+this.EXPORTED_SYMBOLS = ['timerObserver','prefObserver'];
 
 /*
  * Observer for notices of timers for synchronization process
