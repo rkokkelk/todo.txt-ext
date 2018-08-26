@@ -244,11 +244,8 @@ let todoClient = {
       // obj will be replaced once files ar read
       todoClient.todo = TodoTxt.parseFile("");
 
-      if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
-        throw exception.FILES_NOT_SPECIFIED();
-
-      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+      todoFile = fileUtils.getTodoFile(false);
+      doneFile = fileUtils.getDoneFile(false);
 
       Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
         let parseBlob = "";
