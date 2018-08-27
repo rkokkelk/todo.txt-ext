@@ -238,19 +238,26 @@ let todoClient = {
 
   setTodo: function(){
     return new Promise((resolve, reject) => {
+      let data_array = [];
       let prefs = util.getPreferences();
 
       // Set empty todo object to prevent warning
       // obj will be replaced once files ar read
       todoClient.todo = TodoTxt.parseFile("");
 
-      todoFile = fileUtil.getTodoFile(false);
-      doneFile = fileUtil.getDoneFile(false);
+      todoFile = fileUtil.getTodoFile(true);
+      doneFile = fileUtil.getDoneFile(true);
 
-      Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
+      if (todoFile)
+        data_array.push(fileUtil.readFile(todoFile));
+      if (doneFile)
+        data_array.push(fileUtil.readFile(doneFile));
+
+      Promise.all(data_array).then(function (result) {
         let parseBlob = "";
-        parseBlob += result[0];
-        parseBlob += result[1];
+
+        for (i = 0; i < result.length; i++)
+          parseBlob += result[i];
 
         todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
         resolve(TodoTxt.parseFile(parseBlob));
