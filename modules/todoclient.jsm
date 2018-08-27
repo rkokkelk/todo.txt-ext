@@ -61,7 +61,7 @@ let todoClient = {
             for (let b=0; b < addons['due'].length; b++){
               try{
                 let jsDueDate = util.parseDate(addons['due'][b]);
-                jsDueDate.setHours(0,0,0);
+                jsDueDate.setHours(23,59,59);
                 let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
                 item.dueDate = dueDate;
               }catch(e){
@@ -70,7 +70,7 @@ let todoClient = {
             }
           } else {
             let jsDueDate = util.parseDate(addons['due']);
-            jsDueDate.setHours(0,0,0);
+            jsDueDate.setHours(23,59,59);
             let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
             item.dueDate = dueDate;
           }
