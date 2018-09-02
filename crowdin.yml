@@ -1,0 +1,3 @@
+files:
+  - source: /chrome/locale/en-US/options.dtd
+    translation: /chrome/locale/%two_letters_code%/options.dtd
