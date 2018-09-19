@@ -42,10 +42,6 @@ calTodoTxt.prototype = {
       interfaces: calTodoCalendarInterfaces
   }),
   
-  getHelperForLanguage: function getHelperForLanguage(language) {
-    return null;
-  },
-  
   flags: 0,
   
   mUri: null,
@@ -84,6 +80,10 @@ calTodoTxt.prototype = {
   
   get itemType() {
     return this.getProperty('itemType');
+  },
+
+  setProperty: function(aName, aValue) {
+      return this.__proto__.__proto__.setProperty.apply(this, arguments);
   },
   
   getCachedItems: function cSC_getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
@@ -304,15 +304,13 @@ calTodoTxt.prototype = {
   },
 
   startBatch: function cSC_startBatch(){
-    todotxtLogger.debug('calTodotxt.js:startBatch()');
+    cal.LOG('calTodotxt.js:startBatch()');
   },
   
   endBatch: function cSC_endBatch(){
-    todotxtLogger.debug('calTodotxt.js:endBatch()');
+    cal.LOG('calTodotxt.js:endBatch()');
   }
 };
 
-/** Module Registration */
-function NSGetFactory(cid) {
-  return (XPCOMUtils.generateNSGetFactory([calTodoTxt]))(cid);
-}
+/* exported NSGetFactory */
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
