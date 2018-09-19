@@ -18,7 +18,6 @@ Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
-  todotxtLogger.debug("calTodoTxt", "Constructor");
 
   prefObserver.register(this);
   timerObserver.register(this);

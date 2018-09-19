@@ -25,18 +25,14 @@ var timerObserver = {
     this.calendar = cal;
 
     // Add periodical verification of todo files, every 30s
-    timer = Components.classes["@mozilla.org/timer;1"]
+    let timer = Components.classes["@mozilla.org/timer;1"]
       .createInstance(Components.interfaces.nsITimer);
     timer.init(this, 30*1000, Components.interfaces.nsITimer.TYPE_REPEATING_SLACK);
-
-    todotxtLogger.debug('timerObserver','register');
   },
 
   unregister: function() {
     this.calendar = null;
     if(this.timer) timer.cancel();
-
-    todotxtLogger.debug('timerObserver','unregister');
   },
 
   // Verify if todo & done file changed by
