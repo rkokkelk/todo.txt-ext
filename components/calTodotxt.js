@@ -18,28 +18,29 @@ Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
-  
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
   prefObserver.register(this);
   timerObserver.register(this);
 }
 
+var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
+var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
+                    Components.interfaces.nsIClassInfo,
+                    Components.interfaces.nsISupports
+];
+
 calTodoTxt.prototype = {
    __proto__: cal.provider.BaseClass.prototype,
   
-  classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
-  contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-  classDescription: "TodoTxt",
-  
-  getInterfaces: function getInterfaces(count) {
-    const ifaces = [Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports];
-    count.value = ifaces.length;
-    return ifaces;
-  },
+  classID: calTodoCalendarclassID,
+  QueryInterface: XPCOMUtils.generateQI(calTodoCalendarInterfaces),
+  classInfo: XPCOMUtils.generateCI({
+      classDescription: "TodoTxt",
+      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
+      classID: calTodoCalendarclassID,
+      interfaces: calTodoCalendarInterfaces
+  }),
   
   getHelperForLanguage: function getHelperForLanguage(language) {
     return null;
@@ -115,9 +116,6 @@ calTodoTxt.prototype = {
    * nsISupports
    */
   //TODO: find way for using global parametr
-  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo]),
 
   /*
    * calICalendarProvider interface
