@@ -4,19 +4,10 @@ this.EXPORTED_SYMBOLS = ['todotxtLogger'];
 
 let todotxtLogger = {
   
-  app: null,
   notif: {},
   
-  get App(){
-    if(!this.app){
-      this.app = Components.classes["@mozilla.org/steel/application;1"]
-                   .getService(Components.interfaces.steelIApplication);
-    }
-    return this.app;
-  },
-
   get debugMode() {
-    mDebugMode = true;
+    var mDebugMode = true;
     return mDebugMode;
   },
   set debugMode(aValue) {
@@ -31,13 +22,7 @@ let todotxtLogger = {
     return new Date().toLocaleString();
   },
 
-  appLog: function(msg){
-    app = this.App;
-    app.console.log(msg);
-  },
-  
   debug: function(src, msg) {
-    app = this.App;
     if (this.debugMode) {
       let output = '('+this.getDateTime()+') ';
       if (src) {
@@ -50,7 +35,6 @@ let todotxtLogger = {
         output += msg;
       }
       cal.LOG(output);
-      this.appLog(output);
     }
   },
 
@@ -67,7 +51,6 @@ let todotxtLogger = {
         output += error.message;
       
       cal.LOG(output);
-      this.appLog(output);
     }
   },
 
