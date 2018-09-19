@@ -26,7 +26,7 @@ let todoClient = {
     let prefs = util.getPreferences();
     let tzService = cal.getTimezoneService();
 
-    todoItems = todo.items({},'priority');
+    var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
       todoItem = todoItems[i];
       item = cal.createTodo();
@@ -145,7 +145,7 @@ let todoClient = {
     let todo = this.getTodo();
     let prefs = util.getPreferences();
 
-    todoItems = todo.items({},'priority');
+    var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
       todoItem = todoItems[i];
       if(todoItem.id() == oldItem.id){
@@ -210,7 +210,7 @@ let todoClient = {
     let todo = this.getTodo();
     let found = false;
 
-    todoItems = todo.items({},'priority');
+    var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
       todoItem = todoItems[i];
       if(todoItem.id() == item.id){

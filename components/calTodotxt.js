@@ -93,7 +93,6 @@ calTodoTxt.prototype = {
 
     for (let i=0; i < taskCache.length; i++){
       let itemId = taskCache[i];
-      todoItem = todoItems[i];
       let cachedItem = this.mTaskCache[this.id][itemId];
       items.push(cachedItem);
     }
@@ -272,7 +271,7 @@ calTodoTxt.prototype = {
       this.mPendingApiRequestListeners[this.id] = [];
     
     try {
-      items = todoClient.getItems(this, (this.mLastSync == null));
+      let items = todoClient.getItems(this, (this.mLastSync == null));
 
       this.mLastSync = new Date();
       this.mTaskCache[this.id] = {};
