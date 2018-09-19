@@ -45,7 +45,6 @@ calTodoTxt.prototype = {
     return null;
   },
   
-  implementationLanguage: Components.interfaces.nsIProgrammingLanguage.JAVASCRIPT,
   flags: 0,
   
   mUri: null,
