@@ -9,7 +9,6 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import("resource://gre/modules/Timer.jsm");
 
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
 Components.utils.import('resource://todotxt/exception.jsm');
@@ -27,7 +26,7 @@ function calTodoTxt() {
 }
 
 calTodoTxt.prototype = {
-  __proto__: cal.ProviderBase.prototype,
+   __proto__: cal.provider.BaseClass.prototype,
   
   classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
   contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
