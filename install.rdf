@@ -13,7 +13,7 @@
     <em:homepageURL>https://github.com/rkokkelk/todo.txt-ext</em:homepageURL>
     <em:icon64URL>chrome://todotxt/skin/icon-64.png</em:icon64URL>
 
-    <em:optionsURL>chrome://todotxt/content/options.xul</em:optionsURL>
+    <em:optionsURL>chrome://todotxt/content/preferences.xul</em:optionsURL>
     <em:optionsType>3</em:optionsType>
    
     <em:targetApplication>

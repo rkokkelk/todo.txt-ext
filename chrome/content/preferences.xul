@@ -1,15 +1,53 @@
-<?xml version="1.0"?> 
+<?xml version="1.0" encoding="UTF-8"?> 
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet type="text/css" href="chrome://messenger/skin/preferences/preferences.css"?>
 
-<!DOCTYPE window [
-  <!ENTITY % todotxt SYSTEM "chrome://todotxt/locale/options.dtd">
-  %todotxt;
-]> 
+<!DOCTYPE window SYSTEM 'chrome://todotxt/locale/preferences.dtd'>
+
+<window xmlns='http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
+			title='&todotxt; &preferences;'
+			id='todotxt-preferences'
+			persist='screenX screenY'>
+
+  <script type='application/x-javascript' src='chrome://todotxt/content/preferences.js'/>
  
-<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <prefpane id='todotxt-pane' label='&todotxt; &preferences;' orient='vertical'>
+    <preferences>
+      <preference id="todotxt-pref-todo-path" name="extensions.todotxt.todo-txt" type="string" />
+      <preference id="todotxt-pref-done-path" name="extensions.todotxt.done-txt" type="string" />
+      <preference id="todotxt-pref-thunderbird" name="extensions.todotxt.thunderbird" type="bool" />
+      <preference id="todotxt-pref-creation" name="extensions.todotxt.creation" type="bool" />
+      <preference id="todotxt-pref-showFullTitle" name="extensions.todotxt.showFullTitle" type="bool" />
+    </preferences>
 
-  <setting pref="extensions.todotxt.todo-txt" type="file" title="&todotxt.todofile;" />
-  <setting pref="extensions.todotxt.done-txt" type="file" title="&todotxt.donefile;" />
-  <setting pref="extensions.todotxt.thunderbird" type="bool" title="&todotxt.thunderbird;" />
-  <setting pref="extensions.todotxt.creation" type="bool" title="&todotxt.creation;"/>
-  <setting pref="extensions.todotxt.showFullTitle" type="bool" title="&todotxt.showFullTitle;"/>
-</vbox>
+    <groupbox>
+      <caption label='Todo.txt file' />
+      <hbox align="center">
+        <textbox id="todotxt-todo-path" preference="todotxt-pref-todo-path"
+                     readonly="true" size="30"/>
+        <button id="todotxt-browse-todo-path"
+            label="Browse"
+            oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-todo-path')"/>
+      </hbox>
+    </groupbox>
+
+    <groupbox>
+      <caption label='Done.txt file' />
+      <hbox align="center">
+        <textbox id="todotxt-done-path" preference="todotxt-pref-done-path"
+                     readonly="true" size="30"/>
+        <button id="todotxt-browse-done-path"
+            label="Browse"
+            oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-done-path')"/>
+      </hbox>
+    </groupbox>
+
+    <groupbox>
+      <caption label='&Behavior;' />
+      <checkbox label='&todotxt.thunderbird;' id='todotxt-thunderbird' preference='todotxt-pref-thunderbird'/>
+      <checkbox label='&todotxt.creation;' id='todotxt-creation' preference='todotxt-pref-creation'/>
+      <checkbox label='&todotxt.showFullTitle;' id='todotxt-showFullTitle' preference='todotxt-pref-showFullTitle'/>
+    </groupbox>
+
+  </prefpane>
+</window> 
