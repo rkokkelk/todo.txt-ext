@@ -14,8 +14,8 @@ let fileUtil = {
   writeTodo: function(todo){
     let prefs = util.getPreferences();
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getCharPref("todo-txt");
+    doneFile = prefs.getCharPref("done-txt");
 
     let todoRender = todo.render({isComplete:false});
     let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
@@ -39,7 +39,7 @@ let fileUtil = {
   },
 
   readFile: function(file){
-    let promise = OS.File.read(file.path, { encoding: 'utf-8' });
+    let promise = OS.File.read(file, { encoding: 'utf-8' });
 
     onSucces = function(result){
       // Verify if str contains newline at end

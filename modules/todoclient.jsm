@@ -247,8 +247,8 @@ let todoClient = {
       if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
         throw exception.FILES_NOT_SPECIFIED();
 
-      todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-      doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+      todoFile = prefs.getCharPref("todo-txt");
+      doneFile = prefs.getCharPref("done-txt");
 
       Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
         let parseBlob = "";
