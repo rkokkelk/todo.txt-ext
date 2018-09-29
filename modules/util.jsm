@@ -63,8 +63,11 @@ var util = {
 
   getPreferences: function(){
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                            .getService(Components.interfaces.nsIPrefService);
-    return prefs.getBranch("extensions.todotxt.");
+                            .getService(Components.interfaces.nsIPrefService)
+                            .getBranch("extensions.todotxt.");
+    prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
+
+    return prefs;
   },
   
   makeDateStr: function(date) {
