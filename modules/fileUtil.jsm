@@ -5,7 +5,7 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import('resource://todotxt/util.jsm');
 Components.utils.import('resource://todotxt/logger.jsm');
 Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Components.utils.import("resource://todotxt/todotxt.js");
 
 this.EXPORTED_SYMBOLS = ['fileUtil'];
 
