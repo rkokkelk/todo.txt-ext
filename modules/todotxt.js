@@ -167,7 +167,7 @@ var TodoTxt = (function () {
 
       output.addItem = function(item, setCreateDate) {
           if (typeof item.render === 'function') item = item.render();
-          item = parseLineInternal(item, getLineNumber);
+          var item = parseLineInternal(item, getLineNumber);
           if (!item.createdDate() && setCreateDate) item.setCreatedDate(new Date());
 
           items.push(item);
@@ -510,8 +510,8 @@ var TodoTxt = (function () {
   };
 
     var isDate = function(value) {
-        valueExists = (value && typeof value == 'object');
-        objType = (toString.call(value) == '[object Date]' || toString.call(value) == '[xpconnect wrapped native prototype]');
+        var valueExists = (value && typeof value == 'object');
+        var objType = (toString.call(value) == '[object Date]' || toString.call(value) == '[xpconnect wrapped native prototype]');
         return (valueExists && objType) || false;
     };
 

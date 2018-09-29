@@ -78,8 +78,8 @@ var timerObserver = {
 
     ch.init(ch.MD5);
 
-    todoFile = prefs.getCharPref("todo-txt");
-    doneFile = prefs.getCharPref("done-txt");
+    let todoFile = prefs.getCharPref("todo-txt");
+    let doneFile = prefs.getCharPref("done-txt");
 
     Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
       let parseBlob = "";
