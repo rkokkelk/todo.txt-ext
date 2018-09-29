@@ -40,18 +40,19 @@ let todotxtLogger = {
 
   error: function(src, error) {
     this.showNotification(error.message);
-    if (this.debugMode) {
-      let output = '('+this.getDateTime()+') ';
-      if (src) {
-        output += '[' + src + ']';
-      }
-      output += ' ERROR: ';
-
-      if (error)
-        output += error.message;
-      
-      cal.LOG(output);
+    let output = '('+this.getDateTime()+') ';
+    if (src) {
+      output += '[' + src + ']';
     }
+    output += ' ERROR: ';
+
+    if (error)
+      output += error.message;
+
+    if (this.debugMode) 
+      output += "\n"+error.stack;
+    
+    cal.LOG(output);
   },
 
   resetNotifications: function(){
