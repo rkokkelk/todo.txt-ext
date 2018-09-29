@@ -28,8 +28,8 @@ let todoClient = {
 
     var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
-      todoItem = todoItems[i];
-      item = cal.createTodo();
+      let todoItem = todoItems[i];
+      let item = cal.createTodo();
 
       item.id = todoItem.id();
       item.calendar = calendar;
@@ -78,13 +78,13 @@ let todoClient = {
 
         // Set creation date
         if(todoItem.createdDate() && prefs.getBoolPref("creation")){
-          createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+          let createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
           item.entryDate = createDate;
         }
 
         // Set complete date
         if(todoItem.isComplete() && todoItem.completedDate()){
-          dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
+          let dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
           item.completedDate = dateTime;
         }
       }
@@ -122,7 +122,7 @@ let todoClient = {
 
       // Set creation date
       if(todoItem.createdDate() && prefs.getBoolPref("creation")){
-        createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+        let createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
         newItem.entryDate = createDate;
       }
 
@@ -147,7 +147,7 @@ let todoClient = {
 
     var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
-      todoItem = todoItems[i];
+      let todoItem = todoItems[i];
       if(todoItem.id() == oldItem.id){
 
           let parseItem = newItem.title;
@@ -166,9 +166,8 @@ let todoClient = {
             let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.calendarDefaultTimezone());
             let dateStr = util.makeDateStr(dueDate);
             todoItem.setAddOn('due', dateStr);
-          }else{
+          } else
             todoItem.removeAddOn('due');
-          }
 
           // Verify if property is set to true and createTime is present then
           // add creationDate
@@ -179,10 +178,9 @@ let todoClient = {
 
           if(!prefs.getBoolPref('showFullTitle')){
             // add new contexts
-            newContexts = util.makeArray(newItem.getProperty('location'));
-            for(let j=0; j<newContexts.length; j++){
+            let newContexts = util.makeArray(newItem.getProperty('location'));
+            for(let j=0; j<newContexts.length; j++)
               todoItem.addContext(newContexts[j]);
-            }
           }
 
           // Verify if completed changed
@@ -192,10 +190,9 @@ let todoClient = {
             todoItem.uncompleteTask();
 
           if(!prefs.getBoolPref('showFullTitle')){
-            projects = newItem.getCategories({},{});
-            for(let b=0; b < projects.length; b++){
+            let projects = newItem.getCategories({},{});
+            for(let b=0; b < projects.length; b++)
               todoItem.addProject(projects[b]);
-            }
           }
 
           fileUtil.writeTodo(todo);
@@ -212,7 +209,7 @@ let todoClient = {
 
     var todoItems = todo.items({},'priority');
     for (let i=0; i < todoItems.length; i++){
-      todoItem = todoItems[i];
+      let todoItem = todoItems[i];
       if(todoItem.id() == item.id){
           todo.removeItem(todoItem);
           fileUtil.writeTodo(todo);
@@ -233,6 +230,7 @@ let todoClient = {
         throw exception.UNKNOWN();
       });
     }
+
     return this.todo;
   },
 

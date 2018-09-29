@@ -20,7 +20,7 @@ var util = {
         itemTitle = item.render();
 
         // Filter out priority, start date & adds-ons
-        regex = [
+        let regex = [
             /^\([A-Za-z]{1}\)\s*/,
             /^\d{4}-\d{2}-\d{2}\s*/,
             /[\w\d-_]+:[\w\d-_]+\s*/]

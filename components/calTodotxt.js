@@ -276,8 +276,8 @@ calTodoTxt.prototype = {
       this.mLastSync = new Date();
       this.mTaskCache[this.id] = {};
 
-        for (item in items)
-          this.mTaskCache[this.id][item.id] = item;
+      for (let item in items)
+        this.mTaskCache[this.id][item.id] = item;
 
       aListener.onGetResult(this.superCalendar,
                             Components.results.NS_OK,
