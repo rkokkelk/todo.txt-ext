@@ -78,8 +78,8 @@ var timerObserver = {
 
     ch.init(ch.MD5);
 
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
+    todoFile = prefs.getCharPref("todo-txt");
+    doneFile = prefs.getCharPref("done-txt");
 
     Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
       let parseBlob = "";
@@ -128,6 +128,7 @@ var prefObserver = {
   },
 
   observe: function(aSubject, aTopic, aData) {
+    todotxtLogger.debug('prefObserver:observe', 'Changed: '+aData);
     switch (aData) {
       case "creation":
       case "thunderbird":
