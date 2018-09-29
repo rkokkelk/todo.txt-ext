@@ -24,7 +24,7 @@ todotxt.ns.Preferences = function() {
         let prefPath = document.getElementById(id);
         prefPath.value = storagePath;
 
-        if(id.indexOf('todo') !== -1)
+        if(id.indexOf('todo-path') !== -1)
           prefs.setCharPref('todo-txt', storagePath);
         else
           prefs.setCharPref('done-txt', storagePath);
