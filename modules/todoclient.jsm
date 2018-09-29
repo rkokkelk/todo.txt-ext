@@ -62,7 +62,7 @@ let todoClient = {
               try{
                 let jsDueDate = util.parseDate(addons['due'][b]);
                 jsDueDate.setHours(0,0,0);
-                let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
+                let dueDate = cal.dtz.jsDateToDateTime(jsDueDate, cal.dtz.defaultTimezone);
                 item.dueDate = dueDate;
               }catch(e){
                 todotxtLogger.error('todoclient.jsm:getItems','Invalid due date: '+addons['due'][b])
@@ -71,20 +71,20 @@ let todoClient = {
           } else {
             let jsDueDate = util.parseDate(addons['due']);
             jsDueDate.setHours(0,0,0);
-            let dueDate = cal.jsDateToDateTime(jsDueDate, cal.calendarDefaultTimezone());
+            let dueDate = cal.dtz.jsDateToDateTime(jsDueDate, cal.dtz.defaultTimezone);
             item.dueDate = dueDate;
           }
         }
 
         // Set creation date
         if(todoItem.createdDate() && prefs.getBoolPref("creation")){
-          let createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+          let createDate = cal.dtz.jsDateToDateTime(todoItem.createdDate(), cal.dtz.defaultTimezone);
           item.entryDate = createDate;
         }
 
         // Set complete date
         if(todoItem.isComplete() && todoItem.completedDate()){
-          let dateTime = cal.jsDateToDateTime(todoItem.completedDate(), cal.calendarDefaultTimezone());
+          let dateTime = cal.dtz.jsDateToDateTime(todoItem.completedDate(), cal.dtz.defaultTimezone);
           item.completedDate = dateTime;
         }
       }
@@ -122,13 +122,13 @@ let todoClient = {
 
       // Set creation date
       if(todoItem.createdDate() && prefs.getBoolPref("creation")){
-        let createDate = cal.jsDateToDateTime(todoItem.createdDate(), cal.calendarDefaultTimezone());
+        let createDate = cal.dtz.jsDateToDateTime(todoItem.createdDate(), cal.dtz.defaultTimezone);
         newItem.entryDate = createDate;
       }
 
       // Set due date
       if(newItem.dueDate){
-        let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.calendarDefaultTimezone());
+        let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.dtz.defaultTimezone);
         let dateStr = util.makeDateStr(dueDate);
         todoItem.setAddOn('due', dateStr);
       }
@@ -163,7 +163,7 @@ let todoClient = {
           todoItem.replaceWith(parseItem);
 
           if(newItem.dueDate){
-            let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.calendarDefaultTimezone());
+            let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.dtz.defaultTimezone);
             let dateStr = util.makeDateStr(dueDate);
             todoItem.setAddOn('due', dateStr);
           } else
@@ -172,7 +172,7 @@ let todoClient = {
           // Verify if property is set to true and createTime is present then
           // add creationDate
           if(newItem.entryDate && prefs.getBoolPref("creation")){
-            let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.calendarDefaultTimezone());
+            let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.dtz.defaultTimezone);
             todoItem.setCreatedDate(xpConnectDate);
           }
 
