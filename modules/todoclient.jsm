@@ -247,8 +247,8 @@ let todoClient = {
       if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt'))
         throw exception.FILES_NOT_SPECIFIED();
 
-      todoFile = prefs.getCharPref("todo-txt");
-      doneFile = prefs.getCharPref("done-txt");
+      let todoFile = prefs.getCharPref("todo-txt");
+      let doneFile = prefs.getCharPref("done-txt");
 
       Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (result) {
         let parseBlob = "";
@@ -258,6 +258,7 @@ let todoClient = {
         todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
         resolve(TodoTxt.parseFile(parseBlob));
       }, function (aError) {
+        todotxtLogger.error("todoclient:setTodo", aError);
         reject(aError);
       });
     });
