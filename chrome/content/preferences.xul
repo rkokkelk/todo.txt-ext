@@ -21,29 +21,29 @@
     </preferences>
 
     <groupbox>
-      <caption label='Todo.txt file' />
+      <caption label='&todotxt.todofile;' />
       <hbox align="center">
         <textbox id="todotxt-todo-path" preference="todotxt-pref-todo-path"
                      readonly="true" size="30"/>
         <button id="todotxt-browse-todo-path"
-            label="Browse"
+            label="&browse;"
             oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-todo-path')"/>
       </hbox>
     </groupbox>
 
     <groupbox>
-      <caption label='Done.txt file' />
+      <caption label='&todotxt.donefile;' />
       <hbox align="center">
         <textbox id="todotxt-done-path" preference="todotxt-pref-done-path"
                      readonly="true" size="30"/>
         <button id="todotxt-browse-done-path"
-            label="Browse"
+            label="&browse;"
             oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-done-path')"/>
       </hbox>
     </groupbox>
 
     <groupbox>
-      <caption label='&Behavior;' />
+      <caption label='&behavior;' />
       <checkbox label='&todotxt.thunderbird;' id='todotxt-thunderbird' preference='todotxt-pref-thunderbird'/>
       <checkbox label='&todotxt.creation;' id='todotxt-creation' preference='todotxt-pref-creation'/>
       <checkbox label='&todotxt.showFullTitle;' id='todotxt-showFullTitle' preference='todotxt-pref-showFullTitle'/>
