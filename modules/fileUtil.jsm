@@ -25,7 +25,7 @@ let fileUtil = {
   },
 
   writeToFile: function(file, input){
-    let promise = OS.File.writeAtomic(file.path, input, {encoding: "utf-8", flush: true});
+    let promise = OS.File.writeAtomic(file, input, {encoding: "utf-8", flush: true});
 
     let onSucces = function(aVal){
         todotxtLogger.debug("fileUtil.jsm", "written to file");
