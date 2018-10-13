@@ -40,12 +40,13 @@ var util = {
     let result = [];
 
     if(!string) return result;
-    tmp_result = string.split(' ');
+    let str_split = string.split(' ');
 
-    for(let i=0; i<tmp_result.length;i++){
-      tmp_word = tmp_result[i].trim();
+    for(let i=0; i < str_split.length;i++){
+      let tmp_word = str_split[i].trim();
       if (tmp_word) result.push(tmp_word);
     }
+
     return result;
   },
 
