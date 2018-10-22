@@ -11,6 +11,27 @@ this.EXPORTED_SYMBOLS = ['fileUtil'];
 
 let fileUtil = {
 
+  getTodoFile: function(silent_ignore){
+    return this.getFilePreference('todo-txt', silent_ignore);
+  },
+
+  getDoneFile: function(silent_ignore){
+    return this.getFilePreference('done-txt', silent_ignore);
+  },
+
+  getFilePreference: function(tag, silent_ignore){
+    let prefs = util.getPreferences();
+
+    if(!prefs.prefHasUserValue(tag) && silent_ignore)
+      return null;
+
+    else if(!prefs.prefHasUserValue(tag) && !silent_ignore)
+      throw exception.FILES_NOT_SPECIFIED();
+
+    else
+      return prefs.getCharPref(tag);
+  },
+
   writeTodo: function(todo){
     let prefs = util.getPreferences();
 
@@ -59,6 +80,7 @@ let fileUtil = {
     let promise = new Promise(function(resolve, reject) {
 
       let result = "";
+      let data_array = [];
       let prefs = util.getPreferences();
 
       // Use MD5, hash for comparison and needs to be fast not secure
@@ -70,13 +92,19 @@ let fileUtil = {
 
       ch.init(ch.MD5);
 
-      let todoFile = prefs.getCharPref("todo-txt");
-      let doneFile = prefs.getCharPref("done-txt");
+      let todoFile = fileUtil.getTodoFile(true);
+      let doneFile = fileUtil.getDoneFile(true);
 
-      Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (promiseResult) {
+      if (todoFile)
+        data_array.push(fileUtil.readFile(todoFile));
+      if (doneFile)
+        data_array.push(fileUtil.readFile(doneFile));
+
+      Promise.all(data_array).then(function (promiseResult) {
         let parseBlob = "";
-        parseBlob += promiseResult[0];
-        parseBlob += promiseResult[1];
+
+        for (var i = 0; i < promiseResult.length; i++)
+          parseBlob += promiseResult[i];
 
         let converterResult = {};
         let data = converter.convertToByteArray(parseBlob, converterResult);
