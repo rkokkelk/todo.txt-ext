@@ -35,8 +35,8 @@ let fileUtil = {
   writeTodo: function(todo){
     let prefs = util.getPreferences();
 
-    let todoFile = prefs.getCharPref("todo-txt");
-    let doneFile = prefs.getCharPref("done-txt");
+    let todoFile = fileUtil.getTodoFile(false);
+    let doneFile = fileUtil.getDoneFile(false);
 
     let todoRender = todo.render({isComplete:false});
     let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
@@ -47,6 +47,7 @@ let fileUtil = {
 
   writeToFile: function(file, input){
     let promise = OS.File.writeAtomic(file, input, {encoding: "utf-8", flush: true});
+      let data_array = [];
 
     let onSucces = function(aVal){
         todotxtLogger.debug("fileUtil.jsm", "written to file");
