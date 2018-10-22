@@ -54,4 +54,43 @@ let fileUtil = {
 
     return promise.then(onSucces, onError);
   },
+
+  calculateMD5: function(){
+    let promise = new Promise(function(resolve, reject) {
+
+      let result = "";
+      let prefs = util.getPreferences();
+
+      // Use MD5, hash for comparison and needs to be fast not secure
+      let ch = Components.classes["@mozilla.org/security/hash;1"].
+                          createInstance(Components.interfaces.nsICryptoHash);
+      let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+      converter.charset = "UTF-8";
+
+      ch.init(ch.MD5);
+
+      let todoFile = prefs.getCharPref("todo-txt");
+      let doneFile = prefs.getCharPref("done-txt");
+
+      Promise.all([fileUtil.readFile(todoFile), fileUtil.readFile(doneFile)]).then(function (promiseResult) {
+        let parseBlob = "";
+        parseBlob += promiseResult[0];
+        parseBlob += promiseResult[1];
+
+        let converterResult = {};
+        let data = converter.convertToByteArray(parseBlob, converterResult);
+        ch.update(data, data.length);
+
+        result = ch.finish(true);
+        todotxtLogger.debug('fileUtil:calculateMD5','hash ['+result+']');
+
+        resolve(result);
+      }, function (aError) {
+        reject(aError);
+      });
+    });
+
+    return promise;
+  }
 }
