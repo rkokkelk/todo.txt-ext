@@ -40,7 +40,9 @@ let todotxtLogger = {
 
   error: function(src, error) {
     this.showNotification(error.message);
+
     let output = '('+this.getDateTime()+') ';
+
     if (src) {
       output += '[' + src + ']';
     }

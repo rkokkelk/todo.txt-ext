@@ -19,8 +19,10 @@ Components.utils.import("resource://todotxt/todotxt.js");
 function calTodoTxt() {
   this.initProviderBase();
 
+  todotxtLogger.debug("calTodoTxt", "Constructor");
+
   prefObserver.register(this);
-  timerObserver.register(this);
+  this.fileObserver = observers.registerFileObserver(this);
 }
 
 var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
@@ -48,6 +50,8 @@ calTodoTxt.prototype = {
   mTaskCache: {},
   mPendingApiRequest: false,
   mPendingApiRequestListeners: {},
+
+  fileObserver: null,
 
   get pendingApiRequest() {
     return this.mPendingApiRequest;
@@ -190,7 +194,7 @@ calTodoTxt.prototype = {
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
       
-      timerObserver.updateMD5();
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -220,7 +224,7 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      timerObserver.updateMD5();
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -244,7 +248,7 @@ calTodoTxt.prototype = {
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
       // Update checksum
-      timerObserver.updateMD5();
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
