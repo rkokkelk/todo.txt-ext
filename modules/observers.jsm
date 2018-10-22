@@ -27,24 +27,32 @@ var fileEvent = {
     todotxtLogger.debug('fileEvent', 'Starting observation');
 
     try{
-      let old_checksum = this.checkSum;
-      this.checkSum = this.calculateMD5();
+      fileUtil.calculateMD5().then((checkSum) => {
+        let old_checksum = this.checkSum;
+        this.checkSum = checkSum;
 
-      // Verify if not first run, old_checksum != undef
-      if(old_checksum){
-        if(old_checksum != this.checkSum){
-          todotxtLogger.debug('fileEvent','refresh');
-          this.calendar.refresh();
+        // Verify if not first run, old_checksum != undef
+        if(old_checksum){
+          if(old_checksum != this.checkSum){
+            todotxtLogger.debug('fileEvent','refresh');
+            this.calendar.refresh();
+          }
         }
-      }
+      }, (error) => {
+        todotxtLogger.error('fileEvent:observe', error);
+      });
     } catch(e){
-      todotxtLogger.error('fileEvent:observe',e);
+      todotxtLogger.error('fileEvent:observe', e);
     }
   },
 
   notify: function(timer){
     todotxtLogger.debug('fileEvent','notify');
-    this.checkSum = this.calculateMD5();
+    fileUtil.calculateMD5().then((checkSum) => {
+      this.checkSum = checkSum;
+    }, (error) => {
+      todotxtLogger.error('fileEvent:observe', error);
+    });
   },
 
   updateMD5: function(){
