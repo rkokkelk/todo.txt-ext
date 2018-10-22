@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!ENTITY todotxt "Todo.txt Extension">
+<!ENTITY todotxt "Todo.txt">
 <!ENTITY behavior "Behavior">
 <!ENTITY browse "Browse">
-<!ENTITY preferences "Preferences">
+<!ENTITY preferences "preferences">
 <!ENTITY todotxt.todofile "Location of Todo.txt">
 <!ENTITY todotxt.donefile "Location of Done.txt">
 <!ENTITY todotxt.thunderbird "Use Thunderbird's functionality">
