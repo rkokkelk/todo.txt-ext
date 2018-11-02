@@ -9,42 +9,40 @@ Components.utils.import("resource://gre/modules/NetUtil.jsm");
 Components.utils.import("resource://gre/modules/Timer.jsm");
 
 Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://calendar/modules/calProviderUtils.jsm");
 
 Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import("resource://todotxt/todoclient.js");
-Components.utils.import("resource://todotxt/todo-txt-js/todotxt.js");
+Components.utils.import('resource://todotxt/exception.jsm');
+Components.utils.import("resource://todotxt/observers.jsm");
+Components.utils.import("resource://todotxt/todoclient.jsm");
+Components.utils.import("resource://todotxt/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
-  
-  todotxtLogger.debugMode = false;
+
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
-  myPrefObserver.register(this);
+  prefObserver.register(this);
+  this.fileObserver = observers.registerFileObserver(this);
 }
 
-calTodoTxt.prototype = {
-  __proto__: cal.ProviderBase.prototype,
-  
-  classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
-  contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-  classDescription: "TodoTxt",
-  
-  getInterfaces: function getInterfaces(count) {
-    const ifaces = [Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
+var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
+var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
                     Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports];
-    count.value = ifaces.length;
-    return ifaces;
-  },
+                    Components.interfaces.nsISupports
+];
+
+calTodoTxt.prototype = {
+   __proto__: cal.provider.BaseClass.prototype,
   
-  getHelperForLanguage: function getHelperForLanguage(language) {
-    return null;
-  },
+  classID: calTodoCalendarclassID,
+  QueryInterface: XPCOMUtils.generateQI(calTodoCalendarInterfaces),
+  classInfo: XPCOMUtils.generateCI({
+      classDescription: "TodoTxt",
+      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
+      classID: calTodoCalendarclassID,
+      interfaces: calTodoCalendarInterfaces
+  }),
   
-  implementationLanguage: Components.interfaces.nsIProgrammingLanguage.JAVASCRIPT,
   flags: 0,
   
   mUri: null,
@@ -52,6 +50,8 @@ calTodoTxt.prototype = {
   mTaskCache: {},
   mPendingApiRequest: false,
   mPendingApiRequestListeners: {},
+
+  fileObserver: null,
 
   get pendingApiRequest() {
     return this.mPendingApiRequest;
@@ -84,13 +84,19 @@ calTodoTxt.prototype = {
   get itemType() {
     return this.getProperty('itemType');
   },
+
+  setProperty: function(aName, aValue) {
+      return this.__proto__.__proto__.setProperty.apply(this, arguments);
+  },
   
   getCachedItems: function cSC_getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
     todotxtLogger.debug('calTodotxt.js:getCachedItems()');
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
-    for (let itemId in taskCache){
+
+    for (let i=0; i < taskCache.length; i++){
+      let itemId = taskCache[i];
       let cachedItem = this.mTaskCache[this.id][itemId];
       items.push(cachedItem);
     }
@@ -112,9 +118,6 @@ calTodoTxt.prototype = {
    * nsISupports
    */
   //TODO: find way for using global parametr
-  QueryInterface: XPCOMUtils.generateQI([Components.interfaces.calICalendarProvider,
-                    Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo]),
 
   /*
    * calICalendarProvider interface
@@ -160,7 +163,7 @@ calTodoTxt.prototype = {
   getProperty: function cSC_getProperty(aName) {
     return this.__proto__.__proto__.getProperty.apply(this, arguments);
   },
-
+    
   refresh: function cSC_refresh() {
     todotxtLogger.debug('calTodotxt.js:refresh()');
     
@@ -179,9 +182,8 @@ calTodoTxt.prototype = {
     
     try {    
 
-      let isEvent = aItem.isCompleted == null;
-      if(isEvent)
-        throw new Components.Exception('This calendar only accepts todos.', Components.results.NS_ERROR_UNEXPECTED);
+      if(aItem.isCompleted == null)
+        throw exception.EVENT_ENCOUNTERED();
 
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,
@@ -191,6 +193,8 @@ calTodoTxt.prototype = {
                                     item);
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
+      
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -218,11 +222,9 @@ calTodoTxt.prototype = {
       this.observers.notify('onModifyItem', [aNewItem, aOldItem]);
       
       // Update checksum because file changes and thus
-      // prevents different ID's, set interval because write 
+      // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      setTimeout(function(){
-        myPrefObserver.checkSum = myPrefObserver.calculateMD5();
-      }, 1000);
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -245,6 +247,8 @@ calTodoTxt.prototype = {
                                     aItem.id,
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
+      // Update checksum
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
@@ -271,28 +275,25 @@ calTodoTxt.prototype = {
       this.mPendingApiRequestListeners[this.id] = [];
     
     try {
-      if(!this.mLastSync){
-        items = todoClient.getItems(this,true);
+      let items = todoClient.getItems(this, (this.mLastSync == null));
 
-        this.mLastSync = new Date();
-        this.mTaskCache[this.id] = {};
+      this.mLastSync = new Date();
+      this.mTaskCache[this.id] = {};
 
-        for each(item in items)
-          this.mTaskCache[this.id][item.id] = item;
+      for (let item in items)
+        this.mTaskCache[this.id][item.id] = item;
 
-        aListener.onGetResult(this.superCalendar,
-                              Components.results.NS_OK,
-                              Components.interfaces.calITodo,
-                              null,
-                              items.length,
-                              items);
-        this.notifyOperationComplete(aListener, 
-                                    Components.results.NS_OK,
-                                    Components.interfaces.calIOperationListener.GET,
-                                    null,
+      aListener.onGetResult(this.superCalendar,
+                            Components.results.NS_OK,
+                            Components.interfaces.calITodo,
+                            null,
+                            items.length,
+                            items);
+      this.notifyOperationComplete(aListener, 
+                                  Components.results.NS_OK,
+                                  Components.interfaces.calIOperationListener.GET,
+                                  null,
                                     null);
-      }else
-        this.getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener);
       
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:getItems()',e);
@@ -305,114 +306,13 @@ calTodoTxt.prototype = {
   },
 
   startBatch: function cSC_startBatch(){
-    todotxtLogger.debug('calTodotxt.js:startBatch()');
+    cal.LOG('calTodotxt.js:startBatch()');
   },
   
   endBatch: function cSC_endBatch(){
-    todotxtLogger.debug('calTodotxt.js:endBatch()');
+    cal.LOG('calTodotxt.js:endBatch()');
   }
 };
 
-var myPrefObserver = {
-  
-  calendar: null,
-  intervalID: null,
-  checkSum: null,
-
-  register: function(cal) {
-    this.calendar = cal;
-
-    // For this.branch we ask for the preferences for extensions.myextension. and children
-    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService);
-    this.branch = prefs.getBranch("extensions.todotxt.");
-
-    if (!("addObserver" in this.branch))
-        this.branch.QueryInterface(Components.interfaces.nsIPrefBranch2);
-
-    // Finally add the observer.
-    this.branch.addObserver("", this, false);
-
-    // Add periodical verification of todo files, every 15s
-    let _this = this;
-    this.intervalID = setInterval(function(){
-      _this.verifyTodo(_this);
-    }, 15*1000);
-  },
-
-  unregister: function() {
-    this.calendar = null;
-    this.branch.removeObserver("", this);
-
-    if(this.intervalID)
-      clearInterval(this.intervalID);
-
-    todotxtLogger.debug('calTodotxt.js:unregister');
-  },
-
-  observe: function(aSubject, aTopic, aData) {
-    switch (aData) {
-      case "creation":
-      case "thunderbird":
-      case "showFullTitle":
-        this.calendar.refresh();
-        break;
-      case "done-txt":
-      case "todo-txt":
-        todoClient.setTodo();
-        this.calendar.refresh();
-        break;
-    }
-  },
-
-  // Verify if todo & done file changed by
-  // comparing MD5 checksum, if different refresh calendar
-  verifyTodo: function(ref){
-
-    let old_checksum = ref.checkSum;
-    ref.checkSum = this.calculateMD5();
-
-    // Verify if not first run, old_checksum != undef
-    if(old_checksum){
-      if(old_checksum != ref.checkSum){
-        todotxtLogger.debug('verifyTodo','refresh');
-        ref.calendar.refresh();
-      }
-    }
-  },
-
-  calculateMD5: function(){
-    let prefs = todoClient.getPreferences();
-
-    // this tells updateFromStream to read the entire file
-    const PR_UINT32_MAX = 0xffffffff;
-
-    // Use MD5, hash if for comparison and needs to be fast not secure
-    let ch = Components.classes["@mozilla.org/security/hash;1"]
-                         .createInstance(Components.interfaces.nsICryptoHash);
-    ch.init(ch.MD5);
-
-    todoFile = prefs.getComplexValue("todo-txt", Components.interfaces.nsIFile);
-    doneFile = prefs.getComplexValue("done-txt", Components.interfaces.nsIFile);
-
-    var todoIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-    var doneIstream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-                              .createInstance(Components.interfaces.nsIFileInputStream);
-
-    // open files for reading
-    todoIstream.init(todoFile, 0x01, 0444, 0);
-    doneIstream.init(doneFile, 0x01, 0444, 0);
-
-    ch.updateFromStream(todoIstream, PR_UINT32_MAX);
-    ch.updateFromStream(doneIstream, PR_UINT32_MAX);
-    let result =  ch.finish(true);
-    todotxtLogger.debug('calTodotxt.js:calculateMD5','hash ['+result+']');
-    return result
-  }
-}
-
-/** Module Registration */
-function NSGetFactory(cid) {
-  return (XPCOMUtils.generateNSGetFactory([calTodoTxt]))(cid);
-}
+/* exported NSGetFactory */
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);

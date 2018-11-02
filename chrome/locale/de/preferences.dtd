@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!ENTITY todotxt "Todo.txt">
+<!ENTITY behavior "Verhalten">
+<!ENTITY browse "Blättern">
+<!ENTITY preferences "präferenzen">
+<!ENTITY todotxt.todofile "Ort von Todo.txt">
+<!ENTITY todotxt.donefile "Ort von Done.txt">
+<!ENTITY todotxt.thunderbird "Benutze die Thunderbird-Funktionalität">
+<!ENTITY todotxt.creation "Verwende den Erstellungszeitpunkt als Zeitstempel">
+<!ENTITY todotxt.showFullTitle "Zeige Projekte und Kontexte nur im Titel">

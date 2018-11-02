@@ -46,3 +46,4 @@ This project was made possible of the following projects and persons:
 * This extension relies heavily on the [todo-txt-js](https://github.com/roufamatic/todo-txt-js) JavaScript library.
 * Much of the code was inspired on the [StormCows](https://github.com/moldybeats/stormcows) extension.
 * French translations by L. Lucanakin.
+* German translations by N. Reichert
