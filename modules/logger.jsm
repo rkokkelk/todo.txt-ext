@@ -21,23 +21,14 @@ const Ci = Components.interfaces
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
 
-EXPORTED_SYMBOLS = ['todotxtLogger'];
+this.EXPORTED_SYMBOLS = ['todotxtLogger'];
 
 let todotxtLogger = {
   
-  app: null,
   notif: {},
   
-  get App(){
-    if(!this.app){
-      this.app = Cc["@mozilla.org/steel/application;1"]
-                   .getService(Ci.steelIApplication);
-    }
-    return this.app;
-  },
-
   get debugMode() {
-    mDebugMode = true;
+    var mDebugMode = true;
     return mDebugMode;
   },
   set debugMode(aValue) {
@@ -52,13 +43,7 @@ let todotxtLogger = {
     return new Date().toLocaleString();
   },
 
-  appLog: function(msg){
-    app = this.App;
-    app.console.log(msg);
-  },
-  
   debug: function(src, msg) {
-    app = this.App;
     if (this.debugMode) {
       let output = '('+this.getDateTime()+') ';
       if (src) {
@@ -71,25 +56,26 @@ let todotxtLogger = {
         output += msg;
       }
       cal.LOG(output);
-      this.appLog(output);
     }
   },
 
   error: function(src, error) {
     this.showNotification(error.message);
-    if (this.debugMode) {
-      let output = '('+this.getDateTime()+') ';
-      if (src) {
-        output += '[' + src + ']';
-      }
-      output += ' ERROR: ';
 
-      if (error)
-        output += error.message;
-      
-      cal.LOG(output);
-      this.appLog(output);
+    let output = '('+this.getDateTime()+') ';
+
+    if (src) {
+      output += '[' + src + ']';
     }
+    output += ' ERROR: ';
+
+    if (error)
+      output += error.message;
+
+    if (this.debugMode) 
+      output += "\n"+error.stack;
+    
+    cal.LOG(output);
   },
 
   resetNotifications: function(){

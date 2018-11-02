@@ -21,7 +21,7 @@ const Ci = Components.interfaces
 
 Cu.import('resource://todotxt/exception.jsm');
 
-EXPORTED_SYMBOLS = ['util'];
+this.EXPORTED_SYMBOLS = ['util'];
 
 var util = {
 
@@ -36,7 +36,7 @@ var util = {
         itemTitle = item.render();
 
         // Filter out priority, start date & adds-ons
-        regex = [
+        let regex = [
             /^\([A-Za-z]{1}\)\s*/,
             /^\d{4}-\d{2}-\d{2}\s*/,
             /[\w\d-_]+:[\w\d-_]+\s*/]
@@ -56,12 +56,13 @@ var util = {
     let result = [];
 
     if(!string) return result;
-    tmp_result = string.split(' ');
+    let str_split = string.split(' ');
 
-    for(let i=0; i<tmp_result.length;i++){
-      tmp_word = tmp_result[i].trim();
+    for(let i=0; i < str_split.length;i++){
+      let tmp_word = str_split[i].trim();
       if (tmp_word) result.push(tmp_word);
     }
+
     return result;
   },
 
@@ -79,8 +80,11 @@ var util = {
 
   getPreferences: function(){
     let prefs = Cc["@mozilla.org/preferences-service;1"]
-                            .getService(Ci.nsIPrefService);
-    return prefs.getBranch("extensions.todotxt.");
+                            .getService(Ci.nsIPrefService)
+                            .getBranch("extensions.todotxt.");
+    prefs.QueryInterface(Ci.nsIPrefBranch);
+
+    return prefs;
   },
   
   makeDateStr: function(date) {
@@ -104,6 +108,9 @@ var util = {
   // use the following function to parse String dates
   // parse a date in yyyy-mm-dd format
   parseDate: function(input) {
+
+    // jsDueDate is parsed to 01:00:00, 
+    // because no time is used set back to 00:00:00
     var parts = input.split('-');
     return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
   },
@@ -138,5 +145,9 @@ var util = {
       }
     }else
       throw exception.UNKNOWN();
+  },
+
+  toType: function(obj) {
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
   },
 };

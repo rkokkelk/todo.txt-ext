@@ -21,6 +21,8 @@ const Ci = Components.interfaces
 
 Cu.import("resource://calendar/modules/calUtils.jsm");
 Cu.import('resource://gre/modules/Services.jsm');
+
+Cu.import('resource://todotxt/exception.jsm');
 Cu.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
@@ -57,8 +59,11 @@ window.addEventListener("load", function(e) {
   prefs = prefs.getBranch("extensions.todotxt.");
 
   if(!prefs.prefHasUserValue('todo-txt') || !prefs.prefHasUserValue('done-txt')){
-    Services.wm.getMostRecentWindow('navigator:browser')
-      .BrowserOpenAddonsMgr('addons://detail/todotxt/preferences');
+      throw exception.FILES_NOT_SPECIFIED();
+
+    //TODO: fix automatic display of preferences if loaded first time
+    //Services.wm.getMostRecentWindow('navigator:browser')
+    //  .BrowserOpenAddonsMgr('addons://detail/todotxt/preferences');
   }
 }, false);
 

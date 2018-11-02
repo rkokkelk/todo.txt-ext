@@ -32,38 +32,35 @@ Cu.import("resource://todotxt/logger.jsm");
 Cu.import('resource://todotxt/exception.jsm');
 Cu.import("resource://todotxt/observers.jsm");
 Cu.import("resource://todotxt/todoclient.jsm");
-Cu.import("resource://todotxt/todo-txt-js/todotxt.js");
+Cu.import("resource://todotxt/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
-  
+
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
   prefObserver.register(this);
-  timerObserver.register(this);
+  this.fileObserver = observers.registerFileObserver(this);
 }
 
+var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
+var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
+                    Components.interfaces.nsIClassInfo,
+                    Components.interfaces.nsISupports
+];
+
 calTodoTxt.prototype = {
-  __proto__: cal.ProviderBase.prototype,
+   __proto__: cal.provider.BaseClass.prototype,
   
-  classID: Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"),
-  contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-  classDescription: "TodoTxt",
+  classID: calTodoCalendarclassID,
+  QueryInterface: XPCOMUtils.generateQI(calTodoCalendarInterfaces),
+  classInfo: XPCOMUtils.generateCI({
+      classDescription: "TodoTxt",
+      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
+      classID: calTodoCalendarclassID,
+      interfaces: calTodoCalendarInterfaces
+  }),
   
-  getInterfaces: function getInterfaces(count) {
-    const ifaces = [Ci.calICalendarProvider,
-                    Ci.calICalendar,
-                    Ci.nsIClassInfo,
-                    Ci.nsISupports];
-    count.value = ifaces.length;
-    return ifaces;
-  },
-  
-  getHelperForLanguage: function getHelperForLanguage(language) {
-    return null;
-  },
-  
-  implementationLanguage: Ci.nsIProgrammingLanguage.JAVASCRIPT,
   flags: 0,
   
   mUri: null,
@@ -71,6 +68,8 @@ calTodoTxt.prototype = {
   mTaskCache: {},
   mPendingApiRequest: false,
   mPendingApiRequestListeners: {},
+
+  fileObserver: null,
 
   get pendingApiRequest() {
     return this.mPendingApiRequest;
@@ -103,13 +102,19 @@ calTodoTxt.prototype = {
   get itemType() {
     return this.getProperty('itemType');
   },
+
+  setProperty: function(aName, aValue) {
+      return this.__proto__.__proto__.setProperty.apply(this, arguments);
+  },
   
   getCachedItems: function cSC_getCachedItems(aItemFilter, aCount, aRangeStart, aRangeEnd, aListener) {
     todotxtLogger.debug('calTodotxt.js:getCachedItems()');
     
     let items = [];
     let taskCache = this.mTaskCache[this.id];
-    for (let itemId in taskCache){
+
+    for (let i=0; i < taskCache.length; i++){
+      let itemId = taskCache[i];
       let cachedItem = this.mTaskCache[this.id][itemId];
       items.push(cachedItem);
     }
@@ -131,9 +136,6 @@ calTodoTxt.prototype = {
    * nsISupports
    */
   //TODO: find way for using global parametr
-  QueryInterface: XPCOMUtils.generateQI([Ci.calICalendarProvider,
-                    Ci.calICalendar,
-                    Ci.nsIClassInfo]),
 
   /*
    * calICalendarProvider interface
@@ -179,7 +181,7 @@ calTodoTxt.prototype = {
   getProperty: function cSC_getProperty(aName) {
     return this.__proto__.__proto__.getProperty.apply(this, arguments);
   },
-
+    
   refresh: function cSC_refresh() {
     todotxtLogger.debug('calTodotxt.js:refresh()');
     
@@ -210,7 +212,7 @@ calTodoTxt.prototype = {
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
       
-      timerObserver.updateMD5();
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -240,7 +242,7 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      timerObserver.updateMD5();
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -263,6 +265,8 @@ calTodoTxt.prototype = {
                                     aItem.id,
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
+      // Update checksum
+      observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,
@@ -289,13 +293,13 @@ calTodoTxt.prototype = {
       this.mPendingApiRequestListeners[this.id] = [];
     
     try {
-      items = todoClient.getItems(this, (this.mLastSync == null));
+      let items = todoClient.getItems(this, (this.mLastSync == null));
 
       this.mLastSync = new Date();
       this.mTaskCache[this.id] = {};
 
-        for (item in items)
-          this.mTaskCache[this.id][item.id] = item;
+      for (let item in items)
+        this.mTaskCache[this.id][item.id] = item;
 
         aListener.onGetResult(this.superCalendar,
                               Components.results.NS_OK,
@@ -328,7 +332,5 @@ calTodoTxt.prototype = {
   }
 };
 
-/** Module Registration */
-function NSGetFactory(cid) {
-  return (XPCOMUtils.generateNSGetFactory([calTodoTxt]))(cid);
-}
+/* exported NSGetFactory */
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);

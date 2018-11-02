@@ -20,7 +20,7 @@ const Cr = Components.results
 
 Cu.import("resource://gre/modules/Services.jsm");
 
-EXPORTED_SYMBOLS = ['exception'];
+this.EXPORTED_SYMBOLS = ['exception'];
 
 var exception = {
   

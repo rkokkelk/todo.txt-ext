@@ -17,8 +17,12 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 
-<!ENTITY todotxt.todofile "Ort von Todo.txt">
-<!ENTITY todotxt.donefile "Ort von Done.txt">
-<!ENTITY todotxt.thunderbird "Benutze die Thunderbird-Funktionalität">
-<!ENTITY todotxt.creation "Verwende den Erstellungszeitpunkt als Zeitstempel">
-<!ENTITY todotxt.showFullTitle "Zeige Projekte und Kontexte nur im Titel">
+<!ENTITY todotxt "Todo.txt">
+<!ENTITY behavior "Gedrag">
+<!ENTITY browse "Openen">
+<!ENTITY preferences "voorkeuren">
+<!ENTITY todotxt.todofile "Locatie van het Todo.txt bestand">
+<!ENTITY todotxt.donefile "Locatie van het Done.txt bestand">
+<!ENTITY todotxt.thunderbird "Gebruik de functionaliteit van Thunderbird">
+<!ENTITY todotxt.creation "Gebruik de startdatum van de Todo's in Thunderbird">
+<!ENTITY todotxt.showFullTitle "Toon projecten en context in de titel">
