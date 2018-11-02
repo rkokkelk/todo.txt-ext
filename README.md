@@ -2,6 +2,8 @@
 
 Thunderbird extension for the Todo.txt application. This extension tries to integrate the [Todo.txt](http://todotxt.com/) application with Thunderbird. Using the Lightning extension it is now possible to add, delete or modify todo's directly within Thunderbird.
 
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/todotxt-ext/localized.svg)](https://crowdin.com/project/todotxt-ext)
+
 ## Functionality
 
 * Add, delete or modify Todo's from within your Thunderbird.
@@ -46,3 +48,4 @@ This project was made possible of the following projects and persons:
 * This extension relies heavily on the [todo-txt-js](https://github.com/roufamatic/todo-txt-js) JavaScript library.
 * Much of the code was inspired on the [StormCows](https://github.com/moldybeats/stormcows) extension.
 * French translations by L. Lucanakin.
+* German translations by N. Reichert
