@@ -1,5 +1,5 @@
 files:
-  - source: /chrome/locale/en-US/options.dtd
-    translation: /chrome/locale/%two_letters_code%/options.dtd
+  - source: /chrome/locale/en-US/preferences.dtd
+    translation: /chrome/locale/%two_letters_code%/preferences.dtd
   - source: /chrome/locale/en-US/exceptions.properties
     translation: /chrome/locale/%two_letters_code%/exceptions.properties
