@@ -19,6 +19,8 @@ const Cc = Components.classes
 const Cu = Components.utils
 const Ci = Components.interfaces
 
+Cu.import("resource://calendar/modules/calUtils.jsm");
+
 this.EXPORTED_SYMBOLS = ['todotxtLogger'];
 
 let todotxtLogger = {
