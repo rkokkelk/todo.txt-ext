@@ -106,10 +106,10 @@ let fileUtil = {
       let prefs = util.getPreferences();
 
       // Use MD5, hash for comparison and needs to be fast not secure
-      let ch = Components.classes["@mozilla.org/security/hash;1"].
-                          createInstance(Components.interfaces.nsICryptoHash);
-      let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+      let ch = Cc["@mozilla.org/security/hash;1"].
+                          createInstance(Ci.nsICryptoHash);
+      let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].
+                          createInstance(Ci.nsIScriptableUnicodeConverter);
       converter.charset = "UTF-8";
 
       ch.init(ch.MD5);

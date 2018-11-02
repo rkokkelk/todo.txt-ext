@@ -16,8 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA. */
 
 const Cc = Components.classes
-const Cu = Components.utils
 const Ci = Components.interfaces
+const Cr = Components.results
+const Cu = Components.utils
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
@@ -34,6 +35,7 @@ Cu.import("resource://todotxt/observers.jsm");
 Cu.import("resource://todotxt/todoclient.jsm");
 Cu.import("resource://todotxt/todotxt.js");
 
+
 function calTodoTxt() {
   this.initProviderBase();
 
@@ -44,9 +46,9 @@ function calTodoTxt() {
 }
 
 var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
-var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports
+var calTodoCalendarInterfaces = [Ci.calICalendar,
+                    Ci.nsIClassInfo,
+                    Ci.nsISupports
 ];
 
 calTodoTxt.prototype = {
@@ -95,6 +97,7 @@ calTodoTxt.prototype = {
   get listId() {
     return this.getProperty('listId');
   },
+
   set listId(aListId) {
     this.setProperty('listId', aListId);
   },
@@ -120,23 +123,18 @@ calTodoTxt.prototype = {
     }
 
     aListener.onGetResult(this.superCalendar,
-                          Components.results.NS_OK,
+                          Cr.NS_OK,
                           Ci.calITodo,
                           null,
                           items.length,
                           items);
     this.notifyOperationComplete(aListener, 
-                                  Components.results.NS_OK,
+                                  Cr.NS_OK,
                                   Ci.calIOperationListener.GET,
                                   null,
                                   null);
   },
   
-  /*
-   * nsISupports
-   */
-  //TODO: find way for using global parametr
-
   /*
    * calICalendarProvider interface
    */
@@ -205,7 +203,7 @@ calTodoTxt.prototype = {
 
       let item = todoClient.addItem(aItem);
       this.notifyOperationComplete(aListener,
-                                    Components.results.NS_OK,
+                                    Cr.NS_OK,
                                     Ci.calIOperationListener.ADD,
                                     item.id,
                                     item);
@@ -232,7 +230,7 @@ calTodoTxt.prototype = {
       todoClient.modifyItem(aOldItem, aNewItem);
     
       this.notifyOperationComplete(aListener,
-                                   Components.results.NS_OK,
+                                   Cr.NS_OK,
                                    Ci.calIOperationListener.MODIFY,
                                    aNewItem.id,
                                    aNewItem);
@@ -246,7 +244,7 @@ calTodoTxt.prototype = {
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
-                                   Components.results.NS_ERROR_UNEXPECTED,
+                                   Cr.NS_ERROR_UNEXPECTED,
                                    Ci.calIOperationListener.MODIFY,
                                    null,
                                    e.message);
@@ -260,7 +258,7 @@ calTodoTxt.prototype = {
       todoClient.deleteItem(aItem);
       delete this.mTaskCache[this.id][aItem.id];
       this.notifyOperationComplete(aListener,
-                                    Components.results.NS_OK,
+                                    Cr.NS_OK,
                                     Ci.calIOperationListener.DELETE,
                                     aItem.id,
                                     aItem);
@@ -302,13 +300,13 @@ calTodoTxt.prototype = {
         this.mTaskCache[this.id][item.id] = item;
 
         aListener.onGetResult(this.superCalendar,
-                              Components.results.NS_OK,
+                              Cr.NS_OK,
                               Ci.calITodo,
                               null,
                               items.length,
                               items);
         this.notifyOperationComplete(aListener, 
-                                    Components.results.NS_OK,
+                                    Cr.NS_OK,
                                     Ci.calIOperationListener.GET,
                                     null,
                                     null);

@@ -73,9 +73,9 @@ var fileEvent = {
   },
 
   updateMD5: function(){
-    let timer = Components.classes["@mozilla.org/timer;1"]
-      .createInstance(Components.interfaces.nsITimer);
-    timer.initWithCallback(this, 1*1000, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+    let timer = Cc["@mozilla.org/timer;1"]
+      .createInstance(Ci.nsITimer);
+    timer.initWithCallback(this, 1*1000, Ci.nsITimer.TYPE_ONE_SHOT);
   },
 };
 
@@ -138,8 +138,8 @@ var observers = {
     fileEvent.calendar = cal;
     this.fileEvent = fileEvent;
 
-    this.fileObserver = Components.classes["@mozilla.org/timer;1"]
-      .createInstance(Components.interfaces.nsITimer);
-    this.fileObserver.init(fileEvent, 15*1000, Components.interfaces.nsITimer.TYPE_REPEATING_PRECISE_CAN_SKIP);
+    this.fileObserver = Cc["@mozilla.org/timer;1"]
+      .createInstance(Ci.nsITimer);
+    this.fileObserver.init(fileEvent, 15*1000, Ci.nsITimer.TYPE_REPEATING_PRECISE_CAN_SKIP);
   },
 };
