@@ -1,6 +1,4 @@
-<!--
-  Todo.txt add-on for Thunderbird email application.
-  Copyright (C) 2017 Roy Kokkelkoren
+<?xml version="1.0" encoding="UTF-8"?>
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
@@ -17,8 +15,12 @@
   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 
-<!ENTITY todotxt.todofile "Emplacement du fichier Todo.txt">
-<!ENTITY todotxt.donefile "Emplacement du fichier Done.txt">
-<!ENTITY todotxt.thunderbird "Afficher les tâches dans le calendrier de Thunderbird">
-<!ENTITY todotxt.creation "Ajouter automatiquement la date de création aux tâches nouvellement crées">
-<!ENTITY todotxt.showFullTitle "Voir Projets et Contextes dans le titre">
+<!ENTITY todotxt "Todo.txt">
+<!ENTITY behavior "Verhalten">
+<!ENTITY browse "Blättern">
+<!ENTITY preferences "präferenzen">
+<!ENTITY todotxt.todofile "Ort von Todo.txt">
+<!ENTITY todotxt.donefile "Ort von Done.txt">
+<!ENTITY todotxt.thunderbird "Benutze die Thunderbird-Funktionalität">
+<!ENTITY todotxt.creation "Verwende den Erstellungszeitpunkt als Zeitstempel">
+<!ENTITY todotxt.showFullTitle "Zeige Projekte und Kontexte nur im Titel">
