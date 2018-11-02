@@ -2,7 +2,7 @@
 #
 # Build script for todo.txt-adon for Thunderbird email application
 # Output: todotxt_$version$.xpi
-# Copyright (C) 2017 Roy Kokkelkoren
+# Copyright (C) 2018 Roy Kokkelkoren
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License

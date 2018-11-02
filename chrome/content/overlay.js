@@ -1,5 +1,5 @@
 /* Todo.txt add-on for Thunderbird email application.
- * Copyright (C) 2017 Roy Kokkelkoren
+ * Copyright (C) 2018 Roy Kokkelkoren
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
