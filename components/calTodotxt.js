@@ -179,7 +179,7 @@ calTodoTxt.prototype = {
   getProperty: function cSC_getProperty(aName) {
     return this.__proto__.__proto__.getProperty.apply(this, arguments);
   },
-    
+
   refresh: function cSC_refresh() {
     todotxtLogger.debug('calTodotxt.js:refresh()');
     
@@ -258,7 +258,7 @@ calTodoTxt.prototype = {
       todoClient.deleteItem(aItem);
       delete this.mTaskCache[this.id][aItem.id];
       this.notifyOperationComplete(aListener,
-                                    Cr.NS_OK,
+                                    Components.results.NS_OK,
                                     Ci.calIOperationListener.DELETE,
                                     aItem.id,
                                     aItem);
