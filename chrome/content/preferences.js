@@ -2,6 +2,7 @@ if (!todotxt) var todotxt = {};
 if (!todotxt.ns) todotxt.ns = {};
 
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://todotxt/logger.jsm");
 Components.utils.import('resource://todotxt/util.jsm');
 
 const nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -29,6 +30,14 @@ todotxt.ns.Preferences = function() {
         else
           prefs.setCharPref('done-txt', storagePath);
       });
+    },
+
+    selectBool: function(id) {
+      let prefs = util.getPreferences();
+      let checkbox = document.getElementById(id);
+      todotxtLogger.debug('preferences.js', 'Set pref for '+id+' to '+checkbox.checked);
+
+      prefs.setBoolPref(id, checkbox.checked);
     }
   };
 
