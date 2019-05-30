@@ -15,9 +15,9 @@
     <preferences>
       <preference id="todotxt-pref-todo-path" name="extensions.todotxt.todo-txt" type="string" />
       <preference id="todotxt-pref-done-path" name="extensions.todotxt.done-txt" type="string" />
-      <preference id="todotxt-pref-thunderbird" name="extensions.todotxt.thunderbird" type="bool" />
-      <preference id="todotxt-pref-creation" name="extensions.todotxt.creation" type="bool" />
-      <preference id="todotxt-pref-showFullTitle" name="extensions.todotxt.showFullTitle" type="bool" />
+      <preference id="pref-thunderbird" name="extensions.todotxt.thunderbird" type="bool" />
+      <preference id="pref-creation" name="extensions.todotxt.creation" type="bool" />
+      <preference id="pref-showFullTitle" name="extensions.todotxt.showFullTitle" type="bool" />
     </preferences>
 
     <groupbox>
@@ -44,9 +44,12 @@
 
     <groupbox>
       <caption label='&behavior;' />
-      <checkbox label='&todotxt.thunderbird;' id='todotxt-thunderbird' preference='todotxt-pref-thunderbird'/>
-      <checkbox label='&todotxt.creation;' id='todotxt-creation' preference='todotxt-pref-creation'/>
-      <checkbox label='&todotxt.showFullTitle;' id='todotxt-showFullTitle' preference='todotxt-pref-showFullTitle'/>
+      <checkbox label='&todotxt.thunderbird;' id='thunderbird' preference='pref-thunderbird' 
+        oncommand="todotxt.ns.Preferences.selectBool('thunderbird')" />
+      <checkbox label='&todotxt.creation;' id='creation' preference='pref-creation'
+        oncommand="todotxt.ns.Preferences.selectBool('creation')" />
+      <checkbox label='&todotxt.showFullTitle;' id='showFullTitle' preference='pref-showFullTitle'
+        oncommand="todotxt.ns.Preferences.selectBool('showFullTitle')" />
     </groupbox>
 
   </prefpane>
