@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/ChromeUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://gre/modules/FileUtils.jsm");
 Components.utils.import("resource://gre/modules/NetUtil.jsm");
@@ -35,8 +35,8 @@ calTodoTxt.prototype = {
    __proto__: cal.provider.BaseClass.prototype,
   
   classID: calTodoCalendarclassID,
-  QueryInterface: XPCOMUtils.generateQI(calTodoCalendarInterfaces),
-  classInfo: XPCOMUtils.generateCI({
+  QueryInterface: ChromeUtils.generateQI(calTodoCalendarInterfaces),
+  classInfo: ChromeUtils.generateCI({
       classDescription: "TodoTxt",
       contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
       classID: calTodoCalendarclassID,
@@ -315,4 +315,4 @@ calTodoTxt.prototype = {
 };
 
 /* exported NSGetFactory */
-var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
+var NSGetFactory = ChromeUtils.generateNSGetFactory([calTodoTxt]);
