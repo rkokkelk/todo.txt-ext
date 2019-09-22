@@ -27,8 +27,8 @@ while getopts "dh" opt; do
   esac
 done
 
-if [ -e install.rdf ]; then
-  VERSION=$(sed -n 's/.*<em:version>\(.*\)<\/em:version>/\1/p' install.rdf)
+if [ -e manifest.json ]; then
+  VERSION=$(sed -n 's/.*version": "\(.*\)",/\1/p' manifest.json)
   FILE="todotxt_${VERSION}.xpi"
 else
   echo '[ERROR] build.sh not executed from add-on directory, exiting!'
@@ -48,7 +48,7 @@ if [ ! $DEV ]; then
   sed -i 's/ mDebugMode = true;/ mDebugMode = false;/g' modules/logger.jsm
 fi
 
-zip -qr $FILE chrome* install.rdf components defaults icon.png modules
+zip -qr $FILE chrome* manifest.json components defaults icon.png modules
 sed -i 's/ mDebugMode = false;/ mDebugMode = true;/g' modules/logger.jsm
 
 echo "Finished build [$FILE]"
