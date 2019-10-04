@@ -303,4 +303,4 @@ calTodoTxt.prototype = {
 };
 
 /* exported NSGetFactory */
-var NSGetFactory = ChromeUtils.generateNSGetFactory([calTodoTxt]);
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
