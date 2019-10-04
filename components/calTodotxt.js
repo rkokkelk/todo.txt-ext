@@ -22,21 +22,14 @@ function calTodoTxt() {
 
 var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
 var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports
-];
+                                 Components.interfaces.nsIClassInfo,
+                                 Components.interfaces.nsISupports];
 
 calTodoTxt.prototype = {
    __proto__: cal.provider.BaseClass.prototype,
   
   classID: calTodoCalendarclassID,
   QueryInterface: ChromeUtils.generateQI(calTodoCalendarInterfaces),
-  classInfo: ChromeUtils.generateCI({
-      classDescription: "TodoTxt",
-      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-      classID: calTodoCalendarclassID,
-      interfaces: calTodoCalendarInterfaces
-  }),
   
   flags: 0,
   
