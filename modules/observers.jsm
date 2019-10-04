@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/Timer.jsm");
+var { Timer } = ChromeUtils.import("resource://gre/modules/Timer.jsm");
 
-Components.utils.import("resource://todotxt/util.jsm");
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import("resource://todotxt/fileUtil.jsm");
-Components.utils.import("resource://todotxt/todoclient.jsm");
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { fileUtil } = ChromeUtils.import("resource://todotxt/fileUtil.jsm");
+var { todoclient } = ChromeUtils.import("resource://todotxt/todoclient.jsm");
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
 
 this.EXPORTED_SYMBOLS = ['observers','prefObserver'];
 

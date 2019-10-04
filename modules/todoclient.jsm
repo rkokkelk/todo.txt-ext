@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
+var { cal } = ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
 
-Components.utils.import('resource://todotxt/util.jsm');
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import('resource://todotxt/fileUtil.jsm');
-Components.utils.import("resource://todotxt/todotxt.js");
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { fileUtil } = ChromeUtils.import("resource://todotxt/fileUtil.jsm");
+var { TodoTxt } = ChromeUtils.import("resource://todotxt/todotxt.js");
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
+var { util } = ChromeUtils.import("resource://todotxt/util.jsm");
 
 this.EXPORTED_SYMBOLS = ['todoClient'];
 

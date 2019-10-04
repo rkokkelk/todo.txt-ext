@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import('resource://todotxt/exception.jsm');
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
 
 this.EXPORTED_SYMBOLS = ['util'];
 
