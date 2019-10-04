@@ -10,7 +10,7 @@
   "description": "Thunderbird extension for the Todo.txt application",
   "version": "1.1.0",
   "icons": {
-    "32": "skin/icon-64.png"
+    "32": "chrome/content/skin/icon.png"
   },
   "legacy": {
     "type": "xul",
