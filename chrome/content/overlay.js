@@ -1,8 +1,7 @@
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
-Components.utils.import('resource://gre/modules/Services.jsm');
+var { cal } = ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
 
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/logger.jsm");
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
 
 window.addEventListener("load", function(e) { 
   let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";

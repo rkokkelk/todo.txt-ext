@@ -1,4 +1,3 @@
-
 this.EXPORTED_SYMBOLS = ['TodoTxt'];
 
 var TodoTxt = (function () {

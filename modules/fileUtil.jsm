@@ -1,11 +1,9 @@
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/osfile.jsm")
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
+var { OS } = ChromeUtils.import("resource://gre/modules/osfile.jsm")
 
-Components.utils.import('resource://todotxt/util.jsm');
-Components.utils.import('resource://todotxt/logger.jsm');
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/todotxt.js");
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { TodoTxt } = ChromeUtils.import("resource://todotxt/todotxt.js");
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
+var { util } = ChromeUtils.import("resource://todotxt/util.jsm");
 
 this.EXPORTED_SYMBOLS = ['fileUtil'];
 

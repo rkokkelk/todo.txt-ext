@@ -2,46 +2,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://gre/modules/FileUtils.jsm");
-Components.utils.import("resource://gre/modules/NetUtil.jsm");
-Components.utils.import("resource://gre/modules/Timer.jsm");
+var { cal } = ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
+var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
+var observer_scope = ChromeUtils.import("resource://todotxt/observers.jsm");
+var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
+var { todoClient } = ChromeUtils.import("resource://todotxt/todoclient.jsm");
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
 
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import('resource://todotxt/exception.jsm');
-Components.utils.import("resource://todotxt/observers.jsm");
-Components.utils.import("resource://todotxt/todoclient.jsm");
-Components.utils.import("resource://todotxt/todotxt.js");
 
 function calTodoTxt() {
   this.initProviderBase();
 
   todotxtLogger.debug("calTodoTxt", "Constructor");
 
-  prefObserver.register(this);
-  this.fileObserver = observers.registerFileObserver(this);
+  observer_scope.prefObserver.register(this);
+  this.fileObserver = observer_scope.observers.registerFileObserver(this);
 }
 
 var calTodoCalendarclassID = Components.ID("{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}");
 var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
-                    Components.interfaces.nsIClassInfo,
-                    Components.interfaces.nsISupports
-];
+                                 Components.interfaces.nsIClassInfo,
+                                 Components.interfaces.nsISupports];
 
 calTodoTxt.prototype = {
    __proto__: cal.provider.BaseClass.prototype,
   
   classID: calTodoCalendarclassID,
-  QueryInterface: XPCOMUtils.generateQI(calTodoCalendarInterfaces),
-  classInfo: XPCOMUtils.generateCI({
-      classDescription: "TodoTxt",
-      contractID: "@mozilla.org/calendar/calendar;1?type=todotxt",
-      classID: calTodoCalendarclassID,
-      interfaces: calTodoCalendarInterfaces
-  }),
+  QueryInterface: ChromeUtils.generateQI(calTodoCalendarInterfaces),
   
   flags: 0,
   
@@ -194,7 +182,7 @@ calTodoTxt.prototype = {
       this.mTaskCache[this.id][item.id] = item;
       this.observers.notify("onAddItem", [item]);
       
-      observers.fileEvent.updateMD5();
+      observer_scope.observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:addItem()',e);
       
@@ -224,7 +212,7 @@ calTodoTxt.prototype = {
       // Update checksum because file changes and thus
       // prevent different ID's, setTimeout because write 
       // is not immediately finished
-      observers.fileEvent.updateMD5();
+      observer_scope.observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:modifyItem()',e);
       this.notifyOperationComplete(aListener,
@@ -248,7 +236,7 @@ calTodoTxt.prototype = {
                                     aItem);
       this.observers.notify("onDeleteItem", [aItem]);
       // Update checksum
-      observers.fileEvent.updateMD5();
+      observer_scope.observers.fileEvent.updateMD5();
     } catch (e) {
       todotxtLogger.error('calTodotxt.js:deleteItem()',e);
       this.notifyOperationComplete(aListener,

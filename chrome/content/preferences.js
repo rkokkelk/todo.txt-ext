@@ -1,9 +1,8 @@
 if (!todotxt) var todotxt = {};
 if (!todotxt.ns) todotxt.ns = {};
 
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://todotxt/logger.jsm");
-Components.utils.import('resource://todotxt/util.jsm');
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
+var { util } = ChromeUtils.import("resource://todotxt/util.jsm");
 
 const nsIFilePicker = Components.interfaces.nsIFilePicker;
 
@@ -43,3 +42,11 @@ todotxt.ns.Preferences = function() {
 
   return pub;
 }();
+
+Preferences.addAll([
+  { id: "extensions.todotxt.todo-txt", type: "string" },
+  { id: "extensions.todotxt.done-txt", type: "string" },
+  { id: "extensions.todotxt.thunderbird", type: "bool" },
+  { id: "extensions.todotxt.creation", type: "bool" },
+  { id: "extensions.todotxt.showFullTitle", type: "bool" },
+]);

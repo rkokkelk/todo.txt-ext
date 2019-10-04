@@ -1,4 +1,4 @@
-Components.utils.import("resource://calendar/modules/calUtils.jsm");
+var { cal } = ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
 
 this.EXPORTED_SYMBOLS = ['todotxtLogger'];
 
