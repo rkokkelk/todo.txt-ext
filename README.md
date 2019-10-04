@@ -41,6 +41,26 @@ Entered as a new task within Thunderbird, it will automatically have the followi
 
 Offcourse the Todo.txt file will contain the exact line as entered into Thunderbird including a creation date.
 
+## Building
+
+Use the following steps to build the Todo-txt Thunderbird add-on directly from source code:
+
+```bash
+git clone https://github.com/rkokkelk/todo.txt-ext.git
+git checkout master # Checkout the specific branch with the source code you want to try
+./build -d # -d ensures that debug logs are shown in Thunderbird console
+```
+
+These steps results in a file called `todotxt_1.1.0.xpi`, *specific name may change depending on the version of the add-on*. You may install the add-on in Thunderbird by:
+
+1) Open Thunderbird
+2) Open the Add-on tab
+  * via Properties (triple dashes) -> *Add-ons* -> *Add-ons*
+3) Install the add-on
+  * Click the properties (Gear icon on top) -> *Install Add-on from File...*
+4) After restarting Thunderbird, the Todotxt add-on is available
+  * *For debugging output open the Thunderbird console windows, keyboard shortcut (Ctrl - Shift - j).*
+
 # Thanks
 
 This project was made possible of the following projects and persons:
