@@ -8,7 +8,7 @@
   },
   "name": "Todo.txt",
   "description": "Thunderbird extension for the Todo.txt application",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "icons": {
     "32": "chrome/content/skin/icon.png"
   },
