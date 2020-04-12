@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet type="text/css" href="chrome://messenger/skin/messenger.css"?>
 <?xml-stylesheet type="text/css" href="chrome://messenger/skin/preferences/preferences.css"?>
 
-<!DOCTYPE dialog SYSTEM 'chrome://todotxt/locale/preferences.dtd'>
+<!DOCTYPE dialog [
+  <!ENTITY % todoPrefsTDT SYSTEM "chrome://todotxt/locale/preferences.dtd" >
+  %todoPrefsTDT;
+]>
 
 <dialog xmlns='http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
 			title='&todotxt; &preferences;'
@@ -11,7 +15,9 @@
 			persist='screenX screenY'>
 
     <groupbox>
-      <caption label='&todotxt.todofile;' />
+      <hbox class="groupbox-title">
+        <label class="header">&todotxt.todofile;</label>
+      </hbox>
       <hbox align="center">
         <textbox id="todotxt-todo-path" preference="extensions.todotxt.todo-txt"
                  readonly="true" size="30"/>
@@ -22,7 +28,9 @@
     </groupbox>
 
     <groupbox>
-      <caption label='&todotxt.donefile;' />
+      <hbox class="groupbox-title">
+        <label class="header">&todotxt.donefile;</label>
+      </hbox>
       <hbox align="center">
         <textbox id="todotxt-done-path" preference="extensions.todotxt.done-txt"
                      readonly="true" size="30"/>
