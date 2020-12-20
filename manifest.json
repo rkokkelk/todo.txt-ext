@@ -3,7 +3,7 @@
   "applications": {
     "gecko": {
       "id": "todo.txt@xseth.nl",
-      "strict_min_version": "68.0"
+      "strict_min_version": "78.2.0"
     }
   },
   "name": "Todo.txt",
@@ -12,11 +12,22 @@
   "icons": {
     "32": "chrome/content/skin/icon.png"
   },
-  "legacy": {
-    "type": "xul",
-    "options": {
-      "page": "chrome://todotxt/content/preferences.xul",
-      "open_in_tab": true
+
+  "permissions": [
+    "storage"
+  ],
+
+  "experiment_apis": {
+    "todo": {
+      "schema": "api/schema.json",
+      "parent": {
+        "scopes": ["addon_parent"],
+        "script": "api/todo.js",
+        "events": ["startup"],
+        "paths": [
+          ["gdata"]
+        ]
+      }
     }
   }
 }
