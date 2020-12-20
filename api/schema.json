@@ -1,0 +1,13 @@
+[
+  {
+    "namespace": "todo",
+    "functions": [
+      {
+        "name": "verifyTodoCalendar",
+        "async": false,
+        "type": "function",
+        "parameters": []
+      }
+    ]
+  }
+]
