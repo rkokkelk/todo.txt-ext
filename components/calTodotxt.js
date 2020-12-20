@@ -2,13 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var { cal } = ChromeUtils.import("resource://calendar/modules/calUtils.jsm");
-var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+const { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
 
-var observer_scope = ChromeUtils.import("resource://todotxt/observers.jsm");
-var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
-var { todoClient } = ChromeUtils.import("resource://todotxt/todoclient.jsm");
-var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
+var observer_scope = ChromeUtils.import("resource://todotxt/modules/observers.jsm");
+var { exception } = ChromeUtils.import('resource://todotxt/modules/exception.jsm');
+var { todoClient } = ChromeUtils.import("resource://todotxt/modules/todoclient.jsm");
+var { todotxtLogger } = ChromeUtils.import("resource://todotxt/modules/logger.jsm");
 
 
 function calTodoTxt() {
@@ -301,6 +300,3 @@ calTodoTxt.prototype = {
     cal.LOG('calTodotxt.js:endBatch()');
   }
 };
-
-/* exported NSGetFactory */
-var NSGetFactory = XPCOMUtils.generateNSGetFactory([calTodoTxt]);
