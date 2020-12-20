@@ -13,6 +13,10 @@
     "32": "chrome/content/skin/icon.png"
   },
 
+  "background": {
+    "scripts": ["background.js"]
+  },
+
   "permissions": [
     "storage"
   ],
