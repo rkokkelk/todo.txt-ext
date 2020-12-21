@@ -1,9 +1,9 @@
 var { OS } = ChromeUtils.import("resource://gre/modules/osfile.jsm")
 
-var { exception } = ChromeUtils.import('resource://todotxt/exception.jsm');
-var { TodoTxt } = ChromeUtils.import("resource://todotxt/todotxt.js");
-var { todotxtLogger } = ChromeUtils.import("resource://todotxt/logger.jsm");
-var { util } = ChromeUtils.import("resource://todotxt/util.jsm");
+const { exception } = ChromeUtils.import('resource://todotxt/modules/exception.jsm');
+const { TodoTxt } = ChromeUtils.import("resource://todotxt/modules/todotxt.js");
+const { todotxtLogger } = ChromeUtils.import("resource://todotxt/modules/logger.jsm");
+const { util } = ChromeUtils.import("resource://todotxt/modules/util.jsm");
 
 this.EXPORTED_SYMBOLS = ['fileUtil'];
 
