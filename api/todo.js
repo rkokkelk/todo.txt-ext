@@ -16,8 +16,6 @@ this.todo = class extends ExtensionAPI {
       .QueryInterface(Ci.nsIResProtocolHandler)
       .setSubstitution("todotxt", this.extension.rootURI);
 
-    console.log('FOobar');
-
     let aomStartup = Cc["@mozilla.org/addons/addon-manager-startup;1"].getService(
       Ci.amIAddonManagerStartup
     );
@@ -25,10 +23,12 @@ this.todo = class extends ExtensionAPI {
     let { calGoogleCalendar } = ChromeUtils.import(
       "resource://todotxt/components/calTodotxt.js"
     );
-    if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt")) {
-      cal.getCalendarManager().wrappedJSObject.unregisterCalendarProvider("todotxt", true);
+    if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt"))
+      console.log('Calendar provider already present!');
+    else {
+      console.log('Calendar provider created!');
+      cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calGoogleCalendar);
     }
-    cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calGoogleCalendar);
   }
 
   onShutdown(isAppShutdown) {
