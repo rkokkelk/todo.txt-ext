@@ -44,22 +44,22 @@ this.todo = class extends ExtensionAPI {
     return {
       todo: {
         verifyTodoCalendar() {
-          var calManager = cal.getCalendarManager().wrappedJSObject
+          let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+          var calManager = cal.getCalendarManager()
           let found = false;
 
           let calendars = calManager.getCalendars({});
-          for (let i=0; i < calendars.length; i++){
-            calendar = calendars[i];
+          for (let calendar of calendars) {
+            console.log("todo.js","Found calendar: "+calendar.type);
             if(calendar.providerID == ID){
-              todotxtLogger.debug("overlay.js","Calendar found");
+              //todotxtLogger.debug("todo.js","Calendar found");
               found = true;
               break;
             }
           }
 
           if(!found){
-            todotxtLogger.debug("overlay.js","Create calendar");
-            let url = this.makeCalendarURI();
+            let url = Services.io.newURI('todotxt://_unused');
             let newCal = calManager.createCalendar('todotxt',url);
             newCal.name = "Todo.txt";
             calManager.registerCalendar(newCal);
