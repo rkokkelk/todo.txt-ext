@@ -24,6 +24,8 @@ var calTodoCalendarInterfaces = [Components.interfaces.calICalendar,
                                  Components.interfaces.nsIClassInfo,
                                  Components.interfaces.nsISupports];
 
+var EXPORTED_SYMBOLS = ["calTodoTxt"]; /* exported calTodoTxt */
+
 calTodoTxt.prototype = {
    __proto__: cal.provider.BaseClass.prototype,
   
