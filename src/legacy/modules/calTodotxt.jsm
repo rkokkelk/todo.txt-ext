@@ -4,7 +4,7 @@
 
 const { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
 
-const { observer_scope } = ChromeUtils.import("resource://todotxt/legacy/modules/observers.jsm");
+const { observers, prefObserver } = ChromeUtils.import("resource://todotxt/legacy/modules/observers.jsm");
 const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
 const { todoClient } = ChromeUtils.import("resource://todotxt/legacy/modules/todoclient.jsm");
 const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
@@ -30,8 +30,8 @@ class calTodoTxt extends cal.provider.BaseClass {
     super();
     this.initProviderBase();
 
-    observer_scope.prefObserver.register(this);
-    this.fileObserver = observer_scope.observers.registerFileObserver(this);
+    prefObserver.register(this);
+    this.fileObserver = observers.registerFileObserver(this);
   }
   
   get listId() {
