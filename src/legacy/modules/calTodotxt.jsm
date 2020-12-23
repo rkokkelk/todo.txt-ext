@@ -4,10 +4,10 @@
 
 const { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
 
-const { observer_scope } = ChromeUtils.import("resource://todotxt/modules/observers.jsm");
-const { exception } = ChromeUtils.import('resource://todotxt/modules/exception.jsm');
-const { todoClient } = ChromeUtils.import("resource://todotxt/modules/todoclient.jsm");
-const { todotxtLogger } = ChromeUtils.import("resource://todotxt/modules/logger.jsm");
+const { observer_scope } = ChromeUtils.import("resource://todotxt/legacy/modules/observers.jsm");
+const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
+const { todoClient } = ChromeUtils.import("resource://todotxt/legacy/modules/todoclient.jsm");
+const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
 
 var EXPORTED_SYMBOLS = ["calTodoTxt"]; /* exported calTodoTxt */
 

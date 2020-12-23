@@ -4,10 +4,10 @@
 
 const { Timer } = ChromeUtils.import("resource://gre/modules/Timer.jsm");
 
-const { exception } = ChromeUtils.import('resource://todotxt/modules/exception.jsm');
-const { fileUtil } = ChromeUtils.import("resource://todotxt/modules/fileUtil.jsm");
-const { todoClient } = ChromeUtils.import("resource://todotxt/modules/todoclient.jsm");
-const { todotxtLogger } = ChromeUtils.import("resource://todotxt/modules/logger.jsm");
+const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
+const { fileUtil } = ChromeUtils.import("resource://todotxt/legacy/modules/fileUtil.jsm");
+const { todoClient } = ChromeUtils.import("resource://todotxt/legacy/modules/todoclient.jsm");
+const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
 
 this.EXPORTED_SYMBOLS = ['observers','prefObserver'];
 

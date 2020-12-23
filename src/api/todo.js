@@ -21,7 +21,7 @@ this.todo = class extends ExtensionAPI {
     );
 
     let { calGoogleCalendar } = ChromeUtils.import(
-      "resource://todotxt/components/calTodotxt.js"
+      "resource://todotxt/legacy/modules/calTodotxt.js"
     );
     if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt"))
       console.log('Calendar provider already present!');
