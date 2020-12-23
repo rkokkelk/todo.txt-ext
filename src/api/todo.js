@@ -20,14 +20,14 @@ this.todo = class extends ExtensionAPI {
       Ci.amIAddonManagerStartup
     );
 
-    let { calGoogleCalendar } = ChromeUtils.import(
-      "resource://todotxt/legacy/modules/calTodotxt.js"
+    let { calTodoTxt } = ChromeUtils.import(
+      "resource://todotxt/legacy/modules/calTodotxt.jsm"
     );
     if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt"))
       console.log('Calendar provider already present!');
     else {
       console.log('Calendar provider created!');
-      cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calGoogleCalendar);
+      cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calTodoTxt);
     }
   }
 
