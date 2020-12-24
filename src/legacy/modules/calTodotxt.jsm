@@ -198,6 +198,9 @@ class calTodoTxt extends cal.provider.BaseClass {
     try {
       let items = todoClient.getItems(this, true);
 
+      if(!(Array.isArray(items) && items.length))
+        return;
+
       aListener.onGetResult(this.superCalendar,
                             Components.results.NS_OK,
                             Components.interfaces.calITodo,
