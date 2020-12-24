@@ -63,12 +63,8 @@ class util {
   }
 
   getPreferences(){
-    let prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                            .getService(Components.interfaces.nsIPrefService)
-                            .getBranch("extensions.todotxt.");
-    prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
-
-    return prefs;
+    const results = await messenger.storage.local.get("preferences");
+    return results.preferences || {};
   }
   
   makeDateStr(date) {
