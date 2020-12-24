@@ -9,6 +9,16 @@ this.EXPORTED_SYMBOLS = ['util'];
 
 class util {
 
+  const kCurrentLegacyMigration = 1;
+
+  const LEGACY_PREFS = {
+    todo-txt: '',
+    done-txt: '',
+    thunderbird: true,
+    creation: true,
+    showFullTitle: true
+  };
+
   makeTitle(item){
     let itemTitle = "";
     let prefs = this.getPreferences();
@@ -65,6 +75,10 @@ class util {
   getPreferences(){
     const results = await messenger.storage.local.get("preferences");
     return results.preferences || {};
+  }
+
+  updatePreferences(prefs){
+		await messenger.storage.local.set({ preferences: prefs });
   }
   
   makeDateStr(date) {
@@ -129,5 +143,42 @@ class util {
 
   toType(obj) {
     return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+  }
+
+  async migratePrefs() {
+    // You could use any sub-section that you want here, it doesn't have
+    // to be called "preferences".
+    let preferences = getPreferences();
+
+    const currentMigration =
+      preferences && preferences.migratedLegacy
+      ? preferences.migratedLegacy
+      : 0;
+
+    if (currentMigration >= kCurrentLegacyMigration)
+      return;
+
+    // Get old preferences
+    let branch = Services.prefs.getBranch("extensions.todotxt.");
+
+    if (currentMigration < 1) {
+      for (let [pref, defaultValue] of Object.entries(LEGACY_PREFS)) {
+        let type = branch.getPrefType(pref);
+        switch (type) {
+          case Ci.nsIPrefBranch.PREF_BOOL:
+            preferences[pref] = branch.getBoolPref(pref, defaultValue);
+            break;
+          case Ci.nsIPrefBranch.PREF_INT:
+            preferences[pref] = branch.getIntPref(pref, defaultValue);
+            break;
+          case Ci.nsIPrefBranch.PREF_STRING:
+            preferences[pref] = branch.getStringPref(pref, defaultValue);
+            break;
+        }
+      }
+
+    preferences.migratedLegacy = kCurrentLegacyMigration;
+    updatePreferences(preferences);
+    }
   }
 }
