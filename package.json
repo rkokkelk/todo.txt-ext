@@ -1,0 +1,42 @@
+{
+  "name": "Todo.txt",
+  "description": "Thunderbird extension for the Todo.txt application",
+  "version": "2.0.1",
+  "private": true,
+  "author": "Roy K <rkokk@protonmail.com>",
+  "license": "MPL-2.0",
+  "directories": {
+    "test": "test"
+  },
+  "homepage": "https://github.com/rkokkelk/todo.txt-ext",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rkokkelk/todo.txt-ext.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rkokkelk/todo.txt-ext/issues"
+  },
+  "scripts": {
+    "build": "rm dist/*.xpi; ./build.sh;)",
+    "clean": "rm dist/*.xpi",
+    "tag": "git tag v$(jq -r '.version' src/manifest.json)",
+    "lint": "commitlint -f origin/master && eslint --ext '.jsm' . || true"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "action-thunderbird-tests": "github:kewisch/action-thunderbird-tests#master",
+    "babel-eslint": "^10.1.0",
+    "bump-file": "^2.0.0",
+    "conventional-changelog-cli": "^2.0.25",
+    "eslint": "6.2.2",
+    "eslint-config-prettier": "6.1.0",
+    "eslint-plugin-fetch-options": "0.0.5",
+    "eslint-plugin-html": "6.0.0",
+    "eslint-plugin-mozilla": "2.1.0",
+    "eslint-plugin-no-unsanitized": "3.0.2",
+    "eslint-plugin-prettier": "3.1.0",
+    "prettier": "1.17.0"
+  }
+}
