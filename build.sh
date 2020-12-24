@@ -27,9 +27,9 @@ while getopts "dh" opt; do
   esac
 done
 
-if [ -e manifest.json ]; then
-  VERSION=$(sed -n 's/.*version": "\(.*\)",/\1/p' manifest.json)
-  FILE="todotxt_${VERSION}.xpi"
+if [ -e src/manifest.json ]; then
+  VERSION=$(jq -r '.version' src/manifest.json)
+  FILE="dist/todotxt_${VERSION}.xpi"
 else
   echo '[ERROR] build.sh not executed from add-on directory, exiting!'
   exit 1
@@ -45,10 +45,10 @@ fi
 
 # Ensure that debugMode is set to false
 if [ ! $DEV ]; then
-  sed -i 's/ mDebugMode = true;/ mDebugMode = false;/g' modules/logger.jsm
+  sed -i 's/ mDebugMode = true;/ mDebugMode = false;/g' src/legacy/modules/logger.jsm
 fi
 
-zip -qr $FILE chrome* manifest.json components defaults icon.png modules
-sed -i 's/ mDebugMode = false;/ mDebugMode = true;/g' modules/logger.jsm
+zip -9qr $FILE *
+sed -i 's/ mDebugMode = false;/ mDebugMode = true;/g' src/legacy/modules/logger.jsm
 
 echo "Finished build [$FILE]"
