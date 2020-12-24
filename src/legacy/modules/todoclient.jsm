@@ -4,29 +4,28 @@
 
 const { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
 
-const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
+const { exception } = ChromeUtils.import("resource://todotxt/legacy/modules/exception.jsm");
 const { fileUtil } = ChromeUtils.import("resource://todotxt/legacy/modules/fileUtil.jsm");
 const { TodoTxt } = ChromeUtils.import("resource://todotxt/legacy/modules/todotxt.js");
 const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
 const { util } = ChromeUtils.import("resource://todotxt/legacy/modules/util.jsm");
 
-this.EXPORTED_SYMBOLS = ['todoClient'];
+this.EXPORTED_SYMBOLS = ["todoClient"];
 
 let todoClient = {
-
   // Start with empty todo
   todo: TodoTxt.parseFile(""),
 
   getInterface: cal.InterfaceRequestor_getInterface,
 
-  getItems: function(calendar,refresh){
+  getItems: function(calendar, refresh) {
     let items = [];
     let todo = this.getTodo(calendar, refresh);
     let prefs = util.getPreferences();
     let tzService = cal.getTimezoneService();
 
-    var todoItems = todo.items({},'priority');
-    for (let i=0; i < todoItems.length; i++){
+    var todoItems = todo.items({}, "priority");
+    for (let i = 0; i < todoItems.length; i++) {
       let todoItem = todoItems[i];
       let item = cal.createTodo();
 
@@ -35,55 +34,66 @@ let todoClient = {
       item.title = util.makeTitle(todoItem);
       item.isCompleted = todoItem.isComplete();
 
-      if(prefs.getBoolPref("thunderbird")){
-        if(!prefs.getBoolPref('showFullTitle')){
-          let projects = todoItem.projects().map(function(item){
-            if(item.charAt(0) === '+')
+      if (prefs.getBoolPref("thunderbird")) {
+        if (!prefs.getBoolPref("showFullTitle")) {
+          let projects = todoItem.projects().map(item => {
+            if (item.charAt(0) === "+") {
               item = item.substr(1);
+            }
             return item;
           });
-          item.setCategories(projects.length,projects);
+          item.setCategories(projects.length, projects);
 
           // Set contexts
           let contexts = todoItem.contexts();
           let str_context = util.makeStr(contexts);
-          item.setProperty('location', str_context);
+          item.setProperty("location", str_context);
         }
 
-        if(todoItem.priority())
+        if (todoItem.priority()) {
           item.priority = util.calPriority(todoItem.priority());
+        }
 
         // Define due date
         let addons = todoItem.addons();
-        if(addons['due']){
-          if (Array.isArray(addons['due'])){
-            for (let b=0; b < addons['due'].length; b++){
-              try{
-                let jsDueDate = util.parseDate(addons['due'][b]);
-                jsDueDate.setHours(0,0,0);
+        if (addons.due) {
+          if (Array.isArray(addons.due)) {
+            for (let b = 0; b < addons.due.length; b++) {
+              try {
+                let jsDueDate = util.parseDate(addons.due[b]);
+                jsDueDate.setHours(0, 0, 0);
                 let dueDate = cal.dtz.jsDateToDateTime(jsDueDate, cal.dtz.defaultTimezone);
                 item.dueDate = dueDate;
-              }catch(e){
-                todotxtLogger.error('todoclient.jsm:getItems','Invalid due date: '+addons['due'][b])
+              } catch (e) {
+                todotxtLogger.error(
+                  "todoclient.jsm:getItems",
+                  "Invalid due date: " + addons.due[b]
+                );
               }
             }
           } else {
-            let jsDueDate = util.parseDate(addons['due']);
-            jsDueDate.setHours(0,0,0);
+            let jsDueDate = util.parseDate(addons.due);
+            jsDueDate.setHours(0, 0, 0);
             let dueDate = cal.dtz.jsDateToDateTime(jsDueDate, cal.dtz.defaultTimezone);
             item.dueDate = dueDate;
           }
         }
 
         // Set creation date
-        if(todoItem.createdDate() && prefs.getBoolPref("creation")){
-          let createDate = cal.dtz.jsDateToDateTime(todoItem.createdDate(), cal.dtz.defaultTimezone);
+        if (todoItem.createdDate() && prefs.getBoolPref("creation")) {
+          let createDate = cal.dtz.jsDateToDateTime(
+            todoItem.createdDate(),
+            cal.dtz.defaultTimezone
+          );
           item.entryDate = createDate;
         }
 
         // Set complete date
-        if(todoItem.isComplete() && todoItem.completedDate()){
-          let dateTime = cal.dtz.jsDateToDateTime(todoItem.completedDate(), cal.dtz.defaultTimezone);
+        if (todoItem.isComplete() && todoItem.completedDate()) {
+          let dateTime = cal.dtz.jsDateToDateTime(
+            todoItem.completedDate(),
+            cal.dtz.defaultTimezone
+          );
           item.completedDate = dateTime;
         }
       }
@@ -93,43 +103,43 @@ let todoClient = {
     return items;
   },
 
-  addItem: function(newItem){
+  addItem: function(newItem) {
     let todo = this.getTodo();
     let found = false;
     let prefs = util.getPreferences();
     let todoItem = todo.addItem(newItem.title, prefs.getBoolPref("creation"));
 
-    if(prefs.getBoolPref("thunderbird")){
-
-      if(todoItem.priority())
+    if (prefs.getBoolPref("thunderbird")) {
+      if (todoItem.priority()) {
         newItem.priority = util.calPriority(todoItem.priority());
+      }
 
-      if(!prefs.getBoolPref('showFullTitle')){
-
-        let projects = todoItem.projects().map(function(item){
-          if(item.charAt(0) === '+')
+      if (!prefs.getBoolPref("showFullTitle")) {
+        let projects = todoItem.projects().map(item => {
+          if (item.charAt(0) === "+") {
             item = item.substr(1);
+          }
           return item;
         });
-        newItem.setCategories(projects.length,projects);
-        
+        newItem.setCategories(projects.length, projects);
+
         // Set contexts
         let contexts = todoItem.contexts();
         let strContext = util.makeStr(contexts);
-        newItem.setProperty('location', strContext);
+        newItem.setProperty("location", strContext);
       }
 
       // Set creation date
-      if(todoItem.createdDate() && prefs.getBoolPref("creation")){
+      if (todoItem.createdDate() && prefs.getBoolPref("creation")) {
         let createDate = cal.dtz.jsDateToDateTime(todoItem.createdDate(), cal.dtz.defaultTimezone);
         newItem.entryDate = createDate;
       }
 
       // Set due date
-      if(newItem.dueDate){
+      if (newItem.dueDate) {
         let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.dtz.defaultTimezone);
         let dateStr = util.makeDateStr(dueDate);
-        todoItem.setAddOn('due', dateStr);
+        todoItem.setAddOn("due", dateStr);
       }
     }
 
@@ -140,100 +150,105 @@ let todoClient = {
     return newItem;
   },
 
-  modifyItem: function(oldItem, newItem){
+  modifyItem: function(oldItem, newItem) {
     let todo = this.getTodo();
     let prefs = util.getPreferences();
 
-    var todoItems = todo.items({},'priority');
-    for (let i=0; i < todoItems.length; i++){
+    var todoItems = todo.items({}, "priority");
+    for (let i = 0; i < todoItems.length; i++) {
       let todoItem = todoItems[i];
-      if(todoItem.id() == oldItem.id){
+      if (todoItem.id() == oldItem.id) {
+        let parseItem = newItem.title;
 
-          let parseItem = newItem.title;
-
-          // Verify if priorty is altered
-          // ToDo: verify if statement correct
-          if(newItem.priority && newItem.priority != 0){
-            let pri = util.calPriority(newItem.priority);
-            if(pri)
-              parseItem = '('+pri+') '+parseItem;
+        // Verify if priorty is altered
+        // ToDo: verify if statement correct
+        if (newItem.priority && newItem.priority != 0) {
+          let pri = util.calPriority(newItem.priority);
+          if (pri) {
+            parseItem = "(" + pri + ") " + parseItem;
           }
+        }
 
-          todoItem.replaceWith(parseItem);
+        todoItem.replaceWith(parseItem);
 
-          if(newItem.dueDate){
-            let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.dtz.defaultTimezone);
-            let dateStr = util.makeDateStr(dueDate);
-            todoItem.setAddOn('due', dateStr);
-          } else
-            todoItem.removeAddOn('due');
+        if (newItem.dueDate) {
+          let dueDate = cal.dateTimeToJsDate(newItem.dueDate, cal.dtz.defaultTimezone);
+          let dateStr = util.makeDateStr(dueDate);
+          todoItem.setAddOn("due", dateStr);
+        } else {
+          todoItem.removeAddOn("due");
+        }
 
-          // Verify if property is set to true and createTime is present then
-          // add creationDate
-          if(newItem.entryDate && prefs.getBoolPref("creation")){
-            let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.dtz.defaultTimezone);
-            todoItem.setCreatedDate(xpConnectDate);
+        // Verify if property is set to true and createTime is present then
+        // add creationDate
+        if (newItem.entryDate && prefs.getBoolPref("creation")) {
+          let xpConnectDate = cal.dateTimeToJsDate(newItem.entryDate, cal.dtz.defaultTimezone);
+          todoItem.setCreatedDate(xpConnectDate);
+        }
+
+        if (!prefs.getBoolPref("showFullTitle")) {
+          // add new contexts
+          let newContexts = util.makeArray(newItem.getProperty("location"));
+          for (let j = 0; j < newContexts.length; j++) {
+            todoItem.addContext(newContexts[j]);
           }
+        }
 
-          if(!prefs.getBoolPref('showFullTitle')){
-            // add new contexts
-            let newContexts = util.makeArray(newItem.getProperty('location'));
-            for(let j=0; j<newContexts.length; j++)
-              todoItem.addContext(newContexts[j]);
+        // Verify if completed changed
+        if (newItem.isCompleted) {
+          todoItem.completeTask();
+        } else {
+          todoItem.uncompleteTask();
+        }
+
+        if (!prefs.getBoolPref("showFullTitle")) {
+          let projects = newItem.getCategories({}, {});
+          for (let b = 0; b < projects.length; b++) {
+            todoItem.addProject(projects[b]);
           }
+        }
 
-          // Verify if completed changed
-          if(newItem.isCompleted)
-            todoItem.completeTask();
-          else
-            todoItem.uncompleteTask();
-
-          if(!prefs.getBoolPref('showFullTitle')){
-            let projects = newItem.getCategories({},{});
-            for(let b=0; b < projects.length; b++)
-              todoItem.addProject(projects[b]);
-          }
-
-          fileUtil.writeTodo(todo);
-          return todoItem.id();
+        fileUtil.writeTodo(todo);
+        return todoItem.id();
       }
     }
 
     throw exception.ITEM_NOT_FOUND();
   },
 
-  deleteItem: function(item){
+  deleteItem: function(item) {
     let todo = this.getTodo();
     let found = false;
 
-    var todoItems = todo.items({},'priority');
-    for (let i=0; i < todoItems.length; i++){
+    var todoItems = todo.items({}, "priority");
+    for (let i = 0; i < todoItems.length; i++) {
       let todoItem = todoItems[i];
-      if(todoItem.id() == item.id){
-          todo.removeItem(todoItem);
-          fileUtil.writeTodo(todo);
-          return;
+      if (todoItem.id() == item.id) {
+        todo.removeItem(todoItem);
+        fileUtil.writeTodo(todo);
+        return;
       }
     }
-    
+
     throw exception.ITEM_NOT_FOUND();
   },
 
-  getTodo: function(calendar, refresh){
-
-    if(refresh){
-      this.setTodo().then((todo) => {
-        todoClient.todo = todo;
-        calendar.observers.notify("onLoad", [calendar]);
-      }).catch((error) => {
-        throw exception.UNKNOWN();
-      });
+  getTodo: function(calendar, refresh) {
+    if (refresh) {
+      this.setTodo()
+        .then(todo => {
+          todoClient.todo = todo;
+          calendar.observers.notify("onLoad", [calendar]);
+        })
+        .catch(error => {
+          throw exception.UNKNOWN();
+        });
     }
 
     return this.todo;
   },
 
-  setTodo: function(){
+  setTodo: function() {
     return new Promise((resolve, reject) => {
       let data_array = [];
       let prefs = util.getPreferences();
@@ -245,23 +260,29 @@ let todoClient = {
       let todoFile = fileUtil.getTodoFile(true);
       let doneFile = fileUtil.getDoneFile(true);
 
-      if (todoFile)
+      if (todoFile) {
         data_array.push(fileUtil.readFile(todoFile));
-      if (doneFile)
+      }
+      if (doneFile) {
         data_array.push(fileUtil.readFile(doneFile));
+      }
 
-      Promise.all(data_array).then(function (result) {
-        let parseBlob = "";
+      Promise.all(data_array).then(
+        result => {
+          let parseBlob = "";
 
-        for (var i = 0; i < result.length; i++)
-          parseBlob += result[i];
+          for (var i = 0; i < result.length; i++) {
+            parseBlob += result[i];
+          }
 
-        todotxtLogger.debug("readFiles","parseBlob [\n"+parseBlob+"]");
-        resolve(TodoTxt.parseFile(parseBlob));
-      }, function (aError) {
-        todotxtLogger.error("todoclient:setTodo", aError);
-        reject(aError);
-      });
+          todotxtLogger.debug("readFiles", "parseBlob [\n" + parseBlob + "]");
+          resolve(TodoTxt.parseFile(parseBlob));
+        },
+        aError => {
+          todotxtLogger.error("todoclient:setTodo", aError);
+          reject(aError);
+        }
+      );
     });
   },
 };
