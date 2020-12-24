@@ -35,6 +35,7 @@ let todotxtLogger = {
         output += msg;
       }
       cal.LOG(output);
+      console.log(output);
     }
   },
 
@@ -55,6 +56,7 @@ let todotxtLogger = {
       output += "\n"+error.stack;
     
     cal.LOG(output);
+    console.log(output);
   },
 
   resetNotifications: function(){
