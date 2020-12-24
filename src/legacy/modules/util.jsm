@@ -7,9 +7,9 @@ const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/
 
 this.EXPORTED_SYMBOLS = ['util'];
 
-var util = {
+class util {
 
-  makeTitle: function(item){
+  makeTitle(item){
     let itemTitle = "";
     let prefs = this.getPreferences();
 
@@ -34,9 +34,9 @@ var util = {
       itemTitle = item.render();
     
     return itemTitle;
-  },
+  }
 
-  makeArray:function(string){
+  makeArray(string){
     let result = [];
 
     if(!string) return result;
@@ -48,9 +48,9 @@ var util = {
     }
 
     return result;
-  },
+  }
 
-  makeStr:function(array, separator){
+  makeStr(array, separator){
     let result = "";
     if(separator == undefined) separator = ' ';
     for(let i=0; i<array.length;i++){
@@ -60,18 +60,18 @@ var util = {
         result += separator;
     }
     return result;
-  },
+  }
 
-  getPreferences: function(){
+  getPreferences(){
     let prefs = Components.classes["@mozilla.org/preferences-service;1"]
                             .getService(Components.interfaces.nsIPrefService)
                             .getBranch("extensions.todotxt.");
     prefs.QueryInterface(Components.interfaces.nsIPrefBranch);
 
     return prefs;
-  },
+  }
   
-  makeDateStr: function(date) {
+  makeDateStr(date) {
     let day = date.getDate();
     let month = (date.getMonth()+1);
 
@@ -79,31 +79,31 @@ var util = {
     month = (month < 10) ? '0' + month : month;
     
     return date.getFullYear() + '-' + month + '-' + day;
-  },
+  }
   
-  makeTimeStr: function(date) {
+  makeTimeStr(date) {
     let hour = (date.hour < 10) ? '0' + date.hour : date.hour;
     let minute = (date.minute < 10) ? '0' + date.minute : date.minute;
     
     return hour + ':' + minute;
-  },
+  }
 
   // Due to errors parsing ISO format in accordance with local time,
   // use the following function to parse String dates
   // parse a date in yyyy-mm-dd format
-  parseDate: function(input) {
+  parseDate(input) {
 
     // jsDueDate is parsed to 01:00:00, 
     // because no time is used set back to 00:00:00
     var parts = input.split('-');
     return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
-  },
+  }
 
   // Priority 
   // A --> 1, High
   // B --> 5, Normal
   // C --> 9, Low
-  calPriority: function(pri){
+  calPriority(pri){
     if(typeof pri === 'string'){
       let p = pri.charAt(0);
       switch(p){
@@ -129,9 +129,9 @@ var util = {
       }
     }else
       throw exception.UNKNOWN();
-  },
+  }
 
-  toType: function(obj) {
+  toType(obj) {
     return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
-  },
-};
+  }
+}
