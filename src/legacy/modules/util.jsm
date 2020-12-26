@@ -7,13 +7,13 @@ const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/
 
 this.EXPORTED_SYMBOLS = ['util'];
 
-class util {
+class Utils {
 
-  const kCurrentLegacyMigration = 1;
+  kCurrentLegacyMigration = 1;
 
-  const LEGACY_PREFS = {
-    todo-txt: '',
-    done-txt: '',
+  LEGACY_PREFS = {
+    "todo-txt": '',
+    "done-txt": '',
     thunderbird: true,
     creation: true,
     showFullTitle: true
@@ -72,12 +72,12 @@ class util {
     return result;
   }
 
-  getPreferences(){
+  async getPreferences(){
     const results = await messenger.storage.local.get("preferences");
     return results.preferences || {};
   }
 
-  updatePreferences(prefs){
+  async updatePreferences(prefs){
 		await messenger.storage.local.set({ preferences: prefs });
   }
   
@@ -182,3 +182,6 @@ class util {
     }
   }
 }
+
+const util = new Utils();
+Object.freeze(util);
