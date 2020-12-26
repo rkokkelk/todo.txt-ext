@@ -1,3 +1,4 @@
 # Ignore different builds
 todotxt_*.xpi
 todotxt.xpi
+node_modules
