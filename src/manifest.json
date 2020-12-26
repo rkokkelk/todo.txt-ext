@@ -6,12 +6,14 @@
       "strict_min_version": "78.2.0"
     }
   },
-  "name": "Todo.txt",
-  "description": "Thunderbird extension for the Todo.txt application",
+  "name": "__MSG_extName__",
+  "description": "__MSG_extDescription__",
   "version": "2.0.1",
   "icons": {
     "32": "skin/icon32.png"
   },
+
+  "default_locale": "en",
 
   "background": {
     "scripts": ["background.js"]
