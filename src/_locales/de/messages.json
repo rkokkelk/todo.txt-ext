@@ -1,0 +1,94 @@
+{
+	"extName": {
+    "message": "Todo.txt",
+    "description": "Name of the extension."
+  },
+
+  "extDescription": {
+    "message": "Thunderbird extension for the Todo.txt application.",
+    "description": "Description of the extension."
+  },
+
+  "optTodoFile": {
+    "message": "Lage von Todo.txt.",
+    "description": "Option description Todo file"
+  },
+
+  "optDoneFile": {
+    "message": "Lage von Done.txt.",
+    "description": "Option description Done file"
+  },
+
+  "optThunderbird": {
+    "message": "Benutzen Thunderbird's Funktionalität.",
+    "description": "Option description thunderbird"
+  },
+
+  "optCreation": {
+    "message": "Benutzen die Todo's Schaffung Zeitstempel.",
+    "description": "Option description creation timestamp"
+  },
+
+  "optTitle": {
+    "message": "Zeige Projekte und Kontexte nur im Titel.",
+    "description": "Option description show full title"
+  },
+
+  "trBehavior": {
+    "message": "Verhalten",
+    "description": "Translation behavior"
+  },
+
+  "trBrowse": {
+    "message": "Durchsuchen",
+    "description": "Translation browse"
+  },
+
+  "trPreferences": {
+    "message": "einstellungen",
+    "description": "Translation preferences"
+  },
+
+  "errFileRead": {
+    "message": "Datei kann nicht gelesen werden: $FILE$.",
+    "descripion": "Error if file cannot be read",
+    "placeholder": {
+      "file": {
+        "content" : "$1",
+        "placeholder": "Todo.txt"
+      }
+    }
+  },
+
+  "errFileWrite": {
+    "message": "Kann nicht in Datei schreiben: $FILE$.",
+    "descripion": "Error if file cannot be written to",
+    "placeholder": {
+      "file": {
+        "content" : "$1",
+        "placeholder": "Todo.txt"
+      }
+    }
+  },
+
+  "errFileUnspecified": {
+    "message": "Please specify the location of the todo.txt & done.txt files in the properties; see Tools -> Add-ons -> Todo.txt.",
+    "descripion": "Error if files have not been determined"
+  },
+
+  "errItemNotFound": {
+    "message": "Todo aufgabe kann nicht in todo.txt finden.",
+    "descripion": "Error if item cannot be found in todo file"
+  },
+
+  "errEvent": {
+    "message": "Dieser Kalender wird für Todo.txt verwendet und akzeptiert nur Aufgaben, nicht Ereignisse!",
+    "descripion": "Error if event types are created for the todo calendar"
+  },
+
+  "errUnknown": {
+    "message": "An unknown error occurred.",
+    "descripion": "If unknown error occured"
+  }
+}
+
