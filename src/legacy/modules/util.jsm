@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
+const { ExtensionParent } = ChromeUtils.import("resource://gre/modules/ExtensionParent.jsm");
+
 const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
 const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
 
@@ -72,7 +75,44 @@ class Utils {
     return result;
   }
 
+  getWXAPI(extension, name, sync = false) {
+    function implementation(api) {
+      let impl = api.getAPI({ extension })[name];
+
+      if (name == "storage") {
+        impl.local.get = (...args) => impl.local.callMethodInParentProcess("get", args);
+        impl.local.set = (...args) => impl.local.callMethodInParentProcess("set", args);
+        impl.local.remove = (...args) => impl.local.callMethodInParentProcess("remove", args);
+        impl.local.clear = (...args) => impl.local.callMethodInParentProcess("clear", args);
+      }
+      return impl;
+    }
+
+    if (sync) {
+      let api = extension.apiManager.getAPI(name, extension, "addon_parent");
+      return implementation(api);
+    } else {
+      return extension.apiManager.asyncGetAPI(name, extension, "addon_parent").then(api => {
+        return implementation(api);
+      });
+    }
+  }
+
+  getMessenger(extension) {
+    if (!extension) {
+      extension = ExtensionParent.GlobalManager.getExtension(
+        "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}"
+      );
+    }
+
+    let messenger = {};
+    XPCOMUtils.defineLazyGetter(messenger, "i18n", () => this.getWXAPI(extension, "i18n", true));
+    XPCOMUtils.defineLazyGetter(messenger, "storage", () => this.getWXAPI(extension, "storage", true));
+    return messenger;
+  }
+
   async getPreferences(){
+    let messenger = this.getMessenger();
     const results = await messenger.storage.local.get("preferences");
     return results.preferences || {};
   }

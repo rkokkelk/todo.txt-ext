@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "applications": {
     "gecko": {
-      "id": "todo.txt@xseth.nl",
+      "id": "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}",
       "strict_min_version": "78.2.0"
     }
   },
