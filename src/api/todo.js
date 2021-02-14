@@ -10,62 +10,62 @@ const { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
 const { ExtensionAPI } = ExtensionCommon;
 
 this.todo = class extends ExtensionAPI {
-  onStartup() {
-    Services.io
-      .getProtocolHandler("resource")
-      .QueryInterface(Ci.nsIResProtocolHandler)
-      .setSubstitution("todotxt", this.extension.rootURI);
+    onStartup() {
+        Services.io
+            .getProtocolHandler("resource")
+            .QueryInterface(Ci.nsIResProtocolHandler)
+            .setSubstitution("todotxt", this.extension.rootURI);
 
-    let aomStartup = Cc["@mozilla.org/addons/addon-manager-startup;1"].getService(
-      Ci.amIAddonManagerStartup
-    );
+        Cc["@mozilla.org/addons/addon-manager-startup;1"].getService(
+            Ci.amIAddonManagerStartup
+        );
 
-    let { calTodoTxt } = ChromeUtils.import(
-      "resource://todotxt/legacy/modules/calTodotxt.jsm"
-    );
-    if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt"))
-      console.log('Calendar provider already present!');
-    else {
-      console.log('Calendar provider created!');
-      cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calTodoTxt);
-    }
-  }
+        let { calTodoTxt } = ChromeUtils.import(
+            "resource://todotxt/legacy/modules/calTodotxt.jsm"
+        );
 
-  onShutdown(isAppShutdown) {
-    if (isAppShutdown) {
-      return;
+        if (cal.getCalendarManager().wrappedJSObject.hasCalendarProvider("todotxt"))
+            console.log("Calendar provider already present!");
+        else {
+            console.log("Calendar provider created!");
+            cal.getCalendarManager().wrappedJSObject.registerCalendarProvider("todotxt", calTodoTxt);
+        }
     }
 
-    cal.getCalendarManager().wrappedJSObject.unregisterCalendarProvider("todotxt", true);
+    onShutdown(isAppShutdown) {
+        if (isAppShutdown) {
+            return;
+        }
 
-  }
+        cal.getCalendarManager().wrappedJSObject.unregisterCalendarProvider("todotxt", true);
+    }
 
-  getAPI(context) {
-    return {
-      todo: {
-        verifyTodoCalendar() {
-          let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
-          var calManager = cal.getCalendarManager()
-          let found = false;
+    getAPI() {
+        return {
+            todo: {
+                verifyTodoCalendar() {
+                    let ID = "{00C350E2-3F65-11E5-8E8B-FBF81D5D46B0}";
+                    var calManager = cal.getCalendarManager();
+                    let found = false;
 
-          let calendars = calManager.getCalendars({});
-          for (let calendar of calendars) {
-            console.log("todo.js","Found calendar: "+calendar.type);
-            if(calendar.providerID == ID){
-              //todotxtLogger.debug("todo.js","Calendar found");
-              found = true;
-              break;
-            }
-          }
+                    let calendars = calManager.getCalendars({});
+                    for (let calendar of calendars) {
+                        console.log("todo.js","Found calendar: "+calendar.type);
+                        if(calendar.providerID == ID){
+                            //todotxtLogger.debug("todo.js","Calendar found");
+                            found = true;
+                            break;
+                        }
+                    }
 
-          if(!found){
-            let url = Services.io.newURI('todotxt://_unused');
-            let newCal = calManager.createCalendar('todotxt',url);
-            newCal.name = "Todo.txt";
-            calManager.registerCalendar(newCal);
-          }
-        },
-      },
-    };
-  }
+                    if(!found){
+                        let url = Services.io.newURI("todotxt://_unused");
+                        let newCal = calManager.createCalendar("todotxt",url);
+                        newCal.name = "Todo.txt";
+                        calManager.registerCalendar(newCal);
+                    }
+                },
+            },
+        };
+    }
 };
