@@ -1,55 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet type="text/css" href="chrome://messenger/skin/messenger.css"?>
-<?xml-stylesheet type="text/css" href="chrome://messenger/skin/preferences/preferences.css"?>
+<html>
+  <head>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
 
-<!DOCTYPE dialog [
-  <!ENTITY % todoPrefsTDT SYSTEM "chrome://todotxt/locale/preferences.dtd" >
-  %todoPrefsTDT;
-]>
+    <div id="browse" class="groups">
+      <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat" />
+      <label for="vehicle3"> I have a boat</label><br> 
 
-<dialog xmlns='http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul'
-			title='&todotxt; &preferences;'
-			id='todotxt-preferences'
-      buttons="accept"
-			persist='screenX screenY'>
+    </div>
 
-    <groupbox>
-      <hbox class="groupbox-title">
-        <label class="header">&todotxt.todofile;</label>
-      </hbox>
-      <hbox align="center">
-        <textbox id="todotxt-todo-path" preference="extensions.todotxt.todo-txt"
-                 readonly="true" size="30"/>
-        <button id="todotxt-browse-todo-path"
-            label="&browse;"
-            oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-todo-path')"/>
-      </hbox>
-    </groupbox>
+    <div id="behavior" class="groups">
 
-    <groupbox>
-      <hbox class="groupbox-title">
-        <label class="header">&todotxt.donefile;</label>
-      </hbox>
-      <hbox align="center">
-        <textbox id="todotxt-done-path" preference="extensions.todotxt.done-txt"
-                     readonly="true" size="30"/>
-        <button id="todotxt-browse-done-path"
-            label="&browse;"
-            oncommand="todotxt.ns.Preferences.selectStoragePath('todotxt-done-path')"/>
-      </hbox>
-    </groupbox>
+      <input type="checkbox" name="thunderbird" value="0" id="thunderbird">
+      <label for="thunderbird"></label><br />
 
-    <vbox>
-      <caption label='&behavior;' />
-      <checkbox label='&todotxt.thunderbird;' id='thunderbird' preference="extensions.todotxt.thunderbird" 
-                oncommand="todotxt.ns.Preferences.selectBool('thunderbird')" />
-      <checkbox label='&todotxt.creation;' id='creation' preference="extensions.todotxt.creation"
-                oncommand="todotxt.ns.Preferences.selectBool('creation')" />
-      <checkbox label='&todotxt.showFullTitle;' id='showFullTitle' preference="extensions.todotxt.showFullTitle"
-                oncommand="todotxt.ns.Preferences.selectBool('showFullTitle')" />
-    </vbox>
+      <input type="checkbox" name="creation" value="0" id="creation">
+      <label for="creation"></label><br />
 
-  <script type="application/javascript" src="chrome://global/content/preferencesBindings.js"/>
-  <script type="application/javascript" src="chrome://todotxt/content/preferences.js"/>
-</dialog> 
+      <input type="checkbox" name="title" value="0" id="title">
+      <label for="title"></label><br />
+
+    </div>
+
+    <script src="jquery-3.5.1.slim.min.js"></script> 
+    <script src="options.js"></script> 
+  </body>
+</html>

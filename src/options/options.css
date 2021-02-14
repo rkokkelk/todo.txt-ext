@@ -1,0 +1,7 @@
+div.groups {
+  border-style: dotted;
+  border-radius: 16px;
+  border-color: rgb(33, 33, 33);
+  border-width: 1px;
+  padding: 0.01em 16px;
+}
