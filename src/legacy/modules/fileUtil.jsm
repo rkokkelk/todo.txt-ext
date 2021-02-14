@@ -1,123 +1,128 @@
-var { OS } = ChromeUtils.import("resource://gre/modules/osfile.jsm")
+var { OS } = ChromeUtils.import("resource://gre/modules/osfile.jsm");
 
-const { exception } = ChromeUtils.import('resource://todotxt/legacy/modules/exception.jsm');
+const { exception } = ChromeUtils.import("resource://todotxt/legacy/modules/exception.jsm");
 const { TodoTxt } = ChromeUtils.import("resource://todotxt/legacy/modules/todotxt.js");
 const { todotxtLogger } = ChromeUtils.import("resource://todotxt/legacy/modules/logger.jsm");
 const { util } = ChromeUtils.import("resource://todotxt/legacy/modules/util.jsm");
 
-this.EXPORTED_SYMBOLS = ['fileUtil'];
+this.EXPORTED_SYMBOLS = ["fileUtil"];
 
-let fileUtil = {
+class fileUtils {
 
-  getTodoFile: function(silent_ignore){
-    return this.getFilePreference('todo-txt', silent_ignore);
-  },
-
-  getDoneFile: function(silent_ignore){
-    return this.getFilePreference('done-txt', silent_ignore);
-  },
-
-  getFilePreference: function(tag, silent_ignore){
-    let prefs = util.getPreferences();
-
-    if(!prefs.prefHasUserValue(tag) && silent_ignore)
-      return null;
-
-    else if(!prefs.prefHasUserValue(tag) && !silent_ignore)
-      throw exception.FILES_NOT_SPECIFIED();
-
-    else
-      return prefs.getCharPref(tag);
-  },
-
-  writeTodo: function(todo){
-    let prefs = util.getPreferences();
-
-    let todoFile = fileUtil.getTodoFile(false);
-    let doneFile = fileUtil.getDoneFile(false);
-
-    let todoRender = todo.render({isComplete:false});
-    let doneRender = todo.render({isComplete:true},{field: 'completedDate', direction: TodoTxt.SORT_DESC});
-
-    this.writeToFile(todoFile, todoRender);
-    this.writeToFile(doneFile, doneRender);
-  },
-
-  writeToFile: function(file, input){
-    let promise = OS.File.writeAtomic(file, input, {encoding: "utf-8", flush: true});
-      let data_array = [];
-
-    let onSucces = function(aVal){
-        todotxtLogger.debug("fileUtil.jsm", "written to file");
+    getTodoFile(silent_ignore){
+        return this.getFilePreference("todo-txt", silent_ignore);
     }
 
-    let onError = function(aReason){
-        throw exception.FILE_CANNOT_WRITE(file);
+    getDoneFile(silent_ignore){
+        return this.getFilePreference("done-txt", silent_ignore);
     }
 
-    promise.then(onSucces, onError);
-  },
+    getFilePreference(tag, silent_ignore){
+        let prefs = util.getPreferences();
 
-  readFile: function(file){
-    todotxtLogger.debug("fileUtil.jsm", "reading file: "+file);
-    let promise = OS.File.read(file, { encoding: 'utf-8' });
+        if(!(tag in prefs) && silent_ignore)
+            return null;
 
-    let onSucces = function(result){
-      // Verify if str contains newline at end
-      if(result.substr(result.length-1) != "\n") result += "\n";
-      return result;
-    };
+        else if(!(tag in prefs) && !silent_ignore)
+            throw exception.FILES_NOT_SPECIFIED();
 
-    let onError = function(aVal){
-      throw exception.FILE_NOT_FOUND(file);
-    };
+        else
+            return prefs[tag];
+    }
 
-    return promise.then(onSucces, onError);
-  },
+    writeTodo(todo){
+        let prefs = util.getPreferences();
 
-  calculateMD5: function(){
-    let promise = new Promise(function(resolve, reject) {
+        let todoFile = fileUtil.getTodoFile(false);
+        let doneFile = fileUtil.getDoneFile(false);
 
-      let result = "";
-      let data_array = [];
-      let prefs = util.getPreferences();
+        let todoRender = todo.render({ isComplete:false });
+        let doneRender = todo.render({ isComplete:true },{ field: "completedDate", direction: TodoTxt.SORT_DESC });
 
-      // Use MD5, hash for comparison and needs to be fast not secure
-      let ch = Components.classes["@mozilla.org/security/hash;1"].
-                          createInstance(Components.interfaces.nsICryptoHash);
-      let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
-                          createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-      converter.charset = "UTF-8";
+        this.writeToFile(todoFile, todoRender);
+        this.writeToFile(doneFile, doneRender);
+    }
 
-      ch.init(ch.MD5);
+    writeToFile(file, input){
+        let promise = OS.File.writeAtomic(file, input, {encoding: "utf-8", flush: true});
 
-      let todoFile = fileUtil.getTodoFile(true);
-      let doneFile = fileUtil.getDoneFile(true);
+        let onSucces = function(){
+            todotxtLogger.debug("fileUtil.jsm", "written to file");
+        };
 
-      if (todoFile)
-        data_array.push(fileUtil.readFile(todoFile));
-      if (doneFile)
-        data_array.push(fileUtil.readFile(doneFile));
+        let onError = function(){
+            throw exception.FILE_CANNOT_WRITE(file);
+        };
 
-      Promise.all(data_array).then(function (promiseResult) {
-        let parseBlob = "";
+        promise.then(onSucces, onError);
+    }
 
-        for (var i = 0; i < promiseResult.length; i++)
-          parseBlob += promiseResult[i];
+    readFile(file){
+        file = "/home/rx/Documents/ToDo/todo2.txt";
+        todotxtLogger.debug("fileUtil.jsm", "reading file: "+file);
+        let promise = OS.File.read(file, { encoding: "utf-8" });
 
-        let converterResult = {};
-        let data = converter.convertToByteArray(parseBlob, converterResult);
-        ch.update(data, data.length);
+        let onSucces = function(result){
+            // Verify if str contains newline at end
+            if(result.substr(result.length-1) != "\n") result += "\n";
+            return result;
+        };
 
-        result = ch.finish(true);
-        todotxtLogger.debug('fileUtil:calculateMD5','hash ['+result+']');
+        let onError = function(){
+            throw exception.FILE_NOT_FOUND(file);
+        };
 
-        resolve(result);
-      }, function (aError) {
-        reject(aError);
-      });
-    });
+        return promise.then(onSucces, onError);
+    }
 
-    return promise;
-  }
+    calculateMD5(){
+        let promise = new Promise(function(resolve, reject) {
+
+            let result = "";
+            let data_array = [];
+            let prefs = util.getPreferences();
+
+            // Use MD5, hash for comparison and needs to be fast not secure
+            let ch = Components.classes["@mozilla.org/security/hash;1"].
+                createInstance(Components.interfaces.nsICryptoHash);
+
+            let converter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"].
+                createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+
+            converter.charset = "UTF-8";
+
+            ch.init(ch.MD5);
+
+            let todoFile = fileUtil.getTodoFile(true);
+            let doneFile = fileUtil.getDoneFile(true);
+
+            if (todoFile)
+                data_array.push(fileUtil.readFile("/home/rx/Documents/ToDo/todo2.txt"));
+            if (doneFile)
+                data_array.push(fileUtil.readFile("/home/rx/Documents/ToDo/done2.txt"));
+
+            Promise.all(data_array).then(function (promiseResult) {
+                let parseBlob = "";
+
+                for (var i = 0; i < promiseResult.length; i++)
+                    parseBlob += promiseResult[i];
+
+                let converterResult = {};
+                let data = converter.convertToByteArray(parseBlob, converterResult);
+                ch.update(data, data.length);
+
+                result = ch.finish(true);
+                todotxtLogger.debug("fileUtil:calculateMD5","hash ["+result+"]");
+
+                resolve(result);
+            }, function (aError) {
+                reject(aError);
+            });
+        });
+
+        return promise;
+    }
 }
+
+const fileUtil = new fileUtils();
+Object.freeze(fileUtil);
