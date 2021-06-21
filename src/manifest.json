@@ -23,6 +23,11 @@
     "storage"
   ],
 
+  "options_ui": {
+    "page": "options/options.html",
+    "browser_style": true
+  },
+
   "experiment_apis": {
     "todo": {
       "schema": "api/schema.json",
